@@ -1,0 +1,65 @@
+= Vale CLI plugin
+:icons: font
+
+image:https://gitlab.com/pablomxnl/vale-cli-plugin/-/badges/release.svg[link="https://gitlab.com/pablomxnl/vale-cli-plugin/-/releases",title="Latest Release"]
+
+Plugin for JetBrains IDE's that uses https://vale.sh[Vale CLI] to check markdown,asciidoc and other documentation formats
+
+NOTE: Requires Vale CLI installed.
+Please review the https://vale.sh/docs/vale-cli/installation/[Vale CLI installation guide]
+
+TIP: This is a pet project. Not associated with Errata (Vale CLI creators or JetBrains whatsoever)
+
+== Installation
+
+=== From plugin marketplace
+
+`Settings` -> `Plugins` -> `Marketplace` Search for `Vale CLI` -> Click `Install`
+
+=== From gitlab releases
+To install, grab a zip file from the
+https://gitlab.com/pablomxnl/vale-cli-plugin/-/releases[releases distributions] according to your IDE
+
+`Settings` -> `Plugins` -> `⚙` -> `Install Plugin from Disk...`
+
+image::docimages/installPlugin.png[Install Plugin from Disk ...]
+
+
+=== Pre-Requistes
+* https://vale.sh[Vale CLI] installed and with minimal styles configured.
+* Install the dependencies of the https://vale.sh/docs/topics/scoping/#formats[vale formats] configured.
+For example, to check `asciidoctor` documents, Vale CLI requires `asciidoctor gem` .
+
+
+== Configuration
+
+The plugin has 3 options to configure the path of the vale executable, the path to the vale settings file and the
+file extensions to check with vale.
+
+To enter this configuration go to
+`Settings` -> `Tools` -> `Vale CLI`
+
+image::docimages/pluginConfiguration.png["Plugin Configuration"]
+
+== Usage
+The plugin offers three ways to execute Vale CLI
+
+* Tools menu to run Vale against project files. `Tools` => `Vale CLI Check`
+
+image::docimages/toolsMenu.png["Tools menu"]
+
+* Editor contextual menu to check current file.
+
+image::docimages/fromEditorContextualMenu.png["Editor popup menu"]
+
+* By selecting several files that matches the configured extensions and selecting the contextual menu option
+
+image::docimages/severalFilesInProjecTree.png["Several files"]
+
+== Uninstall
+
+. Go to `Settings` => `Plugins` => `Installed`
+. Click `Vale CLI` entry and click the gear `⚙` icon. Older Intellij versions had a `Disabled` dropdown
+. Select `Uninstall`
+
+image::docimages/uninstall.png["Uninstall"]

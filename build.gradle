@@ -1,0 +1,49 @@
+plugins {
+    id 'java'
+    id 'org.jetbrains.intellij' version '0.6.5'
+}
+
+group 'org.ideplugins.vale-plugin'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation ('org.zeroturnaround:zt-exec:1.12') {
+        exclude group: "org.slf4j", module: "slf4j-api"
+    }
+    implementation ('com.google.code.gson:gson:2.9.0')
+}
+
+java {
+    sourceCompatibility(JavaVersion.VERSION_1_8)
+    targetCompatibility(JavaVersion.VERSION_1_8)
+}
+
+// See https://github.com/JetBrains/gradle-intellij-plugin/
+intellij {
+    version '2019.3.1'
+    type "${typeIDE}"
+}
+
+buildPlugin {
+    archiveClassifier = "${typeIDE}"
+}
+
+patchPluginXml {
+    changeNotes """
+    <ul>
+    <li>0.0.1 Initial version
+      <ul>
+      <li>Check current file</li>
+      <li>Check all files in project</li>
+      <li>Check multiple files selected in project tree (that have an extension matching the configured files)</li>
+      </ul>    
+    </li>
+    </ul>
+    """
+
+
+    untilBuild '231.*'
+}
