@@ -9,13 +9,12 @@
 
     <description><![CDATA[
 <p>
-    Plugin that uses <em><a href="https://vale.sh/">Vale</a></em> to check markdown,asciidoc and other documentation
+    Plugin that uses <em><a href="https://vale.sh/">Vale CLI</a></em> to check markdown,asciidoc and other documentation
     formats
     <br/>
 
-    <b>* Requires vale to be installed.</b> <br/>
-    Please see <a href="https://vale.sh/docs/vale-cli/installation/" >Vale installation guide</a>
-    <br/><br/>
+    <b>* Requires Vale CLI to be installed.</b>
+    <br/>
 
     <img src="https://gitlab.com/pablomxnl/vale-cli-plugin/-/raw/main/docimages/vale-cli-plugin.png" />
 </p>

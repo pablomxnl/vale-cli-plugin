@@ -21,18 +21,18 @@ public class ValePluginSettingsComponent {
 
     private TextFieldWithBrowseButton createIniBrowseField() {
 
-        final FileChooserDescriptor fileChooserDescriptor = FileChooserDescriptorFactory.createSingleFileDescriptor("ini");
+        final FileChooserDescriptor fileChooserDescriptor = FileChooserDescriptorFactory.createSingleFileDescriptor();
         TextFieldWithBrowseButton textField = new TextFieldWithBrowseButton();
-        textField.addBrowseFolderListener("Provide vale configuration file", "Locate your vale.ini file", null,
+        textField.addBrowseFolderListener("Provide Vale Configuration File", "Locate your .vale.ini file", null,
             fileChooserDescriptor);
         InsertPathAction.addTo(textField.getTextField(), fileChooserDescriptor);
         return textField;
     }
 
     private TextFieldWithBrowseButton createPathBrowseField() {
-        final FileChooserDescriptor fileChooserDescriptor = FileChooserDescriptorFactory.createSingleFolderDescriptor();
+        final FileChooserDescriptor fileChooserDescriptor = FileChooserDescriptorFactory.createSingleFileDescriptor();
         TextFieldWithBrowseButton textField = new TextFieldWithBrowseButton();
-        textField.addBrowseFolderListener("Provide vale binary location", "Locate your vale binary", null,
+        textField.addBrowseFolderListener("Provide Vale Binary Location", "Locate your vale binary", null,
             fileChooserDescriptor);
         InsertPathAction.addTo(textField.getTextField(), fileChooserDescriptor);
         return textField;
@@ -43,7 +43,7 @@ public class ValePluginSettingsComponent {
     public ValePluginSettingsComponent() {
         myMainPanel = FormBuilder.createFormBuilder()
             .addLabeledComponent(new JBLabel("Enter vale executable location"), valePath, 1, false)
-            .addLabeledComponent(new JBLabel("Enter vale.ini full absolute path"), configurationFilePath, 2, false)
+            .addLabeledComponent(new JBLabel("Enter .vale.ini full absolute path"), configurationFilePath, 2, false)
             .addLabeledComponent(new JBLabel("File extensions to check"), extensionsTextField, 3, false)
             .addComponentFillVertically(new JPanel(), 0)
             .getPanel();
