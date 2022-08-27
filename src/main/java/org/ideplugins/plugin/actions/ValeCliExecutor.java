@@ -94,7 +94,7 @@ public class ValeCliExecutor implements ValeCli {
 
     private List<String> createValeCommand() {
         List<String> command = new ArrayList<>();
-        command.add(settingsState.valePath + File.separator + (OS.isWindows() ? "vale.exe" : "vale"));
+        command.add(settingsState.valePath);
         command.add("--config");
         command.add(settingsState.valeSettingsPath);
         command.add("--no-exit");

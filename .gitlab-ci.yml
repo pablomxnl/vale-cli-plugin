@@ -38,22 +38,22 @@ cache:
 build_community:
   extends: .build_artifact
   script:
-    - gradle -Pversion=0.0.1.$CI_PIPELINE_ID-SNAPSHOT buildPlugin
+    - gradle -Dversion.prerelease=$CI_PIPELINE_ID-SNAPSHOT buildPlugin
 
 build_ultimate:
   extends: .build_artifact
   script:
-    - gradle -Pversion=0.0.1.$CI_PIPELINE_ID-SNAPSHOT -PtypeIDE=IU buildPlugin
+    - gradle -Dversion.prerelease=$CI_PIPELINE_ID-SNAPSHOT -PtypeIDE=IU buildPlugin
 
 build_pycharm_professional:
   extends: .build_artifact
   script:
-    - gradle -Pversion=0.0.1.$CI_PIPELINE_ID-SNAPSHOT -PtypeIDE=PY buildPlugin
+    - gradle -Dversion.prerelease=$CI_PIPELINE_ID-SNAPSHOT -PtypeIDE=PY buildPlugin
 
 build_pycharm_community:
   extends: .build_artifact
   script:
-    - gradle -Pversion=0.0.1.$CI_PIPELINE_ID-SNAPSHOT -PtypeIDE=PC buildPlugin
+    - gradle -Dversion.prerelease=$CI_PIPELINE_ID-SNAPSHOT -PtypeIDE=PC buildPlugin
 
 release_community:
   extends: .build_release

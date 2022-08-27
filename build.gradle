@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'org.jetbrains.intellij' version '0.6.5'
+    id "net.thauvin.erik.gradle.semver" version "1.0.4"
 }
 
 group 'org.ideplugins.vale-plugin'
@@ -34,6 +35,11 @@ buildPlugin {
 patchPluginXml {
     changeNotes """
     <ul>
+    <li>0.0.2
+      <ul>
+      <li>Autodetect if Vale CLI is in system path</li>
+      </ul>    
+    </li>    
     <li>0.0.1 Initial version
       <ul>
       <li>Check current file</li>

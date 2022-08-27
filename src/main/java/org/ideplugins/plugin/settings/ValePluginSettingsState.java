@@ -1,7 +1,7 @@
 package org.ideplugins.plugin.settings;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.util.xmlb.XmlSerializerUtil;
@@ -12,12 +12,13 @@ import java.io.File;
 
 @State(
         name = "org.ideplugins.vale_cli_plugin.settings",
-        storages = {@Storage("SdkSettingsPlugin.xml")}
+        storages = {@Storage("valeCliSettings.xml")}
 )
 public class ValePluginSettingsState implements PersistentStateComponent<ValePluginSettingsState> {
 
-    public String valePath = "";
-    public String valeSettingsPath = System.getProperty("user.home") + File.separator + "vale.ini";
+    public String valePath = OSUtils.findValeBinaryPath();
+
+    public String valeSettingsPath = System.getProperty("user.home") + File.separator + ".vale.ini";
     public String extensions = "md,adoc";
 
     @Nullable
@@ -32,7 +33,7 @@ public class ValePluginSettingsState implements PersistentStateComponent<ValePlu
     }
 
     public static ValePluginSettingsState getInstance() {
-        return ServiceManager.getService(ValePluginSettingsState.class);
+        return ApplicationManager.getApplication().getService(ValePluginSettingsState.class);
     }
 
 }
