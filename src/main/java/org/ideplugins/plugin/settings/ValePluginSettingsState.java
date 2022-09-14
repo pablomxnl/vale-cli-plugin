@@ -8,17 +8,15 @@ import com.intellij.util.xmlb.XmlSerializerUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
-
 @State(
         name = "org.ideplugins.vale_cli_plugin.settings",
         storages = {@Storage("valeCliSettings.xml")}
 )
 public class ValePluginSettingsState implements PersistentStateComponent<ValePluginSettingsState> {
 
-    public String valePath = OSUtils.findValeBinaryPath();
+    public String valePath;
 
-    public String valeSettingsPath = System.getProperty("user.home") + File.separator + ".vale.ini";
+    public String valeSettingsPath = "";
     public String extensions = "md,adoc";
 
     @Nullable
@@ -36,4 +34,9 @@ public class ValePluginSettingsState implements PersistentStateComponent<ValePlu
         return ApplicationManager.getApplication().getService(ValePluginSettingsState.class);
     }
 
+    @Override
+    public void initializeComponent() {
+        valePath = OSUtils.findValeBinaryPath();
+        PersistentStateComponent.super.initializeComponent();
+    }
 }

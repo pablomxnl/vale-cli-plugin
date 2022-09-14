@@ -12,7 +12,7 @@ cache:
     - .gradle
 
 .build_release:
-  image: docker.io/library/gradle:6.5.1-jdk8
+  image: docker.io/library/gradle:7.5.1-jdk11
   stage: publish_gitlab
   only:
     - master
@@ -24,7 +24,7 @@ cache:
     expire_in: 360 days
 
 .build_artifact:
-  image: docker.io/library/gradle:6.5.1-jdk8
+  image: docker.io/library/gradle:7.5.1-jdk11
   stage: build
   only:
     refs:

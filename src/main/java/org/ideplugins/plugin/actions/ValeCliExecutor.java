@@ -2,6 +2,7 @@ package org.ideplugins.plugin.actions;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
+import org.apache.commons.lang.StringUtils;
 import org.ideplugins.plugin.settings.ValePluginSettingsState;
 import org.jdesktop.swingx.util.OS;
 import org.zeroturnaround.exec.ProcessExecutor;
@@ -95,8 +96,10 @@ public class ValeCliExecutor implements ValeCli {
     private List<String> createValeCommand() {
         List<String> command = new ArrayList<>();
         command.add(settingsState.valePath);
-        command.add("--config");
-        command.add(settingsState.valeSettingsPath);
+        if ( StringUtils.isNotBlank(settingsState.valeSettingsPath) ){
+            command.add("--config");
+            command.add(settingsState.valeSettingsPath);
+        }
         command.add("--no-exit");
         command.add("--no-wrap");
         command.add("--output=JSON");

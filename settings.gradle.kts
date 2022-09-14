@@ -4,4 +4,4 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
-rootProject.name = 'vale-cli-plugin'
+rootProject.name = "vale-cli-plugin"
