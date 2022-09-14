@@ -15,9 +15,11 @@ import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentManager;
+import org.apache.commons.lang.StringUtils;
 import org.ideplugins.plugin.settings.ValePluginSettingsState;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -47,7 +49,7 @@ public class ActionHelper {
     }
 
     public static void showResultsInConsole(Project project, String text) {
-        if (text.isEmpty()) return;
+        if (StringUtils.isBlank(text)) return;
         ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow("Vale CLI");
         ContentManager contentManager = toolWindow.getContentManager();
         Content content = contentManager.findContent("Vale Results");
@@ -57,8 +59,7 @@ public class ActionHelper {
         Map<String, Integer> resultsPerSeverity = new HashMap<>();
         Set<String> files = new HashSet<>();
 
-        JsonParser parser = new JsonParser();
-        JsonElement element = parser.parse(text);
+        JsonElement element = JsonParser.parseString(text);
         if (element.isJsonObject()) {
             JsonObject jsonObject = element.getAsJsonObject();
             jsonObject.keySet().forEach(key -> {
@@ -101,22 +102,25 @@ public class ActionHelper {
         }
     }
 
-    public static boolean areSettingsValid(AnActionEvent event){
+    public static boolean areSettingsValid(AnActionEvent event) {
         boolean result = true;
         StringBuilder errors = new StringBuilder();
-        if ( settingsState.valePath.isEmpty() ) {
+        if (StringUtils.isBlank(settingsState.valePath)) {
             errors.append("Vale path is not set.");
             result = false;
         }
-        if ( settingsState.valeSettingsPath.isEmpty() ) {
-            errors.append("\nVale settings ini path is not set.");
-            result = false;
+        if (StringUtils.isNotBlank(settingsState.valeSettingsPath)) {
+            File file = new File(settingsState.valeSettingsPath);
+            if (!file.exists()) {
+                errors.append("\nVale settings file doesn't exist");
+                result = false;
+            }
         }
-        if ( settingsState.extensions.isEmpty() ) {
+        if (StringUtils.isBlank(settingsState.extensions)) {
             errors.append("\nVale extensions to check is not set.");
             result = false;
         }
-        if (!result){
+        if (!result) {
             String message = "Please configure it on Settings -> Tools -> Vale CLI";
             displayNotification(NotificationType.WARNING,
                     "Vale configuration not set: " + message);
