@@ -18,7 +18,7 @@ public class OSUtils {
     public static String findValeBinaryPath(){
         String path = "";
         String []whichCommand = (OS.isWindows())?
-                new String[]{"cmd.exe" , "/c" , "where vale.exe"} : new String[]{SHELL, "-c", "which vale"};
+                new String[]{"cmd.exe" , "/c" , "where vale.exe"} : new String[]{SHELL, "-ic", "which vale"};
         try {
             Future<ProcessResult> future = new ProcessExecutor()
                     .command(whichCommand)
