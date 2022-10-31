@@ -106,7 +106,7 @@ public class ActionHelper {
         boolean result = true;
         StringBuilder errors = new StringBuilder();
         if (StringUtils.isBlank(settingsState.valePath)) {
-            errors.append("Vale path is not set.");
+            errors.append("Vale path couldn't be detected automatically, please set it up");
             result = false;
         }
         if (StringUtils.isNotBlank(settingsState.valeSettingsPath)) {

@@ -13,7 +13,7 @@ repositories {
 // Configure Gradle IntelliJ Plugin
 // Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
 intellij {
-    version.set("2019.3.1")
+    version.set("2021.3")
     type.set("IC") // Target IDE Platform
     plugins.set(listOf(/* Plugin Dependencies */))
 
@@ -51,6 +51,12 @@ tasks {
         untilBuild.set("231.*")
         changeNotes.set("""
     <ul>
+    <li>0.0.3
+      <ul>
+      <li>Fixed issue in chrome os where vale binary wasn't autodetected in system path</li>
+      <li>Vale configuration file now optional, let the binary do it's magic to find the configuration</li>
+      </ul>
+    </li>    
     <li>0.0.2
       <ul>
       <li>Autodetect if Vale CLI is in system path</li>

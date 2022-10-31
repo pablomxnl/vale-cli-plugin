@@ -16,7 +16,7 @@ TIP: This is a pet project. Not associated with Errata (Vale CLI creators or Jet
 
 `Settings` -> `Plugins` -> `Marketplace` Search for `Vale CLI` -> Click `Install`
 
-=== From gitlab releases
+=== From Gitlab releases
 To install, grab a zip file from the
 https://gitlab.com/pablomxnl/vale-cli-plugin/-/releases[releases distributions] according to your IDE
 
@@ -27,13 +27,18 @@ image::docimages/installPlugin.png[Install Plugin from Disk ...]
 
 === Pre-Requistes
 * https://vale.sh[Vale CLI] installed and with minimal styles configured.
-* Install the dependencies of the https://vale.sh/docs/topics/scoping/#formats[vale formats] configured.
-For example, to check `asciidoctor` and `reStructuredTex` documents, Vale CLI requires `asciidoctor gem` and python package `rst2html` accordingly. These must be in the system path and available to the IDE. One way to check is by running `vale adoc_file_or_rst_file` in the integrated IDE terminal. In some operating systems using a version manager like `rvm` or `pyenv` can help to solve these path issues. In others cases, helps to install these dependencies with the OS package manager.
+* Install the dependencies of the https://vale.sh/docs/topics/scoping/#formats[vale formats] configured. +
+For example, to check `asciidoctor` and `reStructuredTex` documents, Vale CLI requires `asciidoctor gem` and python package `rst2html` accordingly in the system path. +
+To verify the setup, run `vale adoc_file_or_rst_file` in the integrated terminal. +
+In some operating systems using a version manager like `rvm` or `pyenv` can help to solve these path issues. In others cases, helps to install these dependencies with the OS package manager.
 
 == Configuration
 
-The plugin has 3 options to configure the path of the vale executable, the path to the vale settings file and the
-file extensions to check with vale.
+The plugin has 3 configurations:
+
+   . vale binary location: only required when the plugin didn't found it in the system path
+   . vale settings file location: only required to use a configuration file outside of the paths the binary looks for it.
+   . file extensions to check:  pre-set to `md,adoc`, it requires at least one extension.
 
 To enter this configuration go to
 `Settings` -> `Tools` -> `Vale CLI`
@@ -58,7 +63,7 @@ image::docimages/severalFilesInProjecTree.png["Several files"]
 == Uninstall
 
 . Go to `Settings` => `Plugins` => `Installed`
-. Click `Vale CLI` entry and click the gear `⚙` icon. Older Intellij versions had a `Disabled` dropdown
+. Click `Vale CLI` entry and click the gear `⚙` icon. Older IntelliJ versions had a `Disabled` dropdown
 . Select `Uninstall`
 
 image::docimages/uninstall.png["Uninstall"]

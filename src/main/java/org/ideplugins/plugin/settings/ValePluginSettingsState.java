@@ -17,7 +17,7 @@ public class ValePluginSettingsState implements PersistentStateComponent<ValePlu
     public String valePath;
 
     public String valeSettingsPath = "";
-    public String extensions = "md,adoc,rst";
+    public String extensions = "md,adoc";
 
     @Nullable
     @Override

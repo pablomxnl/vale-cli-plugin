@@ -1,16 +1,17 @@
 package org.ideplugins.plugin.actions;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.psi.PsiFile;
 import org.apache.commons.lang.StringUtils;
 import org.ideplugins.plugin.settings.ValePluginSettingsState;
-import org.jdesktop.swingx.util.OS;
 import org.zeroturnaround.exec.ProcessExecutor;
 import org.zeroturnaround.exec.ProcessResult;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -76,13 +77,14 @@ public class ValeCliExecutor implements ValeCli {
 
     private String executeCommand(List<String> command, int timeout)
             throws IOException, ExecutionException, InterruptedException, TimeoutException {
-        Future<ProcessResult> future = new ProcessExecutor()
+        String projectPath =
+                Arrays.stream(ProjectRootManager.getInstance(project).getContentRoots()).findFirst().get().getPath();
+        Future<ProcessResult> future = new ProcessExecutor().directory(new File(projectPath))
                 .command(command)
                 .exitValueNormal()
                 .readOutput(true)
                 .start().getFuture();
-        String output = future.get(timeout, TimeUnit.SECONDS).outputUTF8();
-        return output;
+        return future.get(timeout, TimeUnit.SECONDS).outputUTF8();
     }
 
 
@@ -96,7 +98,7 @@ public class ValeCliExecutor implements ValeCli {
     private List<String> createValeCommand() {
         List<String> command = new ArrayList<>();
         command.add(settingsState.valePath);
-        if ( StringUtils.isNotBlank(settingsState.valeSettingsPath) ){
+        if (StringUtils.isNotBlank(settingsState.valeSettingsPath)) {
             command.add("--config");
             command.add(settingsState.valeSettingsPath);
         }
