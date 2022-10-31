@@ -24,7 +24,8 @@ public class ValeToolsMenuAction extends AnAction {
         if (areSettingsValid(actionEvent)){
             FileDocumentManager.getInstance().saveAllDocuments();
             ApplicationManager.getApplication().invokeLater(() -> {
-                String output = ValeCliExecutor.getInstance(actionEvent.getProject()).executeValeCliOnProject();
+                String output = ValeCliExecutor.getInstance(actionEvent.getProject())
+                        .executeValeCliOnProject();
                 showResultsInConsole(actionEvent.getProject(), output);
             });
         }
