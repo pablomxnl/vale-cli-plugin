@@ -28,8 +28,7 @@ image::docimages/installPlugin.png[Install Plugin from Disk ...]
 === Pre-Requistes
 * https://vale.sh[Vale CLI] installed and with minimal styles configured.
 * Install the dependencies of the https://vale.sh/docs/topics/scoping/#formats[vale formats] configured.
-For example, to check `asciidoctor` documents, Vale CLI requires `asciidoctor gem` .
-
+For example, to check `asciidoctor` and `reStructuredTex` documents, Vale CLI requires `asciidoctor gem` and python package `rst2html` accordingly. These must be in the system path and available to the IDE. One way to check is by running `vale adoc_file_or_rst_file` in the integrated IDE terminal. In some operating systems using a version manager like `rvm` or `pyenv` can help to solve these path issues. In others cases, helps to install these dependencies with the OS package manager.
 
 == Configuration
 
