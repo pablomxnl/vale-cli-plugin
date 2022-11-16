@@ -1,9 +1,5 @@
 package org.ideplugins.plugin.actions;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.intellij.execution.ui.ConsoleView;
 import com.intellij.execution.ui.ConsoleViewContentType;
 import com.intellij.notification.Notification;
@@ -20,13 +16,9 @@ import org.ideplugins.plugin.settings.ValePluginSettingsState;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.Objects;
 
-import static com.intellij.execution.ui.ConsoleViewContentType.*;
+import static com.intellij.execution.ui.ConsoleViewContentType.LOG_ERROR_OUTPUT;
 
 public class ActionHelper {
 
@@ -40,66 +32,12 @@ public class ActionHelper {
 
     public static void writeTextToConsole(@NotNull Project project, String text, ConsoleViewContentType level) {
         ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow("Vale CLI");
-        ContentManager contentManager = toolWindow.getContentManager();
+        ContentManager contentManager = Objects.requireNonNull(toolWindow).getContentManager();
         Content content = contentManager.findContent("Vale Results");
         ConsoleView consoleView = (ConsoleView) content.getComponent();
         consoleView.clear();
         consoleView.print(text, level);
         toolWindow.show(null);
-    }
-
-    public static void showResultsInConsole(Project project, String text) {
-        if (StringUtils.isBlank(text)) return;
-        ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow("Vale CLI");
-        ContentManager contentManager = toolWindow.getContentManager();
-        Content content = contentManager.findContent("Vale Results");
-        ConsoleView consoleView = (ConsoleView) content.getComponent();
-        consoleView.clear();
-
-        Map<String, Integer> resultsPerSeverity = new HashMap<>();
-        Set<String> files = new HashSet<>();
-
-        JsonElement element = JsonParser.parseString(text);
-        if (element.isJsonObject()) {
-            JsonObject jsonObject = element.getAsJsonObject();
-            jsonObject.keySet().forEach(key -> {
-                JsonArray jsonArray = jsonObject.getAsJsonArray(key);
-                jsonArray.forEach(jsonElement -> {
-                    JsonObject object = jsonElement.getAsJsonObject();
-                    String severity = object.get("Severity").getAsString();
-                    resultsPerSeverity.merge(severity, 1, Integer::sum);
-                    ConsoleViewContentType level = getSeverity(severity);
-                    String fileName = key.substring(project.getBasePath().length() + 1);
-                    files.add(fileName);
-                    String pattern = "suggestion".equalsIgnoreCase(severity) ? "{0}\t\t{1}:{2}\t\t{3}\n" :
-                            "{0}\t\t\t{1}:{2}\t\t{3}\n";
-                    String message =
-                            MessageFormat.format(pattern, severity, fileName, object.get("Line").getAsString(),
-                                    object.get("Message").getAsString());
-                    consoleView.print(message, level);
-                });
-            });
-        }
-        consoleView.print("\n Vale found ", LOG_INFO_OUTPUT);
-        resultsPerSeverity.forEach((key, value) -> {
-            ConsoleViewContentType level = getSeverity(key);
-            String message = MessageFormat.format("{0} {1}s, ", value, key);
-            consoleView.print(message, level);
-        });
-        consoleView.print(String.format(" in %s files", files.size()), LOG_INFO_OUTPUT);
-        toolWindow.show(null);
-    }
-
-    private static ConsoleViewContentType getSeverity(String severity) {
-        switch (severity) {
-            case "warning":
-                return LOG_WARNING_OUTPUT;
-            case "error":
-                return LOG_ERROR_OUTPUT;
-            case "suggestion":
-            default:
-                return LOG_INFO_OUTPUT;
-        }
     }
 
     public static boolean areSettingsValid(AnActionEvent event) {

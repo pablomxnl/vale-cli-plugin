@@ -1,5 +1,6 @@
 package org.ideplugins.plugin.actions;
 
+import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.psi.PsiFile;
@@ -21,22 +22,18 @@ import java.util.concurrent.TimeoutException;
 import static com.intellij.execution.ui.ConsoleViewContentType.LOG_ERROR_OUTPUT;
 import static org.ideplugins.plugin.actions.ActionHelper.writeTextToConsole;
 
-public class ValeCliExecutor implements ValeCli {
+@Service
+public final class ValeCliExecutor implements ValeCli {
 
-    private static ValeCliExecutor INSTANCE;
-    private ValePluginSettingsState settingsState;
-    private Project project;
+    private final ValePluginSettingsState settingsState = ValePluginSettingsState.getInstance();
+    private final Project project;
 
-    private ValeCliExecutor(Project project) {
-        settingsState = ValePluginSettingsState.getInstance();
-        this.project = project;
+    public ValeCliExecutor(Project theProject) {
+        project = theProject;
     }
 
-    public static ValeCliExecutor getInstance(Project project) {
-        if (INSTANCE == null) {
-            INSTANCE = new ValeCliExecutor(project);
-        }
-        return INSTANCE;
+    public static ValeCliExecutor getInstance(Project aProject) {
+        return aProject.getService(ValeCliExecutor.class);
     }
 
     @Override
@@ -78,7 +75,8 @@ public class ValeCliExecutor implements ValeCli {
     private String executeCommand(List<String> command, int timeout)
             throws IOException, ExecutionException, InterruptedException, TimeoutException {
         String projectPath =
-                Arrays.stream(ProjectRootManager.getInstance(project).getContentRoots()).findFirst().get().getPath();
+                Arrays.stream(ProjectRootManager.getInstance(project).getContentRoots())
+                        .findFirst().get().getPath();
         Future<ProcessResult> future = new ProcessExecutor().directory(new File(projectPath))
                 .command(command)
                 .exitValueNormal()

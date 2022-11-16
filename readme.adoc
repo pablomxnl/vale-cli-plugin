@@ -2,11 +2,10 @@
 :icons: font
 
 image:https://gitlab.com/pablomxnl/vale-cli-plugin/-/badges/release.svg[link="https://gitlab.com/pablomxnl/vale-cli-plugin/-/releases",title="Latest Release"]
+image:https://img.shields.io/jetbrains/plugin/d/org.ideplugins.vale-cli-plugin[title="Downloads"]
+image:https://img.shields.io/gitlab/issues/open/pablomxnl/vale-cli-plugin?style=plastic[GitLab issues]
 
 Plugin for JetBrains IDE's that uses https://vale.sh[Vale CLI] to check markdown,asciidoc and other documentation formats
-
-NOTE: Requires Vale CLI installed.
-Please review the https://vale.sh/docs/vale-cli/installation/[Vale CLI installation guide]
 
 TIP: This is a pet project. Not associated with Errata (Vale CLI creators or JetBrains whatsoever)
 
@@ -26,7 +25,11 @@ image::docimages/installPlugin.png[Install Plugin from Disk ...]
 
 
 === Pre-Requistes
-* https://vale.sh[Vale CLI] installed and with minimal styles configured.
+
+NOTE: Requires Vale CLI installed.
+Please review the https://vale.sh/docs/vale-cli/installation/[Vale CLI installation guide]
+
+* https://vale.sh[Vale CLI] installed and with minimal https://vale.sh/generator/[styles configured].
 * Install the dependencies of the https://vale.sh/docs/topics/scoping/#formats[vale formats] configured. +
 For example, to check `asciidoctor` and `reStructuredTex` documents, Vale CLI requires `asciidoctor gem` and python package `rst2html` accordingly in the system path. +
 To verify the setup, run `vale adoc_file_or_rst_file` in the integrated terminal. +

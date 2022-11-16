@@ -1,10 +1,16 @@
+val typeIDE: String by project
+
 plugins {
     id("java")
-    id("org.jetbrains.intellij") version "1.5.2"
+    id("org.jetbrains.intellij") version "1.8.0"
     id("net.thauvin.erik.gradle.semver") version "1.0.4"
 }
 
 group = "org.ideplugins.vale-plugin"
+
+configurations.all {
+    resolutionStrategy.sortArtifacts(ResolutionStrategy.SortOrder.DEPENDENCY_FIRST)
+}
 
 repositories {
     mavenCentral()
@@ -14,25 +20,29 @@ repositories {
 // Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
 intellij {
     version.set("2021.3")
-    type.set("IC") // Target IDE Platform
-    plugins.set(listOf(/* Plugin Dependencies */))
+    plugins.set(
+        listOf(
+            "org.asciidoctor.intellij.asciidoc:0.36.12",
+            "org.intellij.plugins.markdown:213.5744.9",
+            "org.jetbrains.plugins.rest:213.5744.190"
+        )
+    )
+    updateSinceUntilBuild.set(false)
+    type.set(typeIDE) // Target IDE Platform
 
 }
 
 dependencies {
-    implementation ("org.zeroturnaround:zt-exec:1.12"){
-        exclude(group="org.slf4j", module ="slf4j-api" )
-    }
-    implementation("com.google.code.gson:gson" ){
+    implementation("com.google.code.gson:gson") {
         version {
             strictly("2.9.1")
         }
     }
+    implementation("org.zeroturnaround:zt-exec:1.12") {
+        exclude(group = "org.slf4j", module = "slf4j-api")
+    }
 }
 
-configurations.all {
-    resolutionStrategy.sortArtifacts(ResolutionStrategy.SortOrder.DEPENDENCY_FIRST)
-}
 
 tasks {
     // Set the JVM compatibility versions
@@ -42,15 +52,28 @@ tasks {
         options.compilerArgs = listOf("-Xlint:deprecation")
     }
 
+
+    runIde {
+        systemProperty("idea.auto.reload.plugins", "false")
+
+    }
+
     init {
         version = semver.version
     }
 
     patchPluginXml {
-        sinceBuild.set("193.5662.53")
+        sinceBuild.set("201.668.113")
         untilBuild.set("231.*")
-        changeNotes.set("""
+        changeNotes.set(
+            """
     <ul>
+    <li>0.0.4
+      <ul>
+      <li>Report results in problem view</li>
+      <li>Fixed issue when switching projects</li>
+      </ul>
+    </li>       
     <li>0.0.3
       <ul>
       <li>Fixed issue in chrome os where vale binary wasn't autodetected in system path</li>
@@ -70,7 +93,8 @@ tasks {
       </ul>
     </li>
     </ul>            
-        """.trimIndent())
+        """.trimIndent()
+        )
     }
 
     signPlugin {

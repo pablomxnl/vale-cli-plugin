@@ -9,7 +9,7 @@ variables:
 cache:
   key: ${CI_PROJECT_NAME}
   paths:
-    - .gradle
+    - cache/caches
 
 .build_release:
   image: docker.io/library/gradle:7.5.1-jdk11
@@ -38,10 +38,10 @@ cache:
 build_community:
   extends: .build_plugin
   script:
-    - gradle -Dversion.prerelease=$CI_PIPELINE_ID-SNAPSHOT buildPlugin
+    - gradle --gradle-user-home cache -Dversion.prerelease=$CI_PIPELINE_ID-SNAPSHOT buildPlugin
 
 release_community:
   extends: .build_release
   script:
-    - gradle buildPlugin
+    - gradle --gradle-user-home cache buildPlugin
 
