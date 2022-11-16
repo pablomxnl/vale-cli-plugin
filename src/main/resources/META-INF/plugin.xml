@@ -12,11 +12,7 @@
     Plugin that uses <em><a href="https://vale.sh/">Vale CLI</a></em> to check markdown,asciidoc and other documentation
     formats
     <br/>
-
-    <b>* Requires Vale CLI to be installed.</b>
-    <br/>
-
-    <img src="https://gitlab.com/pablomxnl/vale-cli-plugin/-/raw/main/docimages/vale-cli-plugin.png" />
+    <img src="https://gitlab.com/pablomxnl/vale-cli-plugin/-/raw/main/docimages/vale-cli-plugin-0.4-small.png" />
 </p>
 
     ]]></description>
@@ -25,7 +21,10 @@
     <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
          on how to target different products -->
     <depends>com.intellij.modules.platform</depends>
-    <idea-version since-build="193.5662.53" />
+    <depends>org.intellij.plugins.markdown</depends>
+    <depends>org.jetbrains.plugins.rest</depends>
+    <depends>org.asciidoctor.intellij.asciidoc</depends>
+    <idea-version since-build="201.668.113" />
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
@@ -36,13 +35,27 @@
             displayName="Vale CLI"
         />
         <applicationService serviceImplementation="org.ideplugins.plugin.settings.ValePluginSettingsState" />
+        <projectService serviceImplementation="org.ideplugins.plugin.service.ValeIssuesReporter" />
 
         <!-- output window -->
         <toolWindow id="Vale CLI"
           anchor="bottom"
-          canCloseContents="false"
+          canCloseContents="true"
+          doNotActivateOnStart="true"
           factoryClass="org.ideplugins.plugin.toolwindow.ValeToolWindow"
           icon="/icons/pluginIcon2.svg"/>
+        <externalAnnotator order="last"
+                           implementationClass="org.ideplugins.plugin.annotator.ValeExternalAnnotatorProcessor"
+                           language="Markdown"
+        />
+        <externalAnnotator order="last"
+                           implementationClass="org.ideplugins.plugin.annotator.ValeExternalAnnotatorProcessor"
+                           language="AsciiDoc"
+        />
+        <externalAnnotator order="last"
+                           implementationClass="org.ideplugins.plugin.annotator.ValeExternalAnnotatorProcessor"
+                           language="ReST"
+        />
 
     </extensions>
 

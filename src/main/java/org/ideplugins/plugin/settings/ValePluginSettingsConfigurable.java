@@ -1,7 +1,6 @@
 package org.ideplugins.plugin.settings;
 
 import com.intellij.openapi.options.Configurable;
-import com.intellij.openapi.options.ConfigurationException;
 import javax.swing.JComponent;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nls.Capitalization;
@@ -39,7 +38,7 @@ public class ValePluginSettingsConfigurable implements Configurable {
     }
 
     @Override
-    public void apply() throws ConfigurationException {
+    public void apply() {
         ValePluginSettingsState settings = ValePluginSettingsState.getInstance();
         settings.valePath = settingsComponent.getValePathText();
         settings.valeSettingsPath = settingsComponent.getConfigurationFilePathText();
