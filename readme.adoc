@@ -2,8 +2,10 @@
 :icons: font
 
 image:https://gitlab.com/pablomxnl/vale-cli-plugin/-/badges/release.svg[link="https://gitlab.com/pablomxnl/vale-cli-plugin/-/releases",title="Latest Release"]
-image:https://img.shields.io/jetbrains/plugin/d/org.ideplugins.vale-cli-plugin[title="Downloads"]
-image:https://img.shields.io/gitlab/issues/open/pablomxnl/vale-cli-plugin?style=plastic[GitLab issues]
+image:https://img.shields.io/jetbrains/plugin/d/org.ideplugins.vale-cli-plugin[link="https://plugins.jetbrains.com/plugin/19613-vale-cli",title="Downloads"]
+image:https://img.shields.io/gitlab/issues/open/pablomxnl/vale-cli-plugin?style=plastic[link="https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues", title="GitLab issues"]
+image:https://img.shields.io/jetbrains/plugin/r/stars/org.ideplugins.vale-cli-plugin[link="https://plugins.jetbrains.com/plugin/19613-vale-cli/reviews",title="Ratings"]
+image:https://img.shields.io/jetbrains/plugin/v/org.ideplugins.vale-cli-plugin[link="https://plugins.jetbrains.com/plugin/19613-vale-cli",title="Version"]
 
 Plugin for JetBrains IDE's that uses https://vale.sh[Vale CLI] to check markdown,asciidoc and other documentation formats
 
@@ -39,8 +41,8 @@ In some operating systems using a version manager like `rvm` or `pyenv` can help
 
 The plugin has 3 configurations:
 
-   . vale binary location: only required when the plugin didn't found it in the system path
-   . vale settings file location: only required to use a configuration file outside of the paths the binary looks for it.
+   . vale binary location: only required when the plugin couldn't find it automatically in the system path
+   . vale settings file location: only required to use a configuration file located in a path different from where the binary looks for it.
    . file extensions to check:  pre-set to `md,adoc`, it requires at least one extension.
 
 To enter this configuration go to
@@ -59,7 +61,7 @@ image::docimages/toolsMenu.png["Tools menu"]
 
 image::docimages/fromEditorContextualMenu.png["Editor popup menu"]
 
-* By selecting several files that matches the configured extensions and selecting the contextual menu option
+* By selecting several files that match the configured extensions and selecting the contextual menu option
 
 image::docimages/severalFilesInProjecTree.png["Several files"]
 

@@ -67,4 +67,10 @@ public class ActionHelper {
         return result;
     }
 
+    public static void handleError(Project project, Exception exception) {
+        writeTextToConsole(project, "There was an error executing vale \n" +
+                        "Please check paths for vale cli binary on Settings -> Tools -> Vale CLI\nError output:\n\t" +
+                        exception.getMessage(),
+                LOG_ERROR_OUTPUT);
+    }
 }

@@ -1,21 +1,17 @@
 package org.ideplugins.plugin.service;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.intellij.openapi.project.Project;
 import com.intellij.serviceContainer.NonInjectable;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class ValeIssuesReporter {
     private final Project userProject;
-    private final Map<String, List<JsonObject>> issuesPerFile;
+    private Map<String, List<JsonObject>> issuesPerFile;
 
     @NonInjectable
     public ValeIssuesReporter(Project project) {
@@ -27,32 +23,14 @@ public class ValeIssuesReporter {
         issuesPerFile = issues;
     }
 
-    public void updateIssuesForFile(String filePath, String valeJsonResponse) {
-        JsonElement element = JsonParser.parseString(valeJsonResponse);
-        if (element.isJsonObject()) {
-            JsonObject resultsPerFile = element.getAsJsonObject();
-            List<JsonObject> issueList = new ArrayList<>();
-            JsonArray issues = resultsPerFile.getAsJsonArray(filePath);
-            issues.forEach(jsonElement -> issueList.add(jsonElement.getAsJsonObject()));
-            issuesPerFile.remove(filePath);
-            issuesPerFile.put(filePath, issueList);
-        }
-
+    public void updateIssuesForFile(String filePath, List<JsonObject> issueList) {
+        issuesPerFile.remove(filePath);
+        issuesPerFile.put(filePath, issueList);
     }
 
-    public void populateIssuesFromValeResponse(String valeJsonResponse) {
+    public void populateIssuesFromValeResponse(Map<String, List<JsonObject>> issues) {
         issuesPerFile.clear();
-        JsonElement element = JsonParser.parseString(valeJsonResponse);
-        if (element.isJsonObject()) {
-            JsonObject resultsPerFile = element.getAsJsonObject();
-            resultsPerFile.keySet().forEach(filePath -> {
-                List<JsonObject> issueList = new ArrayList<>();
-                JsonArray issues = resultsPerFile.getAsJsonArray(filePath);
-                issues.forEach(jsonElement -> issueList.add(jsonElement.getAsJsonObject()));
-                issuesPerFile.put(filePath, issueList);
-            });
-        }
-
+        this.issuesPerFile = issues;
     }
 
     public boolean hasIssuesForFile(String filePath) {
@@ -66,7 +44,7 @@ public class ValeIssuesReporter {
     public String getTotalIssues() {
         Map<String, Integer> resultsPerSeverity = new HashMap<>();
         StringBuilder message = new StringBuilder("Vale found: \n");
-        issuesPerFile.forEach( (file, issues) -> issues.forEach(jsonObject -> {
+        issuesPerFile.forEach((file, issues) -> issues.forEach(jsonObject -> {
             String severity = jsonObject.get("Severity").getAsString();
             resultsPerSeverity.merge(severity, 1, Integer::sum);
         }));
