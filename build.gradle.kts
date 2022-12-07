@@ -2,7 +2,7 @@ val typeIDE: String by project
 
 plugins {
     id("java")
-    id("org.jetbrains.intellij") version "1.8.0"
+    id("org.jetbrains.intellij") version "1.9.0"
     id("net.thauvin.erik.gradle.semver") version "1.0.4"
 }
 
@@ -41,17 +41,24 @@ dependencies {
     implementation("org.zeroturnaround:zt-exec:1.12") {
         exclude(group = "org.slf4j", module = "slf4j-api")
     }
+    testImplementation("org.junit.jupiter:junit-jupiter:5.9.0")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.9.0")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.0")
 }
+
 
 
 tasks {
     // Set the JVM compatibility versions
     withType<JavaCompile> {
-        sourceCompatibility = "1.8"
-        targetCompatibility = "1.8"
+        sourceCompatibility = "11"
+        targetCompatibility = "11"
         options.compilerArgs = listOf("-Xlint:deprecation")
     }
 
+    withType<Test>{
+        useJUnitPlatform()
+    }
 
     runIde {
         systemProperty("idea.auto.reload.plugins", "false")
@@ -63,11 +70,17 @@ tasks {
     }
 
     patchPluginXml {
-        sinceBuild.set("201.668.113")
+        sinceBuild.set("213")
         untilBuild.set("231.*")
         changeNotes.set(
             """
     <ul>
+    <li>0.0.5
+      <ul>
+      <li>Reparse currently opened files so the external annotators reflects the problem view faster</li>
+      <li>Added notification action to show the settings screen when can't setup Vale correctly</li>      
+      </ul>
+    </li>      
     <li>0.0.4
       <ul>
       <li>Report results in problem view</li>

@@ -3,15 +3,18 @@ package org.ideplugins.plugin.actions;
 import com.intellij.execution.ui.ConsoleView;
 import com.intellij.execution.ui.ConsoleViewContentType;
 import com.intellij.notification.Notification;
+import com.intellij.notification.NotificationAction;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentManager;
 import org.apache.commons.lang.StringUtils;
+import org.ideplugins.plugin.settings.ValePluginSettingsConfigurable;
 import org.ideplugins.plugin.settings.ValePluginSettingsState;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,6 +30,12 @@ public class ActionHelper {
 
     public static void displayNotification(final NotificationType notificationType, final String notificationBody) {
         Notification notification = new Notification(GROUP_ID, "Vale CLI", notificationBody, notificationType);
+        notification.addAction(new NotificationAction("Click here to configure Vale CLI") {
+            @Override
+            public void actionPerformed(@NotNull AnActionEvent anActionEvent, @NotNull Notification notification) {
+                ShowSettingsUtil.getInstance().showSettingsDialog(null, ValePluginSettingsConfigurable.class);
+            }
+        });
         Notifications.Bus.notify(notification);
     }
 
@@ -61,7 +70,7 @@ public class ActionHelper {
         if (!result) {
             String message = "Please configure it on Settings -> Tools -> Vale CLI";
             displayNotification(NotificationType.WARNING,
-                    "Vale configuration not set: " + message);
+                    "Vale configuration not set");
             writeTextToConsole(event.getProject(), errors + "\n" + message, LOG_ERROR_OUTPUT);
         }
         return result;

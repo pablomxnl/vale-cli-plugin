@@ -6,6 +6,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.util.FileContentUtil;
 import org.ideplugins.plugin.service.ValeCliExecutor;
 import org.ideplugins.plugin.service.ValeIssuesReporter;
 import org.jetbrains.annotations.NotNull;
@@ -45,6 +46,7 @@ public class ValeToolsMenuAction extends AnAction {
                     handleError(actionEvent.getProject(), exception);
                 }
             });
+            ApplicationManager.getApplication().invokeAndWait(FileContentUtil::reparseOpenedFiles);
         }
     }
 

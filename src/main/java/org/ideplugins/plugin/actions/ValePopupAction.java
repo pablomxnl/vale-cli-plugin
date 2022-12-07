@@ -1,13 +1,17 @@
 package org.ideplugins.plugin.actions;
 
 import com.google.gson.JsonObject;
+import com.intellij.analysis.problemsView.toolWindow.ProblemsView;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.wm.ToolWindow;
+import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.psi.PsiFile;
+import com.intellij.util.FileContentUtil;
 import org.ideplugins.plugin.service.ValeCliExecutor;
 import org.ideplugins.plugin.service.ValeIssuesReporter;
 import org.ideplugins.plugin.settings.ValePluginSettingsState;
@@ -52,6 +56,10 @@ public class ValePopupAction extends AnAction {
                             }
                         }
                     }
+                    ToolWindow toolWindow =
+                            ToolWindowManager.getInstance(actionEvent.getProject()).getToolWindow(ProblemsView.ID);
+                    Objects.requireNonNull(toolWindow).show(() -> ApplicationManager.getApplication()
+                            .invokeAndWait(FileContentUtil::reparseOpenedFiles));
                 } catch (Exception exception) {
                     handleError(actionEvent.getProject(), exception);
                 }
