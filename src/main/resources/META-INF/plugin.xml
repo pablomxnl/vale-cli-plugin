@@ -21,10 +21,10 @@
     <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
          on how to target different products -->
     <depends>com.intellij.modules.platform</depends>
-    <depends>org.intellij.plugins.markdown</depends>
-    <depends>org.jetbrains.plugins.rest</depends>
-    <depends>org.asciidoctor.intellij.asciidoc</depends>
-    <idea-version since-build="201.668.113" />
+    <depends optional="true" config-file="org.ideplugins.markdown.xml">org.intellij.plugins.markdown</depends>
+    <depends optional="true" config-file="org.ideplugins.rest.xml">org.jetbrains.plugins.rest</depends>
+    <depends optional="true" config-file="org.ideplugins.asciidoc.xml">org.asciidoctor.intellij.asciidoc</depends>
+    <idea-version since-build="213" />
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
@@ -44,18 +44,6 @@
           doNotActivateOnStart="true"
           factoryClass="org.ideplugins.plugin.toolwindow.ValeToolWindow"
           icon="/icons/pluginIcon2.svg"/>
-        <externalAnnotator order="last"
-                           implementationClass="org.ideplugins.plugin.annotator.ValeExternalAnnotatorProcessor"
-                           language="Markdown"
-        />
-        <externalAnnotator order="last"
-                           implementationClass="org.ideplugins.plugin.annotator.ValeExternalAnnotatorProcessor"
-                           language="AsciiDoc"
-        />
-        <externalAnnotator order="last"
-                           implementationClass="org.ideplugins.plugin.annotator.ValeExternalAnnotatorProcessor"
-                           language="ReST"
-        />
 
     </extensions>
 

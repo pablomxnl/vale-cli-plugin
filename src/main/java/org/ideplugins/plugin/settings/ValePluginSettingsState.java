@@ -8,6 +8,7 @@ import com.intellij.util.xmlb.XmlSerializerUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+
 @State(
         name = "org.ideplugins.vale_cli_plugin.settings",
         storages = {@Storage("valeCliSettings.xml")}
@@ -17,7 +18,7 @@ public class ValePluginSettingsState implements PersistentStateComponent<ValePlu
     public String valePath;
 
     public String valeSettingsPath = "";
-    public String extensions = "md,adoc";
+    public String extensions = "md,adoc,rst";
 
     @Nullable
     @Override
@@ -36,7 +37,9 @@ public class ValePluginSettingsState implements PersistentStateComponent<ValePlu
 
     @Override
     public void initializeComponent() {
-        valePath = OSUtils.findValeBinaryPath();
+        if (valePath == null){
+            valePath = OSUtils.findValeBinaryPath();
+        }
         PersistentStateComponent.super.initializeComponent();
     }
 }
