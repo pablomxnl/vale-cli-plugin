@@ -75,6 +75,12 @@ tasks {
         changeNotes.set(
             """
     <ul>
+    <li>0.0.6
+        <ul>
+        <li>fix <a href='https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/14'>#14</a> NPE when no annotations are returned for a file</li>
+        <li>Add cmd+shift+0 shortcut to execute vale on project, cmd+shift+1 to execute vale in current file</li>
+        </ul>
+    </li>
     <li>0.0.5
       <ul>
       <li>Reparse currently opened files so the external annotators reflects the problem view faster</li>

@@ -41,8 +41,8 @@ In some operating systems using a version manager like `rvm` or `pyenv` can help
 
 The plugin has 3 configurations:
 
-   . vale binary location: only required when the plugin couldn't find it automatically in the system path
-   . vale settings file location: only required to use a configuration file located in a path different from where the binary looks for it.
+   . vale binary location: required when the plugin couldn't find it automatically in the system path
+   . vale settings file location: required when want to use a configuration file located in a path different from where the binary looks for it.
    . file extensions to check:  pre-set to `md,adoc`, it requires at least one extension.
 
 To enter this configuration go to

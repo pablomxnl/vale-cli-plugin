@@ -53,6 +53,10 @@
                 class="org.ideplugins.plugin.actions.ValeToolsMenuAction" text="Vale CLI Check"
                 description="Runs vale check on project">
             <add-to-group group-id="ToolsMenu" anchor="last"/>
+            <keyboard-shortcut first-keystroke="shift meta 0" keymap="$default" />
+            <keyboard-shortcut first-keystroke="shift meta 0" keymap="Default for KDE"/>
+            <keyboard-shortcut first-keystroke="shift meta 0" keymap="Default for GNOME" />
+            <keyboard-shortcut first-keystroke="shift meta 0" keymap="Mac OS X 10.5+" />
         </action>
         <action
                 id="org.ideplugins.plugin.actions.ValePopupAction" icon="/icons/logo-alt.svg"
@@ -65,6 +69,11 @@
                 class="org.ideplugins.plugin.actions.ValePopupAction" text="Vale CLI Check"
                 description="Run vale cli vs the current file">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+            <keyboard-shortcut first-keystroke="shift meta 1" keymap="$default" />
+            <keyboard-shortcut first-keystroke="shift meta 1" keymap="Default for KDE"/>
+            <keyboard-shortcut first-keystroke="shift meta 1" keymap="Default for GNOME" />
+            <keyboard-shortcut first-keystroke="shift meta 1" keymap="Mac OS X 10.5+" />
+
         </action>
     </actions>
 </idea-plugin>
