@@ -27,7 +27,7 @@ public class ValeExternalAnnotatorProcessor extends ExternalAnnotator<InitialAnn
         PsiDocumentManager documentManager = PsiDocumentManager.getInstance(psiFile.getProject());
         Document document = documentManager.getDocument(psiFile);
         String filePath = psiFile.getVirtualFile().getPath();
-        if (SystemInfo.isWindows && !filePath.contains(File.separator) ){
+        if (SystemInfo.isWindows && !filePath.contains(File.separator)) {
             filePath = filePath.replace('/', File.separatorChar);
         }
         if (!reporter.hasIssuesForFile(filePath))
@@ -43,20 +43,21 @@ public class ValeExternalAnnotatorProcessor extends ExternalAnnotator<InitialAnn
 
     @Override
     public void apply(@NotNull PsiFile psiFile, AnnotatorResult annotationResult, @NotNull AnnotationHolder holder) {
-        annotationResult.getValeResults().forEach(jsonObject -> {
-            JsonArray span = jsonObject.getAsJsonArray("Span");
-            int line = jsonObject.get("Line").getAsInt();
-            int initialColumn = span.get(0).getAsInt();
-            int finalColumn = span.get(1).getAsInt();
-            TextRange range = annotationResult.getRange(line, initialColumn, finalColumn);
-            if (annotationResult.isValidRangeForAnnotation(range)) {
-                String valeSeverity = jsonObject.get("Severity").getAsString();
-                HighlightSeverity severity = getSeverity(valeSeverity);
-                holder.newAnnotation(severity, jsonObject.get("Message").getAsString())
-                        .tooltip(jsonObject.get("Message").getAsString()).range(range).create();
-            }
-        });
-
+        if (annotationResult.getValeResults() !=null ) {
+            annotationResult.getValeResults().forEach(jsonObject -> {
+                JsonArray span = jsonObject.getAsJsonArray("Span");
+                int line = jsonObject.get("Line").getAsInt();
+                int initialColumn = span.get(0).getAsInt();
+                int finalColumn = span.get(1).getAsInt();
+                TextRange range = annotationResult.getRange(line, initialColumn, finalColumn);
+                if (annotationResult.isValidRangeForAnnotation(range)) {
+                    String valeSeverity = jsonObject.get("Severity").getAsString();
+                    HighlightSeverity severity = getSeverity(valeSeverity);
+                    holder.newAnnotation(severity, jsonObject.get("Message").getAsString())
+                            .tooltip(jsonObject.get("Message").getAsString()).range(range).create();
+                }
+            });
+        }
     }
 
     private HighlightSeverity getSeverity(@NotNull String valeSeverity) {
