@@ -2,7 +2,7 @@ val typeIDE: String by project
 
 plugins {
     id("java")
-    id("org.jetbrains.intellij") version "1.9.0"
+    id("org.jetbrains.intellij") version "1.12.0"
     id("net.thauvin.erik.gradle.semver") version "1.0.4"
 }
 
@@ -24,7 +24,8 @@ intellij {
         listOf(
             "org.asciidoctor.intellij.asciidoc:0.36.12",
             "org.intellij.plugins.markdown:213.5744.9",
-            "org.jetbrains.plugins.rest:213.5744.190"
+            "org.jetbrains.plugins.rest:213.5744.190",
+            "java"
         )
     )
     updateSinceUntilBuild.set(false)
@@ -41,6 +42,9 @@ dependencies {
     implementation("org.zeroturnaround:zt-exec:1.12") {
         exclude(group = "org.slf4j", module = "slf4j-api")
     }
+//    implementation("org.zeroturnaround:zt-process-killer:1.10"){
+//        exclude(group = "org.slf4j", module = "slf4j-api")
+//    }
     testImplementation("org.junit.jupiter:junit-jupiter:5.9.0")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.9.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.0")
@@ -75,6 +79,12 @@ tasks {
         changeNotes.set(
             """
     <ul>
+    <li>0.0.7
+        <ul>
+        <li>Execute vale binary for project as a background task, allowing to cancel</li>
+        <li>Limit one vale execution per project at a time</li>
+        </ul>
+    </li>    
     <li>0.0.6
         <ul>
         <li>fix <a href='https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/14'>#14</a> NPE when no annotations are returned for a file</li>

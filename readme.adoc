@@ -9,7 +9,7 @@ image:https://img.shields.io/jetbrains/plugin/v/org.ideplugins.vale-cli-plugin[l
 
 Plugin for JetBrains IDE's that uses https://vale.sh[Vale CLI] to check markdown,asciidoc and other documentation formats
 
-TIP: This is a pet project. Not associated with Errata (Vale CLI creators or JetBrains whatsoever)
+TIP: Pet project. Not associated with Errata (Vale CLI creators) or JetBrains whatsoever
 
 == Installation
 
@@ -53,17 +53,42 @@ image::docimages/pluginConfiguration.png["Plugin Configuration"]
 == Usage
 The plugin offers three ways to execute Vale CLI
 
-* Tools menu to run Vale against project files. `Tools` => `Vale CLI Check`
+=== Tools menu, project scope
+
+To run Vale against project files use the menu in `Tools` => `Vale CLI Check`
 
 image::docimages/toolsMenu.png["Tools menu"]
+For projects with large amount of documentation files, depending on machine the execution can take a while, the user can stop the process at any time by clicking on the `✖️` button.
 
-* Editor contextual menu to check current file.
+image::docimages/background-task.png["Background task execution"]
+As the cancel button can be hard to click, another way to cancel the execution is to click in the "Executing vale cli on project scope" text to show the Background Tasks dialog and from the dialog the `✖️` button is easier to click. To hide the dialog, just click the minimize button or click the "Hide processes" link
+
+image::docimages/background-tasks-dialog.png["Background Tasks dialog"]
+
+Once the process has concluded it prints a summary of the results on the tool window, to see these results, open a supported file and look them on the problem view or in the editor.
+
+image::docimages/toolWindowProjectScopeResult.png["Editor popup menu"]
+
+=== Editor contextual menu
+To check the current opened file in the editor, providing the file extension matches one of the extensions configured in the plugin settings.
 
 image::docimages/fromEditorContextualMenu.png["Editor popup menu"]
 
-* By selecting several files that match the configured extensions and selecting the contextual menu option
+Once the process has finished, it activates the problem view with the results, and also the editor has markers annotated to these
+
+image::docimages/vale-cli-plugin-0.4-small.png["Result in problem view and in editor"]
+
+=== Multiple files selected on the Project tree
+
+By selecting several files whose extension matches the configured extensions and selecting the contextual menu option
 
 image::docimages/severalFilesInProjecTree.png["Several files"]
+
+Once the process has finished, it activates the problem view with the results, and also the editor has markers annotated to these
+
+
+image::docimages/vale-cli-plugin-0.4-small.png["Result in problem view and in editor"]
+
 
 == Uninstall
 
