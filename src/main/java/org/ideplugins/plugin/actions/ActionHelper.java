@@ -7,18 +7,17 @@ import com.intellij.notification.NotificationAction;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentManager;
-import org.apache.commons.lang.StringUtils;
 import org.ideplugins.plugin.settings.ValePluginSettingsConfigurable;
 import org.ideplugins.plugin.settings.ValePluginSettingsState;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
 import java.util.Objects;
 
 import static com.intellij.execution.ui.ConsoleViewContentType.LOG_ERROR_OUTPUT;
@@ -39,6 +38,10 @@ public class ActionHelper {
         Notifications.Bus.notify(notification);
     }
 
+    public static ValePluginSettingsState getSettings(){
+        return settingsState;
+    }
+
     public static void writeTextToConsole(@NotNull Project project, String text, ConsoleViewContentType level) {
         ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow("Vale CLI");
         ContentManager contentManager = Objects.requireNonNull(toolWindow).getContentManager();
@@ -49,37 +52,12 @@ public class ActionHelper {
         toolWindow.show(null);
     }
 
-    public static boolean areSettingsValid(AnActionEvent event) {
-        boolean result = true;
-        StringBuilder errors = new StringBuilder();
-        if (StringUtils.isBlank(settingsState.valePath)) {
-            errors.append("Vale path couldn't be detected automatically, please set it up");
-            result = false;
-        }
-        if (StringUtils.isNotBlank(settingsState.valeSettingsPath)) {
-            File file = new File(settingsState.valeSettingsPath);
-            if (!file.exists()) {
-                errors.append("\nVale settings file doesn't exist");
-                result = false;
-            }
-        }
-        if (StringUtils.isBlank(settingsState.extensions)) {
-            errors.append("\nVale extensions to check is not set.");
-            result = false;
-        }
-        if (!result) {
-            String message = "Please configure it on Settings -> Tools -> Vale CLI";
-            displayNotification(NotificationType.WARNING,
-                    "Vale configuration not set");
-            writeTextToConsole(event.getProject(), errors + "\n" + message, LOG_ERROR_OUTPUT);
-        }
-        return result;
-    }
-
     public static void handleError(Project project, Exception exception) {
-        writeTextToConsole(project, "There was an error executing vale \n" +
-                        "Please check paths for vale cli binary on Settings -> Tools -> Vale CLI\nError output:\n\t" +
-                        exception.getMessage(),
-                LOG_ERROR_OUTPUT);
+        ApplicationManager.getApplication().invokeLater(()->{
+            writeTextToConsole(project, "There was an error executing vale \n" +
+                            "Please check paths for vale cli binary on Settings -> Tools -> Vale CLI\nError output:\n\t" +
+                            exception.getMessage(),
+                    LOG_ERROR_OUTPUT);
+        });
     }
 }

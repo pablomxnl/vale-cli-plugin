@@ -21,6 +21,7 @@
     <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
          on how to target different products -->
     <depends>com.intellij.modules.platform</depends>
+    <depends optional="true" config-file="org.ideplugins.java.xml">com.intellij.java</depends>
     <depends optional="true" config-file="org.ideplugins.markdown.xml">org.intellij.plugins.markdown</depends>
     <depends optional="true" config-file="org.ideplugins.rest.xml">org.jetbrains.plugins.rest</depends>
     <depends optional="true" config-file="org.ideplugins.asciidoc.xml">org.asciidoctor.intellij.asciidoc</depends>
@@ -44,6 +45,8 @@
           doNotActivateOnStart="true"
           factoryClass="org.ideplugins.plugin.toolwindow.ValeToolWindow"
           icon="/icons/pluginIcon2.svg"/>
+
+        <postStartupActivity implementation="org.ideplugins.plugin.activity.ValeStartupActivity" />
 
     </extensions>
 

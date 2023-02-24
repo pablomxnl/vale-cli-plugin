@@ -1,6 +1,7 @@
 package org.ideplugins.plugin.service;
 
 import com.google.gson.JsonObject;
+import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
 import com.intellij.serviceContainer.NonInjectable;
 
@@ -9,8 +10,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Service
 public class ValeIssuesReporter {
-    private final Project userProject;
+    private final Project project;
     private Map<String, List<JsonObject>> issuesPerFile;
 
     @NonInjectable
@@ -19,12 +21,11 @@ public class ValeIssuesReporter {
     }
 
     public ValeIssuesReporter(Project project, Map<String, List<JsonObject>> issues) {
-        userProject = project;
+        this.project = project;
         issuesPerFile = issues;
     }
 
     public void updateIssuesForFile(String filePath, List<JsonObject> issueList) {
-        issuesPerFile.remove(filePath);
         issuesPerFile.put(filePath, issueList);
     }
 
