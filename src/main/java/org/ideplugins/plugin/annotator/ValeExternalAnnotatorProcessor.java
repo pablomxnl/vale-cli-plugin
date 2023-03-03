@@ -4,32 +4,26 @@ import com.google.gson.JsonArray;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.ExternalAnnotator;
 import com.intellij.lang.annotation.HighlightSeverity;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
-import com.intellij.openapi.util.SystemInfo;
-import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
 import org.ideplugins.plugin.service.ValeIssuesReporter;
+import org.ideplugins.plugin.settings.OSUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
+import java.util.Optional;
 
 
 public class ValeExternalAnnotatorProcessor extends ExternalAnnotator<InitialAnnotatorInfo, AnnotatorResult> {
 
-    private static final Logger LOG = Logger.getInstance(ValeExternalAnnotatorProcessor.class);
 
     @Override
     public @Nullable InitialAnnotatorInfo collectInformation(@NotNull PsiFile psiFile) {
         ValeIssuesReporter reporter = psiFile.getProject().getService(ValeIssuesReporter.class);
         PsiDocumentManager documentManager = PsiDocumentManager.getInstance(psiFile.getProject());
         Document document = documentManager.getDocument(psiFile);
-        String filePath = psiFile.getVirtualFile().getPath();
-        if (SystemInfo.isWindows && !filePath.contains(File.separator)) {
-            filePath = filePath.replace('/', File.separatorChar);
-        }
+        String filePath = OSUtils.normalizeFilePath(psiFile.getVirtualFile().getPath());
         if (!reporter.hasIssuesForFile(filePath))
             return null;
         return new InitialAnnotatorInfo(document, psiFile, reporter.getIssues(filePath));
@@ -49,13 +43,14 @@ public class ValeExternalAnnotatorProcessor extends ExternalAnnotator<InitialAnn
                 int line = jsonObject.get("Line").getAsInt();
                 int initialColumn = span.get(0).getAsInt();
                 int finalColumn = span.get(1).getAsInt();
-                TextRange range = annotationResult.getRange(line, initialColumn, finalColumn);
-                if (annotationResult.isValidRangeForAnnotation(range)) {
-                    String valeSeverity = jsonObject.get("Severity").getAsString();
-                    HighlightSeverity severity = getSeverity(valeSeverity);
-                    holder.newAnnotation(severity, jsonObject.get("Message").getAsString())
-                            .tooltip(jsonObject.get("Message").getAsString()).range(range).create();
-                }
+                Optional.ofNullable(annotationResult.getRange(line, initialColumn, finalColumn)).ifPresent(range -> {
+                    if (annotationResult.isValidRangeForAnnotation(range)) {
+                        String valeSeverity = jsonObject.get("Severity").getAsString();
+                        HighlightSeverity severity = getSeverity(valeSeverity);
+                        holder.newAnnotation(severity, jsonObject.get("Message").getAsString())
+                                .tooltip(jsonObject.get("Message").getAsString()).range(range).create();
+                    }
+                });
             });
         }
     }

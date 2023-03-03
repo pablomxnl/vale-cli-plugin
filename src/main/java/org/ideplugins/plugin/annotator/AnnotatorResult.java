@@ -3,6 +3,7 @@ package org.ideplugins.plugin.annotator;
 import com.google.gson.JsonObject;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.util.DocumentUtil;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -18,9 +19,13 @@ public class AnnotatorResult {
         return info.results;
     }
 
+    @Nullable
     public TextRange getRange(int line, int begin, int end) {
-        int startOffset = info.document.getLineStartOffset(line - 1);
-        return TextRange.from(startOffset + begin - 1, (end - begin) + 1);
+        if (line < info.document.getLineCount()-1 ){
+            int startOffset = info.document.getLineStartOffset(line - 1);
+            return TextRange.from(startOffset + begin - 1, (end - begin) + 1);
+        }
+        return null;
     }
 
     public boolean isValidRangeForAnnotation(TextRange range) {

@@ -1,8 +1,5 @@
 # hidden files
 .idea
 build
-!.travis.yml
-gradlew*
 .gradle
-gradle
-
+./styles/

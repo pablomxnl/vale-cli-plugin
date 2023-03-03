@@ -4,6 +4,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
+import com.intellij.openapi.util.SystemInfo;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -21,7 +22,17 @@ import static  java.util.Map.Entry;
 )
 public class ValePluginSettingsState implements PersistentStateComponent<ValePluginSettingsState> {
 
-    public String valePath;
+    @Override
+    public void initializeComponent() {
+        String path = OSUtils.findValeBinaryPath();
+        if (path.isEmpty() && !OSUtils.valeVersion().isEmpty()){
+            valePath = SystemInfo.isWindows? "vale.exe" : "vale";
+        } else {
+            valePath = path;
+        }
+    }
+
+    public String valePath = "";
 
     public String valeSettingsPath = "";
     public String extensions = "md,adoc,rst";
@@ -41,34 +52,26 @@ public class ValePluginSettingsState implements PersistentStateComponent<ValePlu
         return ApplicationManager.getApplication().getService(ValePluginSettingsState.class);
     }
 
-    @Override
-    public void initializeComponent() {
-        if (valePath == null){
-            valePath = OSUtils.findValeBinaryPath();
-        }
-        PersistentStateComponent.super.initializeComponent();
-    }
-
     public Entry<Boolean,String> areSettingsValid(){
         StringBuilder errors = new StringBuilder("Invalid Vale CLI plugin configuration, " +
                 "please click on the Notification link to configure it. \n" +
                 "Or check it on Settings(Preferences on Mac) -> Tools -> Vale CLI\nError list: \n");
-        boolean validation = true;
+        boolean validationResult = true;
         if (StringUtils.isBlank(valePath)) {
             errors.append("\n* Vale path couldn't be detected automatically, please set it up");
-            validation = false;
+            validationResult = false;
         }
         if (StringUtils.isNotBlank(valeSettingsPath)) {
             File file = new File(valeSettingsPath);
             if (!file.exists()) {
                 errors.append("\n* Vale settings file doesn't exist");
-                validation = false;
+                validationResult = false;
             }
         }
         if (StringUtils.isBlank(extensions)) {
             errors.append("\n* Vale extensions to check is not set.");
-            validation = false;
+            validationResult = false;
         }
-        return new SimpleEntry<>(validation, errors.toString());
+        return new SimpleEntry<>(validationResult, errors.toString());
     }
 }

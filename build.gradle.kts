@@ -2,8 +2,10 @@ val typeIDE: String by project
 
 plugins {
     id("java")
-    id("org.jetbrains.intellij") version "1.12.0"
     id("net.thauvin.erik.gradle.semver") version "1.0.4"
+    id("org.jetbrains.intellij") version "1.13.0"
+    id("org.barfuin.gradle.jacocolog") version "3.0.0"
+    id("jacoco")
 }
 
 group = "org.ideplugins.vale-plugin"
@@ -42,12 +44,11 @@ dependencies {
     implementation("org.zeroturnaround:zt-exec:1.12") {
         exclude(group = "org.slf4j", module = "slf4j-api")
     }
-//    implementation("org.zeroturnaround:zt-process-killer:1.10"){
-//        exclude(group = "org.slf4j", module = "slf4j-api")
-//    }
     testImplementation("org.junit.jupiter:junit-jupiter:5.9.0")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.9.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.0")
+    testImplementation("org.assertj:assertj-core:3.24.2")
+    testImplementation("org.mockito:mockito-core:4.11.0")
 }
 
 
@@ -57,11 +58,12 @@ tasks {
     withType<JavaCompile> {
         sourceCompatibility = "11"
         targetCompatibility = "11"
-        options.compilerArgs = listOf("-Xlint:deprecation")
+        options.compilerArgs = listOf("-Xlint:deprecation","-Xlint:unchecked")
     }
 
     withType<Test>{
         useJUnitPlatform()
+        finalizedBy("jacocoTestReport")
     }
 
     runIde {
@@ -79,6 +81,12 @@ tasks {
         changeNotes.set(
             """
     <ul>
+    <li>0.0.8
+        <ul>
+        <li>Fixes <a href='https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/15' >#15</a> exception in external annotator when editing a file</li>
+        <li>Fixes <a href='https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/16' >#16</a> On windows, popup action doesn't show results in proble view</li>
+        </ul>
+    </li>
     <li>0.0.7
         <ul>
         <li>Execute vale binary for project as a background task, allowing to cancel</li>
@@ -134,5 +142,11 @@ tasks {
 
     publishPlugin {
         token.set(System.getenv("JBM_PUBLISH_TOKEN"))
+    }
+
+    jacocoTestReport {
+        reports {
+            xml.required.set(true)
+        }
     }
 }

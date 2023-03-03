@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
 import com.intellij.serviceContainer.NonInjectable;
+import org.ideplugins.plugin.settings.OSUtils;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -12,6 +13,7 @@ import java.util.Map;
 
 @Service
 public class ValeIssuesReporter {
+
     private final Project project;
     private Map<String, List<JsonObject>> issuesPerFile;
 
@@ -25,8 +27,8 @@ public class ValeIssuesReporter {
         issuesPerFile = issues;
     }
 
-    public void updateIssuesForFile(String filePath, List<JsonObject> issueList) {
-        issuesPerFile.put(filePath, issueList);
+    public void updateIssuesForFile(final String filePath, List<JsonObject> issueList) {
+        issuesPerFile.put(OSUtils.normalizeFilePath(filePath), issueList);
     }
 
     public void populateIssuesFromValeResponse(Map<String, List<JsonObject>> issues) {

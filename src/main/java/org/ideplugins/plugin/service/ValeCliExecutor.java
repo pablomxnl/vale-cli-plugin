@@ -7,9 +7,9 @@ import com.google.gson.JsonParser;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.psi.PsiFile;
 import org.apache.commons.lang.StringUtils;
+import org.ideplugins.plugin.exception.ValeCliExecutionException;
 import org.ideplugins.plugin.settings.ValePluginSettingsState;
 import org.zeroturnaround.exec.ProcessExecutor;
 import org.zeroturnaround.exec.ProcessResult;
@@ -22,21 +22,16 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 
-import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.*;
 
 
 @Service
 public final class ValeCliExecutor {
 
-    private final ValePluginSettingsState settingsState = ValePluginSettingsState.getInstance();
     private final Project project;
 
     private int numberOfFiles;
@@ -52,20 +47,20 @@ public final class ValeCliExecutor {
         return aProject.getService(ValeCliExecutor.class);
     }
 
-    public StartedProcess executeValeCliOnFile(PsiFile file) throws Exception {
+    public StartedProcess executeValeCliOnFile(PsiFile file) throws ValeCliExecutionException {
         String filePath = file.getVirtualFile().getPath();
         List<String> command = createValeCommand();
         command.add(filePath);
         return executeCommand(command);
     }
 
-    public StartedProcess executeValeCliOnFiles(List<String> files) throws Exception {
+    public StartedProcess executeValeCliOnFiles(List<String> files) throws ValeCliExecutionException {
         List<String> command = createValeCommand();
         command.addAll(files);
         return executeCommand(command);
     }
 
-    public StartedProcess executeValeCliOnProject() throws IOException {
+    public StartedProcess executeValeCliOnProject() throws ValeCliExecutionException {
         List<String> command = createValeInProjectCommand();
         return executeCommand(command);
     }
@@ -75,24 +70,31 @@ public final class ValeCliExecutor {
     }
 
     public Map<String, List<JsonObject>> parseValeJsonResponse(Future<ProcessResult> future, ProgressIndicator indicator)
-            throws InterruptedException, ExecutionException, TimeoutException {
-//        Instant expectedEnd = Instant.now().plusSeconds(numberOfFiles);
+            throws ValeCliExecutionException {
 
         while (!future.isDone()) {
             indicator.checkCanceled();
-//            Instant now = Instant.now();
-//            Duration duration = Duration.between(now, expectedEnd);
-//            double fraction = 1 - (float) duration.toSeconds()/numberOfFiles;
-//            System.out.println(String.format("Fraction: %s", fraction) );
-//            indicator.setFraction(fraction*2);
-            TimeUnit.MILLISECONDS.sleep(200);
+            try {
+                TimeUnit.MILLISECONDS.sleep(200);
+            } catch (InterruptedException exception) {
+                throw new ValeCliExecutionException(exception);
+            }
         }
         return parseValeJsonResponse(future, numberOfFiles);
     }
 
     public Map<String, List<JsonObject>> parseValeJsonResponse(Future<ProcessResult> future, int numberOfFilesToCheck)
-            throws ExecutionException, InterruptedException, TimeoutException {
-        String valeJsonResponse = future.get(numberOfFilesToCheck, TimeUnit.SECONDS).outputUTF8();
+            throws ValeCliExecutionException {
+        String valeJsonResponse;
+        try {
+            valeJsonResponse = future.get(numberOfFilesToCheck, TimeUnit.SECONDS).outputUTF8();
+            return parseJsonResponse(valeJsonResponse);
+        } catch (InterruptedException | ExecutionException | TimeoutException exception) {
+            throw new ValeCliExecutionException(exception);
+        }
+    }
+
+    private Map<String, List<JsonObject>> parseJsonResponse(String valeJsonResponse) {
         Map<String, List<JsonObject>> issuesPerFile = new HashMap<>();
         JsonElement element = JsonParser.parseString(valeJsonResponse);
         if (element.isJsonObject()) {
@@ -107,21 +109,24 @@ public final class ValeCliExecutor {
         return issuesPerFile;
     }
 
-    private StartedProcess executeCommand(List<String> command) throws IOException {
-        String projectPath =
-                Arrays.stream(ProjectRootManager.getInstance(project).getContentRoots())
-                        .findFirst().get().getPath();
-        ProcessExecutor processExecutor = new ProcessExecutor().directory(new File(projectPath))
+    private StartedProcess executeCommand(List<String> command) throws ValeCliExecutionException {
+        ProcessExecutor processExecutor = new ProcessExecutor()
+                .directory(new File(project.getBasePath()))
                 .command(command)
                 .exitValueNormal()
                 .listener(new ValeProcessListener())
                 .destroyOnExit()
                 .readOutput(true);
-        return processExecutor.start();
+        try {
+            return processExecutor.start();
+        } catch (IOException exception) {
+            throw new ValeCliExecutionException(exception);
+        }
     }
 
 
     private List<String> createValeInProjectCommand() {
+        ValePluginSettingsState settingsState = ValePluginSettingsState.getInstance();
         List<String> command = createValeCommand();
         command.add(String.format("--glob=*.{%s}", settingsState.extensions));
         command.add(project.getBasePath());
@@ -129,6 +134,7 @@ public final class ValeCliExecutor {
     }
 
     private List<String> createValeCommand() {
+        ValePluginSettingsState settingsState = ValePluginSettingsState.getInstance();
         List<String> command = new ArrayList<>();
         command.add(settingsState.valePath);
         if (StringUtils.isNotBlank(settingsState.valeSettingsPath)) {
@@ -140,7 +146,6 @@ public final class ValeCliExecutor {
         command.add("--output=JSON");
         return command;
     }
-
 
     public void setNumberOfFiles(int numberOfFiles) {
         this.numberOfFiles = numberOfFiles;

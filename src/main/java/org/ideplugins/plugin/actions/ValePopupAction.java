@@ -15,6 +15,7 @@ import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.psi.PsiFile;
 import com.intellij.util.FileContentUtil;
+import org.ideplugins.plugin.exception.ValeCliExecutionException;
 import org.ideplugins.plugin.service.ValeCliExecutor;
 import org.ideplugins.plugin.service.ValeIssuesReporter;
 import org.ideplugins.plugin.settings.ValePluginSettingsState;
@@ -52,24 +53,21 @@ public class ValePopupAction extends AnAction {
                         if (psiFile != null) {
                             Future<ProcessResult> future = cliExecutor.executeValeCliOnFile(psiFile).getFuture();
                             Map<String, List<JsonObject>> results = cliExecutor.parseValeJsonResponse(future , 2);
-                            reporter.updateIssuesForFile(psiFile.getVirtualFile().getPath(),
-                                    results.get(psiFile.getVirtualFile().getPath()));
+                            updateResults(reporter, results);
                         } else {
                             VirtualFile[] virtualFiles = actionEvent.getData(CommonDataKeys.VIRTUAL_FILE_ARRAY);
                             if (virtualFiles != null && virtualFiles.length > 1) {
                                 List<String> filesToCheck = Arrays.stream(virtualFiles).map(VirtualFile::getPath).collect(Collectors.toList());
                                 Future<ProcessResult> future = cliExecutor.executeValeCliOnFiles(filesToCheck).getFuture();
                                 Map<String, List<JsonObject>> results = cliExecutor.parseValeJsonResponse(future, filesToCheck.size());
-                                for (String file : filesToCheck) {
-                                    reporter.updateIssuesForFile(file, results.get(file));
-                                }
+                                updateResults(reporter, results);
                             }
                         }
-                        ToolWindow toolWindow =
-                                ToolWindowManager.getInstance(project).getToolWindow(ProblemsView.ID);
-                        Objects.requireNonNull(toolWindow).show(() -> ApplicationManager.getApplication()
-                                .invokeAndWait(FileContentUtil::reparseOpenedFiles));
-                    } catch (Exception exception) {
+                        Optional.ofNullable(ToolWindowManager.getInstance(project).getToolWindow(ProblemsView.ID)).ifPresent(toolWindow -> {
+                            toolWindow.show(() -> ApplicationManager.getApplication().invokeAndWait(FileContentUtil::reparseOpenedFiles));
+                        });
+
+                    } catch (ValeCliExecutionException exception) {
                         LOGGER.info("Error executing Vale CLI for file or set of files\n" + exception.getMessage());
                         handleError(project, exception);
                     }
@@ -81,6 +79,11 @@ public class ValePopupAction extends AnAction {
         }
     }
 
+    private static void updateResults(ValeIssuesReporter reporter, Map<String, List<JsonObject>> results) {
+        results.entrySet().stream().forEach(entry -> {
+            reporter.updateIssuesForFile(entry.getKey(), entry.getValue());
+        });
+    }
 
     @Override
     public void update(@NotNull AnActionEvent event) {
@@ -106,7 +109,6 @@ public class ValePopupAction extends AnAction {
                     shouldBeEnabled.set(allFiles);
                 }
                 event.getPresentation().setEnabled(shouldBeEnabled.get());
-
             }
         });
     }
