@@ -18,14 +18,11 @@ import org.ideplugins.plugin.settings.ValePluginSettingsConfigurable;
 import org.ideplugins.plugin.settings.ValePluginSettingsState;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Objects;
-
 import static com.intellij.execution.ui.ConsoleViewContentType.LOG_ERROR_OUTPUT;
 
 public class ActionHelper {
 
     private static final String GROUP_ID = "org.ideplugins.vale-cli-plugin";
-    private static final ValePluginSettingsState settingsState = ValePluginSettingsState.getInstance();
 
     public static void displayNotification(final NotificationType notificationType, final String notificationBody) {
         Notification notification = new Notification(GROUP_ID, "Vale CLI", notificationBody, notificationType);
@@ -39,25 +36,25 @@ public class ActionHelper {
     }
 
     public static ValePluginSettingsState getSettings(){
-        return settingsState;
+        return ValePluginSettingsState.getInstance();
     }
 
     public static void writeTextToConsole(@NotNull Project project, String text, ConsoleViewContentType level) {
         ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow("Vale CLI");
-        ContentManager contentManager = Objects.requireNonNull(toolWindow).getContentManager();
-        Content content = contentManager.findContent("Vale Results");
-        ConsoleView consoleView = (ConsoleView) content.getComponent();
-        consoleView.clear();
-        consoleView.print(text, level);
-        toolWindow.show(null);
+        if (toolWindow != null){
+            ContentManager contentManager = toolWindow.getContentManager();
+            Content content = contentManager.findContent("Vale Results");
+            ConsoleView consoleView = (ConsoleView) content.getComponent();
+            consoleView.clear();
+            consoleView.print(text, level);
+            toolWindow.show(null);
+        }
     }
 
     public static void handleError(Project project, Exception exception) {
-        ApplicationManager.getApplication().invokeLater(()->{
-            writeTextToConsole(project, "There was an error executing vale \n" +
-                            "Please check paths for vale cli binary on Settings -> Tools -> Vale CLI\nError output:\n\t" +
-                            exception.getMessage(),
-                    LOG_ERROR_OUTPUT);
-        });
+        ApplicationManager.getApplication().invokeLater(()-> writeTextToConsole(project, "There was an error executing vale \n" +
+                        "Please check paths for vale cli binary on Settings -> Tools -> Vale CLI\nError output:\n\t" +
+                        exception.getMessage(),
+                LOG_ERROR_OUTPUT));
     }
 }

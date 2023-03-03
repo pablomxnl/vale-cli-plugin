@@ -6,6 +6,7 @@ image:https://img.shields.io/jetbrains/plugin/d/org.ideplugins.vale-cli-plugin[l
 image:https://img.shields.io/gitlab/issues/open/pablomxnl/vale-cli-plugin?style=plastic[link="https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues", title="GitLab issues"]
 image:https://img.shields.io/jetbrains/plugin/r/stars/org.ideplugins.vale-cli-plugin[link="https://plugins.jetbrains.com/plugin/19613-vale-cli/reviews",title="Ratings"]
 image:https://img.shields.io/jetbrains/plugin/v/org.ideplugins.vale-cli-plugin[link="https://plugins.jetbrains.com/plugin/19613-vale-cli",title="Version"]
+image:https://gitlab.com/pablomxnl/vale-cli-plugin/badges/main/coverage.svg[link="https://gitlab.com/pablomxnl/vale-cli-plugin/-/commits/main",title="Coverage report"]
 
 Plugin for JetBrains IDE's that uses https://vale.sh[Vale CLI] to check markdown,asciidoc and other documentation formats
 

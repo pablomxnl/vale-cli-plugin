@@ -13,17 +13,15 @@ import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.FileContentUtil;
 import com.jetbrains.rd.util.AtomicReference;
+import org.ideplugins.plugin.exception.ValeCliExecutionException;
 import org.ideplugins.plugin.service.ValeCliExecutor;
 import org.ideplugins.plugin.service.ValeIssuesReporter;
 import org.jetbrains.annotations.NotNull;
 import org.zeroturnaround.exec.StartedProcess;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
 
 import static com.intellij.execution.ui.ConsoleViewContentType.LOG_ERROR_OUTPUT;
 import static com.intellij.execution.ui.ConsoleViewContentType.LOG_INFO_OUTPUT;
@@ -36,7 +34,7 @@ public class ValeToolsMenuAction extends AnAction {
 
     private static void executeValeInBackground(ValeCliExecutor cliExecutor, ValeIssuesReporter reporter,
                                                 @NotNull ProgressIndicator indicator, AtomicReference<StartedProcess> processReference)
-            throws IOException, ExecutionException, InterruptedException, TimeoutException {
+            throws ValeCliExecutionException {
         processReference.getAndSet(cliExecutor.executeValeCliOnProject());
         Map<String, List<JsonObject>> results = cliExecutor.parseValeJsonResponse(processReference.get().getFuture(), indicator);
         reporter.populateIssuesFromValeResponse(results);
@@ -86,7 +84,7 @@ public class ValeToolsMenuAction extends AnAction {
                     public void run(@NotNull ProgressIndicator indicator) {
                         try {
                             executeValeInBackground(cliExecutor, reporter, indicator, processReference);
-                        } catch (IOException | ExecutionException | InterruptedException | TimeoutException exception) {
+                        } catch (ValeCliExecutionException exception) {
                             LOGGER.info("Error executing Vale CLI for project\n" + exception.getMessage());
                             handleError(project, exception);
                         }
@@ -107,7 +105,6 @@ public class ValeToolsMenuAction extends AnAction {
             } else {
                 displayNotification(NotificationType.WARNING, "Invalid Vale CLI plugin configuration");
                 writeTextToConsole(project, validation.getValue(), LOG_ERROR_OUTPUT);
-
             }
         }
     }
