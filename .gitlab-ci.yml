@@ -14,6 +14,8 @@ cache:
   image: registry.gitlab.com/pablomxnl/vale-cli-plugin/builder
   stage: build
   coverage: '/    - Instruction Coverage: ([0-9.]+)%/'
+  tags:
+    - saas-linux-medium-amd64
   only:
     - main
   artifacts:
@@ -30,6 +32,8 @@ cache:
   image: registry.gitlab.com/pablomxnl/vale-cli-plugin/builder
   stage: build
   coverage: '/    - Instruction Coverage: ([0-9.]+)%/'
+  tags:
+    - saas-linux-medium-amd64    
   only:
     refs:
       - merge_requests
