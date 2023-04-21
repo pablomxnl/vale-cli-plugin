@@ -31,29 +31,30 @@
         <!-- Add your extensions here -->
         <!-- plugin settings -->
         <applicationConfigurable parentId="tools"
-            instance="org.ideplugins.plugin.settings.ValePluginSettingsConfigurable"
-            id="org.ideplugins.plugin.settings.ValePluginSettingsConfigurable"
+            instance="org.ideplugins.vale_cli_plugin.settings.ValePluginSettingsConfigurable"
+            id="org.ideplugins.vale_cli_plugin.settings.ValePluginSettingsConfigurable"
             displayName="Vale CLI"
         />
-        <applicationService serviceImplementation="org.ideplugins.plugin.settings.ValePluginSettingsState" />
-        <projectService serviceImplementation="org.ideplugins.plugin.service.ValeIssuesReporter" />
+        <applicationService serviceImplementation="org.ideplugins.vale_cli_plugin.settings.ValePluginSettingsState" />
+        <projectService serviceImplementation="org.ideplugins.vale_cli_plugin.service.ValeIssuesReporter" />
 
         <!-- output window -->
         <toolWindow id="Vale CLI"
           anchor="bottom"
           canCloseContents="true"
           doNotActivateOnStart="true"
-          factoryClass="org.ideplugins.plugin.toolwindow.ValeToolWindow"
+          factoryClass="org.ideplugins.vale_cli_plugin.toolwindow.ValeToolWindow"
           icon="/icons/pluginIcon2.svg"/>
 
-        <postStartupActivity implementation="org.ideplugins.plugin.activity.ValeStartupActivity" />
+        <postStartupActivity implementation="org.ideplugins.vale_cli_plugin.activity.ValeStartupActivity" />
+        <errorHandler implementation="org.ideplugins.vale_cli_plugin.errorhandling.SentryErrorReporter" />
 
     </extensions>
 
     <actions>
         <!-- Add your actions here -->
-        <action id="org.ideplugins.plugin.actions.ValeToolsMenuAction" icon="/icons/logo-alt.svg"
-                class="org.ideplugins.plugin.actions.ValeToolsMenuAction" text="Vale CLI Check"
+        <action id="org.ideplugins.vale_cli_plugin.actions.ValeToolsMenuAction" icon="/icons/logo-alt.svg"
+                class="org.ideplugins.vale_cli_plugin.actions.ValeToolsMenuAction" text="Vale CLI Check"
                 description="Runs vale check on project">
             <add-to-group group-id="ToolsMenu" anchor="last"/>
             <keyboard-shortcut first-keystroke="shift meta 0" keymap="$default" />
@@ -62,14 +63,14 @@
             <keyboard-shortcut first-keystroke="shift meta 0" keymap="Mac OS X 10.5+" />
         </action>
         <action
-                id="org.ideplugins.plugin.actions.ValePopupAction" icon="/icons/logo-alt.svg"
-                class="org.ideplugins.plugin.actions.ValePopupAction" text="Vale CLI Check"
+                id="org.ideplugins.vale_cli_plugin.actions.ValePopupAction" icon="/icons/logo-alt.svg"
+                class="org.ideplugins.vale_cli_plugin.actions.ValePopupAction" text="Vale CLI Check"
                 description="Run vale cli vs the current file">
             <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
         </action>
         <action
                 id="org.ideplugins.vale_cli_plugin.actions.ValeEditorPopupAction" icon="/icons/logo-alt.svg"
-                class="org.ideplugins.plugin.actions.ValePopupAction" text="Vale CLI Check"
+                class="org.ideplugins.vale_cli_plugin.actions.ValePopupAction" text="Vale CLI Check"
                 description="Run vale cli vs the current file">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
             <keyboard-shortcut first-keystroke="shift meta 1" keymap="$default" />

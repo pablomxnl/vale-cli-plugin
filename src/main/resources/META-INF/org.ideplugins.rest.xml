@@ -1,7 +1,7 @@
 <idea-plugin>
     <extensions defaultExtensionNs="com.intellij">
         <externalAnnotator order="last"
-                           implementationClass="org.ideplugins.plugin.annotator.ValeExternalAnnotatorProcessor"
+                           implementationClass="org.ideplugins.vale_cli_plugin.annotator.ValeExternalAnnotatorProcessor"
                            language="ReST"
         />
     </extensions>
