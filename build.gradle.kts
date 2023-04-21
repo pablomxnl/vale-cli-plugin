@@ -1,4 +1,6 @@
 val typeIDE: String by project
+val ciEnvVar: String? = System.getenv("CI")
+val isInCI: Boolean = ciEnvVar?.isNotEmpty() ?: false
 
 plugins {
     id("java")
@@ -16,6 +18,17 @@ configurations.all {
 
 repositories {
     mavenCentral()
+    maven {
+        name = "GITLAB_MAVEN"
+        setUrl("https://gitlab.com/api/v4/projects/44083372/packages/maven")
+        credentials(HttpHeaderCredentials::class) {
+            name = if (isInCI) "Job-Token" else "Private-Token"
+            value = if (isInCI) System.getenv("CI_JOB_TOKEN") else System.getenv("GITLAB_TOKEN")
+        }
+        authentication {
+            create("header", HttpHeaderAuthentication::class)
+        }
+    }
 }
 
 // Configure Gradle IntelliJ Plugin
@@ -32,23 +45,23 @@ intellij {
     )
     updateSinceUntilBuild.set(false)
     type.set(typeIDE) // Target IDE Platform
-
 }
 
 dependencies {
-    implementation("com.google.code.gson:gson") {
-        version {
-            strictly("2.9.1")
-        }
-    }
+    implementation("com.google.code.gson:gson:2.10.1")
     implementation("org.zeroturnaround:zt-exec:1.12") {
         exclude(group = "org.slf4j", module = "slf4j-api")
     }
-    testImplementation("org.junit.jupiter:junit-jupiter:5.9.0")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.9.0")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.0")
+    implementation("org.ideplugins:pluginSettingsLibrary:0.0.1")
+    implementation("io.sentry:sentry:6.17.0"){
+        exclude(group = "org.slf4j")
+    }
+    testImplementation("org.junit.jupiter:junit-jupiter:5.9.2")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.9.2")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.2")
     testImplementation("org.assertj:assertj-core:3.24.2")
     testImplementation("org.mockito:mockito-core:4.11.0")
+
 }
 
 
@@ -81,6 +94,13 @@ tasks {
         changeNotes.set(
             """
     <ul>
+    <li>0.0.9
+        <ul>
+        <li>Add plugin update notification</li>
+        <li>Add error reporter</li>
+        <li>Fix minor issue where vale error reported on last line of a file was not annotated</li>
+        </ul>
+    </li>
     <li>0.0.8
         <ul>
         <li>Fixes <a href='https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/15' >#15</a> exception in external annotator when editing a file</li>
