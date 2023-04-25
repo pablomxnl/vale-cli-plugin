@@ -3,7 +3,6 @@ package org.ideplugins.vale_cli_plugin.service;
 import com.google.gson.JsonObject;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
-import com.intellij.serviceContainer.NonInjectable;
 import org.ideplugins.vale_cli_plugin.settings.OSUtils;
 
 import java.text.MessageFormat;
@@ -11,19 +10,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Service
-public class ValeIssuesReporter {
+@Service(Service.Level.PROJECT)
+public final class ValeIssuesReporter {
 
-    private final Project project;
     private Map<String, List<JsonObject>> issuesPerFile;
 
-    @NonInjectable
     public ValeIssuesReporter(Project project) {
-        this(project, new HashMap<>());
+        this(new HashMap<>());
     }
 
-    public ValeIssuesReporter(Project project, Map<String, List<JsonObject>> issues) {
-        this.project = project;
+    public ValeIssuesReporter(Map<String, List<JsonObject>> issues) {
         issuesPerFile = issues;
     }
 
