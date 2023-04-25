@@ -36,7 +36,6 @@
             displayName="Vale CLI"
         />
         <applicationService serviceImplementation="org.ideplugins.vale_cli_plugin.settings.ValePluginSettingsState" />
-        <projectService serviceImplementation="org.ideplugins.vale_cli_plugin.service.ValeIssuesReporter" />
 
         <!-- output window -->
         <toolWindow id="Vale CLI"
