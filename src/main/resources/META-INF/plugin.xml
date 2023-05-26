@@ -5,18 +5,12 @@
             url="https://gitlab.com/pablomxnl/vale-cli-plugin/">
         The Plugin Dude
     </vendor>
-
-
     <description><![CDATA[
-<p>
-    Plugin that uses <em><a href="https://vale.sh/">Vale CLI</a></em> to check markdown,asciidoc and other documentation
-    formats
-    <br/>
-    <img src="https://gitlab.com/pablomxnl/vale-cli-plugin/-/raw/main/docimages/vale-cli-plugin-0.4-small.png" />
-</p>
-
+        <p>
+            Plugin that uses <em><a href="https://vale.sh/">Vale CLI</a></em> to check markdown,asciidoc and other documentation
+            formats
+        </p>
     ]]></description>
-
 
     <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
          on how to target different products -->
@@ -31,19 +25,20 @@
         <!-- Add your extensions here -->
         <!-- plugin settings -->
         <applicationConfigurable parentId="tools"
-            instance="org.ideplugins.vale_cli_plugin.settings.ValePluginSettingsConfigurable"
-            id="org.ideplugins.vale_cli_plugin.settings.ValePluginSettingsConfigurable"
-            displayName="Vale CLI"
+                                 instance="org.ideplugins.vale_cli_plugin.settings.ValePluginSettingsConfigurable"
+                                 id="org.ideplugins.vale_cli_plugin.settings.ValePluginSettingsConfigurable"
+                                 displayName="Vale CLI"
         />
         <applicationService serviceImplementation="org.ideplugins.vale_cli_plugin.settings.ValePluginSettingsState" />
+        <projectService serviceImplementation="org.ideplugins.vale_cli_plugin.service.ValeIssuesReporter" />
 
         <!-- output window -->
         <toolWindow id="Vale CLI"
-          anchor="bottom"
-          canCloseContents="true"
-          doNotActivateOnStart="true"
-          factoryClass="org.ideplugins.vale_cli_plugin.toolwindow.ValeToolWindow"
-          icon="/icons/pluginIcon2.svg"/>
+                    anchor="bottom"
+                    canCloseContents="true"
+                    doNotActivateOnStart="true"
+                    factoryClass="org.ideplugins.vale_cli_plugin.toolwindow.ValeToolWindow"
+                    icon="/icons/pluginIcon2.svg"/>
 
         <postStartupActivity implementation="org.ideplugins.vale_cli_plugin.activity.ValeStartupActivity" />
         <errorHandler implementation="org.ideplugins.vale_cli_plugin.errorhandling.SentryErrorReporter" />
