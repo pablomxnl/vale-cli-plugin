@@ -1,3 +1,4 @@
+import org.jetbrains.intellij.tasks.RunIdeTask
 import org.jsoup.Jsoup
 
 fun properties(key: String) = providers.gradleProperty(key)
@@ -42,7 +43,6 @@ repositories {
 intellij {
     version = properties("platformVersion")
     plugins = properties("platformPlugins").map { it.split(',').map(String::trim).filter(String::isNotEmpty) }
-    updateSinceUntilBuild = false
     type = properties("platformType") // Target IDE Platform
 }
 
@@ -61,7 +61,33 @@ dependencies {
 
     testRuntimeOnly(libs.junitplatform)
     testRuntimeOnly(libs.junitengine)
+}
 
+val dir1 = file("${intellij.sandboxDir.get()}/manualtest")
+val dirConfig = file("${intellij.sandboxDir.get()}/manualtest/config")
+val dirSystem = file("${intellij.sandboxDir.get()}/manualtest/system")
+
+tasks.register("createDirsManualTesting"){
+    mkdir(dir1.toPath())
+    mkdir(dirConfig.toPath())
+    mkdir(dirSystem.toPath())
+}
+
+tasks.register<RunIdeTask>("runForManualTests"){
+    dependsOn("createDirsManualTesting")
+    doFirst{
+        copy{
+            from("${projectDir}/src/test/resources/ide/options/")
+            into("${dirConfig}/options/")
+            include("*.xml")
+        }
+    }
+    configDir = dirConfig
+    systemDir = dirSystem
+    systemProperty("idea.auto.reload.plugins", "false")
+    systemProperty("idea.trust.all.projects", "true")
+    systemProperty("ide.show.tips.on.startup.default.value", "false")
+    args = listOf("${projectDir}/src/test/resources/multiplefiles-example/")
 }
 
 tasks {
@@ -74,6 +100,10 @@ tasks {
 
     withType<Test>{
         useJUnitPlatform()
+        configure<JacocoTaskExtension> {
+            isIncludeNoLocationClasses = true
+            excludes = listOf("jdk.internal.*")
+        }
         finalizedBy("jacocoTestReport")
     }
 
@@ -88,7 +118,6 @@ tasks {
         systemProperty("idea.auto.reload.plugins", "false")
         systemProperty("idea.trust.all.projects", "true")
         systemProperty("ide.show.tips.on.startup.default.value", "false")
-        args = listOf("${projectDir}/src/test/resources/multiplefiles-example/")
     }
 
     init {

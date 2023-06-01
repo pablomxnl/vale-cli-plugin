@@ -35,13 +35,14 @@ public class ValeToolsMenuAction extends AnAction {
     private static void executeValeInBackground(ValeCliExecutor cliExecutor, ValeIssuesReporter reporter,
                                                 @NotNull ProgressIndicator indicator, AtomicReference<StartedProcess> processReference)
             throws ValeCliExecutionException {
-        processReference.getAndSet(cliExecutor.executeValeCliOnProject());
         Map<String, List<JsonObject>> results = cliExecutor.parseValeJsonResponse(processReference.get().getFuture(), indicator);
         reporter.populateIssuesFromValeResponse(results);
     }
 
     private static void killProcess(AtomicReference<StartedProcess> processReference) {
-        processReference.get().getFuture().cancel(true);
+        Optional.ofNullable(processReference.get()).ifPresent(reference -> {
+            reference.getFuture().cancel(true);
+        });
     }
 
     private static void reparseAndDisplaySuccessMessage(ValeIssuesReporter reporter, Project project, ValeCliExecutor cliExecutor) {
@@ -80,6 +81,7 @@ public class ValeToolsMenuAction extends AnAction {
                     @Override
                     public void run(@NotNull ProgressIndicator indicator) {
                         try {
+                            processReference.getAndSet(cliExecutor.executeValeCliOnProject());
                             executeValeInBackground(cliExecutor, reporter, indicator, processReference);
                         } catch (ValeCliExecutionException exception) {
                             LOGGER.info("Error executing Vale CLI for project\n" + exception.getMessage());
@@ -89,9 +91,11 @@ public class ValeToolsMenuAction extends AnAction {
 
                     @Override
                     public void onSuccess() {
-                        if (processReference.get().getProcess().exitValue() == 0){
-                            reparseAndDisplaySuccessMessage(reporter, project, cliExecutor);
-                        }
+                        Optional.ofNullable(processReference.get()).ifPresent( reference -> {
+                            if (reference.getProcess().exitValue() == 0){
+                                reparseAndDisplaySuccessMessage(reporter, project, cliExecutor);
+                            }
+                        });
                     }
 
                     @Override
