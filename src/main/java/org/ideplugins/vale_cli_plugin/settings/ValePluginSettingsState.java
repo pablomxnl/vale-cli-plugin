@@ -2,13 +2,13 @@ package org.ideplugins.vale_cli_plugin.settings;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
+import com.intellij.openapi.components.Service;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 
@@ -20,7 +20,8 @@ import static  java.util.Map.Entry;
         name = "org.ideplugins.vale_cli_plugin.settings",
         storages = {@Storage("valeCliSettings.xml")}
 )
-public class ValePluginSettingsState implements PersistentStateComponent<ValePluginSettingsState> {
+@Service(Service.Level.APP)
+final public class ValePluginSettingsState implements PersistentStateComponent<ValePluginSettingsState> {
 
     @Override
     public void initializeComponent() {
@@ -37,7 +38,6 @@ public class ValePluginSettingsState implements PersistentStateComponent<ValePlu
     public String valeSettingsPath = "";
     public String extensions = "md,adoc,rst";
 
-    @Nullable
     @Override
     public ValePluginSettingsState getState() {
         return this;

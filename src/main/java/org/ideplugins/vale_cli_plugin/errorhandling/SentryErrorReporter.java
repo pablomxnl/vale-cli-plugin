@@ -60,7 +60,7 @@ public class SentryErrorReporter extends ErrorReportSubmitter {
     public @Nullable String getPrivacyNoticeText() {
         String path = getClass().getPackageName().replaceAll("\\.", "/");
         String fileName = getClass().getSimpleName();
-        String url = "https://gitlab.com/pablomxnl/gitlab-yaml-pipeline-lint/-/blob/main/src/main/java/%s/%s.java";
+        String url = "https://gitlab.com/pablomxnl/vale-cli-plugin/-/blob/main/src/main/java/%s/%s.java";
         String gitlabSourceLink =
                 String.format(url, path, fileName);
         return "This error reporter doesn't log any PII or system information, just the stacktrace, \n" +

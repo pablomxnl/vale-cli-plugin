@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.concurrent.*;
 
 
-@Service
+@Service(Service.Level.PROJECT)
 public final class ValeCliExecutor {
 
     private final Project project;

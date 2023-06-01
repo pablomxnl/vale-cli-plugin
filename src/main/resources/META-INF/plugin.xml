@@ -15,10 +15,10 @@
     <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
          on how to target different products -->
     <depends>com.intellij.modules.platform</depends>
-    <depends optional="true" config-file="org.ideplugins.java.xml">com.intellij.java</depends>
-    <depends optional="true" config-file="org.ideplugins.markdown.xml">org.intellij.plugins.markdown</depends>
-    <depends optional="true" config-file="org.ideplugins.rest.xml">org.jetbrains.plugins.rest</depends>
-    <depends optional="true" config-file="org.ideplugins.asciidoc.xml">org.asciidoctor.intellij.asciidoc</depends>
+    <depends optional="true" config-file="org.ideplugins.vale-cli-plugin-java.xml">com.intellij.java</depends>
+    <depends config-file="org.ideplugins.vale-cli-plugin-markdown.xml">org.intellij.plugins.markdown</depends>
+    <depends optional="true" config-file="org.ideplugins.vale-cli-plugin-rest.xml">org.jetbrains.plugins.rest</depends>
+    <depends config-file="org.ideplugins.vale-cli-plugin-asciidoc.xml">org.asciidoctor.intellij.asciidoc</depends>
     <idea-version since-build="213" />
 
     <extensions defaultExtensionNs="com.intellij">
@@ -39,7 +39,7 @@
                     doNotActivateOnStart="true"
                     factoryClass="org.ideplugins.vale_cli_plugin.toolwindow.ValeToolWindow"
                     icon="/icons/pluginIcon2.svg"/>
-
+        <notificationGroup displayType="STICKY_BALLOON" id="vale-cli-plugin-update" />
         <postStartupActivity implementation="org.ideplugins.vale_cli_plugin.activity.ValeStartupActivity" />
         <errorHandler implementation="org.ideplugins.vale_cli_plugin.errorhandling.SentryErrorReporter" />
 
