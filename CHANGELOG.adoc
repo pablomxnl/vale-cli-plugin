@@ -7,6 +7,11 @@ This document provides an overview of the changes by release.
 [[releasenotes]]
 == Release notes
 
+=== 0.0.11
+
+- Fixes https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/18[#18] NPE reported by plugin user in sentry in writeTextToConsole
+- Fixes https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/18[#17] NPE reported by plugin user in sentry when executing Tools Menu Action
+
 === 0.0.10
 
 - Fix plugin exception in external annotator
