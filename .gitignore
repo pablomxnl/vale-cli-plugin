@@ -3,3 +3,4 @@
 build
 .gradle
 ./styles/
+CHANGELOG.xml
