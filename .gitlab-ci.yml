@@ -1,6 +1,5 @@
 stages:
   - build
-  - build-docs
   - deploy
 
 variables:
@@ -36,7 +35,7 @@ cache:
   stage: build
   coverage: '/    - Instruction Coverage: ([0-9.]+)%/'
   tags:
-    - saas-linux-medium-amd64    
+    - saas-linux-medium-amd64
   only:
     refs:
       - merge_requests
@@ -64,7 +63,7 @@ release_artifact:
 
 build-documentation:
   image: registry.jetbrains.team/p/writerside/builder/writerside-builder:2.1.1435-p3718
-  stage: build-docs
+  stage: build
   only:
     refs:
       - merge_requests
