@@ -40,7 +40,7 @@ The plugin requires at least the Vale CLI tool installed, optional dependency fo
 ### Vale config file generation
 Once the Vale CLI binary has been installed, a configuration file has to be created.
 
-This a minimal configuration to get started, place this into a file named either `.vale.ini` or `_vale.ini` at the root of the project, or on the user's home directory (for Linux/Mac usually contained in `$HOME` environment variable, for Windows usually contained in `%USERPROFILE%` environment variable).
+This a minimal configuration to get started, place this into a file named either `.vale.ini` or `_vale.ini` at the root of the project, or on the user's home directory (for Linux/Mac usually contained in `$HOME` environment variable, for Windows usually contained in `%\USERPROFILE%` environment variable).
 
 ```
 StylesPath = styles
