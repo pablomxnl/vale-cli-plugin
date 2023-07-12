@@ -104,7 +104,7 @@ tasks {
             isIncludeNoLocationClasses = true
             excludes = listOf("jdk.internal.*")
         }
-        finalizedBy("jacocoTestReport")
+        finalizedBy(jacocoTestReport)
     }
 
     runIde {
@@ -151,10 +151,14 @@ tasks {
     }
 
     publishPlugin {
+        if (semver.preRelease.contains("SNAPSHOT")) {
+            channels = listOf("EAP")
+        }
         token = environment("JBM_PUBLISH_TOKEN")
     }
 
     jacocoTestReport {
+        classDirectories.setFrom(instrumentCode)
         reports {
             xml.required = true
         }
