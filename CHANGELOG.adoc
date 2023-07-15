@@ -7,6 +7,11 @@ This document provides an overview of the changes by release.
 [[releasenotes]]
 == Release notes
 
+=== 0.0.12 (future release)
+
+- https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/19[Add fix intention action]
+
+
 === 0.0.11
 
 - Fixes https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/18[#18] NPE reported by plugin user in sentry in writeTextToConsole

@@ -1,10 +1,14 @@
 package org.ideplugins.vale_cli_plugin.annotator;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.intellij.lang.annotation.AnnotationBuilder;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.ExternalAnnotator;
 import com.intellij.lang.annotation.HighlightSeverity;
 import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
 import org.ideplugins.vale_cli_plugin.service.ValeIssuesReporter;
@@ -45,14 +49,28 @@ public class ValeExternalAnnotatorProcessor extends ExternalAnnotator<InitialAnn
                 int finalColumn = span.get(1).getAsInt();
                 Optional.ofNullable(annotationResult.getRange(line, initialColumn, finalColumn)).ifPresent(range -> {
                     if (annotationResult.isValidRangeForAnnotation(range)) {
-                        String valeSeverity = jsonObject.get("Severity").getAsString();
-                        HighlightSeverity severity = getSeverity(valeSeverity);
-                        holder.newAnnotation(severity, jsonObject.get("Message").getAsString())
-                                .tooltip(jsonObject.get("Message").getAsString()).range(range).create();
+                        createAnnotation(holder, jsonObject, range);
                     }
                 });
             });
         }
+    }
+
+    private void createAnnotation(AnnotationHolder holder, JsonObject jsonObject, TextRange range) {
+        String valeSeverity = jsonObject.get("Severity").getAsString();
+        HighlightSeverity severity = getSeverity(valeSeverity);
+        JsonObject action = jsonObject.getAsJsonObject("Action");
+        String actionName = action.get("Name").getAsString();
+        JsonElement params = action.get("Params");
+        AnnotationBuilder ab =
+        holder.newAnnotation(severity, jsonObject.get("Message").getAsString())
+                .tooltip(jsonObject.get("Message").getAsString()).range(range);
+        if ("replace".equals(actionName) && params.isJsonArray()){
+            String term = jsonObject.get("Match").getAsString();
+            String replacement =  params.getAsJsonArray().get(0).getAsString();
+            ab = ab.withFix(new ValeReplaceQuickFix(term, replacement, range));
+        }
+        ab.create();
     }
 
     private HighlightSeverity getSeverity(@NotNull String valeSeverity) {
@@ -66,7 +84,7 @@ public class ValeExternalAnnotatorProcessor extends ExternalAnnotator<InitialAnn
                 break;
             case "suggestion":
             default:
-                severity = HighlightSeverity.WEAK_WARNING;
+                severity = HighlightSeverity.INFORMATION;
         }
         return severity;
     }
