@@ -1,6 +1,7 @@
 package org.ideplugins.vale_cli_plugin.service;
 
 import com.google.gson.JsonObject;
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
 import org.ideplugins.vale_cli_plugin.settings.OSUtils;
@@ -11,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service(Service.Level.PROJECT)
-public final class ValeIssuesReporter {
+public final class ValeIssuesReporter implements Disposable {
 
     private Map<String, List<JsonObject>> issuesPerFile;
 
@@ -56,4 +57,18 @@ public final class ValeIssuesReporter {
         message.append(files);
         return message.toString();
     }
+
+    public int getTotalFiles(){
+        return issuesPerFile.size();
+    }
+
+    @Override
+    public void dispose() {
+        issuesPerFile.clear();
+    }
+
+    public void remove(String path) {
+        issuesPerFile.remove(path);
+    }
+
 }

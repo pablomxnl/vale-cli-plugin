@@ -5,12 +5,14 @@ import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManagerCore;
 import com.intellij.notification.*;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.StartupActivity;
 import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import org.apache.commons.lang.StringUtils;
+import org.ideplugins.vale_cli_plugin.listener.FileSavedListener;
 import org.ideplugins.vale_cli_plugin.service.ValeCliExecutor;
 import org.ideplugins.vale_cli_plugin.settings.ValeCliPluginConfigurationState;
 import org.ideplugins.vale_cli_plugin.settings.ValePluginSettingsState;
@@ -60,6 +62,9 @@ public class ValeStartupActivity implements StartupActivity {
     @Override
     public void runActivity(@NotNull Project project) {
         ApplicationManager.getApplication().executeOnPooledThread(() -> getValeFilesCount(project));
+        FileSavedListener listener = FileSavedListener.getInstance(project);
+        EditorFactory.getInstance().getEventMulticaster().addDocumentListener(listener, listener);
+        listener.activate();
         PluginId id = PluginId.getId(PLUGIN_ID);
         IdeaPluginDescriptor pluginDescriptor = PluginManagerCore.getPlugin(id);
         if (pluginDescriptor != null) {

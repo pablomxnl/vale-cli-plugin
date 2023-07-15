@@ -3,10 +3,10 @@
 The plugin requires at least the Vale CLI tool installed, optional dependency for asciidoctor and docutils if planning to lint asciidoctor or ReStructured text files.
 
 
-> **Make sure these dependencies are on your system path**
+> **Make sure these dependencies are available on your system path**
 >
-> For the Vale CLI, the plugin will try to find it's location, if it fails, there is still the option to specify it's location on the [plugin settings](starter-topic.md#configuration). For asciidoctor or docutils, these
-> need to be included in the <code>$PATH</code> environment variable, as the Vale CLI binary will try to invoke them.
+> For the Vale CLI, the plugin tries to find it's location, if it fails, there is still the option to specify it's location on the [plugin settings](starter-topic.md#configuration). For asciidoctor or docutils, these
+> need to be included in the <code>$PATH</code> environment variable, as the Vale CLI binary invokes them from there.
 >
 {style="note"}
 

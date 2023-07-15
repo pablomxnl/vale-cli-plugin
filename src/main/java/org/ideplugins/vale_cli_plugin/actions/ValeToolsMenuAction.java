@@ -40,9 +40,7 @@ public class ValeToolsMenuAction extends AnAction {
     }
 
     private static void killProcess(AtomicReference<StartedProcess> processReference) {
-        Optional.ofNullable(processReference.get()).ifPresent(reference -> {
-            reference.getFuture().cancel(true);
-        });
+        Optional.ofNullable(processReference.get()).ifPresent(reference -> reference.getFuture().cancel(true));
     }
 
     private static void reparseAndDisplaySuccessMessage(ValeIssuesReporter reporter, Project project, ValeCliExecutor cliExecutor) {

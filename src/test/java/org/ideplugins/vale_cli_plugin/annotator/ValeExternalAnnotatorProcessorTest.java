@@ -7,7 +7,7 @@ import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.HighlightSeverity;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiFile;
-import com.intellij.testFramework.fixtures.JavaCodeInsightTestFixture;
+import com.intellij.testFramework.fixtures.CodeInsightTestFixture;
 import org.ideplugins.vale_cli_plugin.BaseTest;
 import org.ideplugins.vale_cli_plugin.testing.PluginTest;
 import org.ideplugins.vale_cli_plugin.exception.ValeCliExecutionException;
@@ -32,7 +32,7 @@ import static org.mockito.Mockito.when;
 public class ValeExternalAnnotatorProcessorTest extends BaseTest {
 
     @Test
-    public void testAnnotator(JavaCodeInsightTestFixture codeInsightTestFixture) throws ValeCliExecutionException {
+    public void testAnnotator(CodeInsightTestFixture codeInsightTestFixture) throws ValeCliExecutionException {
         codeInsightTestFixture.copyDirectoryToProject("annotator-test", "src");
         PsiFile file = codeInsightTestFixture.configureFromTempProjectFile("src/readme.md");
         ValeCliExecutor executor = ValeCliExecutor.getInstance(codeInsightTestFixture.getProject());
