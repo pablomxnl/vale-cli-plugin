@@ -2,6 +2,11 @@ What's new
 =====
 This document provides an overview of the changes by release.
 
+0.0.12 (future release)
+------
+
+-   [Add fix intention action](https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/19)
+
 0.0.11
 ------
 
