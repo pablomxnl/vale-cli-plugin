@@ -2,7 +2,7 @@ package org.ideplugins.vale_cli_plugin.actions;
 
 import com.google.gson.JsonObject;
 import com.intellij.psi.PsiFile;
-import com.intellij.testFramework.fixtures.JavaCodeInsightTestFixture;
+import com.intellij.testFramework.fixtures.CodeInsightTestFixture;
 import org.ideplugins.vale_cli_plugin.BaseTest;
 import org.ideplugins.vale_cli_plugin.exception.ValeCliExecutionException;
 import org.ideplugins.vale_cli_plugin.service.ValeCliExecutor;
@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ValePopupActionTest extends BaseTest {
 
     @Test
-    public void testAction(JavaCodeInsightTestFixture codeInsightTestFixture) throws ValeCliExecutionException {
+    public void testAction(CodeInsightTestFixture codeInsightTestFixture) throws ValeCliExecutionException {
         codeInsightTestFixture.copyDirectoryToProject("multiplefiles-example", "content");
         PsiFile[] files = codeInsightTestFixture.configureByFiles("content/readme.md", "content/manual.md");
         codeInsightTestFixture.testAction(new ValePopupAction());

@@ -4,9 +4,12 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.components.Service;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import org.apache.commons.lang.StringUtils;
 import org.ideplugins.vale_cli_plugin.exception.ValeCliExecutionException;
@@ -30,7 +33,9 @@ import java.util.concurrent.*;
 
 
 @Service(Service.Level.PROJECT)
-public final class ValeCliExecutor {
+public final class ValeCliExecutor implements Disposable {
+
+    private final Logger LOGGER = Logger.getInstance(ValeCliExecutor.class);
 
     private final Project project;
 
@@ -51,17 +56,27 @@ public final class ValeCliExecutor {
         String filePath = file.getVirtualFile().getPath();
         List<String> command = createValeCommand();
         command.add(filePath);
+        LOGGER.info("Running executeValeCliOnFile on PSI file " + filePath);
+        return executeCommand(command);
+    }
+
+    public StartedProcess executeValeCliOnFile(VirtualFile file) throws ValeCliExecutionException {
+        List<String> command = createValeCommand();
+        command.add(file.getPath());
+        LOGGER.info("Running executeValeCliOnFile on VirtualFile file " + file.getPath());
         return executeCommand(command);
     }
 
     public StartedProcess executeValeCliOnFiles(List<String> files) throws ValeCliExecutionException {
         List<String> command = createValeCommand();
         command.addAll(files);
+        LOGGER.info("Running executeValeCliOnFiles on files " + files);
         return executeCommand(command);
     }
 
     public StartedProcess executeValeCliOnProject() throws ValeCliExecutionException {
         List<String> command = createValeInProjectCommand();
+        LOGGER.info("Running executeValeCliOnFiles on project " + project.getName());
         return executeCommand(command);
     }
 
@@ -110,6 +125,7 @@ public final class ValeCliExecutor {
     }
 
     private StartedProcess executeCommand(List<String> command) throws ValeCliExecutionException {
+        LOGGER.info("Executing vale command: " + command);
         ProcessExecutor processExecutor = new ProcessExecutor()
                 .directory(new File(project.getBasePath()))
                 .command(command)
@@ -157,6 +173,11 @@ public final class ValeCliExecutor {
 
     public long getExecutionTime() {
         return executionTime;
+    }
+
+    @Override
+    public void dispose() {
+
     }
 
     private class ValeProcessListener extends ProcessListener {

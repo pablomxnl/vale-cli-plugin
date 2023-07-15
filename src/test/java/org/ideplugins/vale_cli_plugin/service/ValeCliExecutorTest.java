@@ -2,7 +2,7 @@ package org.ideplugins.vale_cli_plugin.service;
 
 import com.google.gson.JsonObject;
 import com.intellij.psi.PsiFile;
-import com.intellij.testFramework.fixtures.JavaCodeInsightTestFixture;
+import com.intellij.testFramework.fixtures.CodeInsightTestFixture;
 import org.ideplugins.vale_cli_plugin.BaseTest;
 import org.ideplugins.vale_cli_plugin.testing.PluginTest;
 import org.ideplugins.vale_cli_plugin.exception.ValeCliExecutionException;
@@ -24,7 +24,7 @@ public class ValeCliExecutorTest extends BaseTest {
 
     @Test
     @Order(3)
-    public void testSingleFile(JavaCodeInsightTestFixture codeInsightTestFixture) throws ValeCliExecutionException {
+    public void testSingleFile(CodeInsightTestFixture codeInsightTestFixture) throws ValeCliExecutionException {
         codeInsightTestFixture.copyDirectoryToProject("markdown-example", "src");
         PsiFile file = codeInsightTestFixture.configureFromTempProjectFile("src/readme.md");
         ValeCliExecutor executor = ValeCliExecutor.getInstance(codeInsightTestFixture.getProject());
@@ -36,7 +36,7 @@ public class ValeCliExecutorTest extends BaseTest {
 
     @Test
     @Order(2)
-    public void testMultipleFiles(JavaCodeInsightTestFixture codeInsightTestFixture) throws ValeCliExecutionException {
+    public void testMultipleFiles(CodeInsightTestFixture codeInsightTestFixture) throws ValeCliExecutionException {
         codeInsightTestFixture.copyDirectoryToProject("multiplefiles-example", "content");
         PsiFile []files = codeInsightTestFixture.configureByFiles("content/readme.md", "content/manual.md");
         ValeCliExecutor executor = ValeCliExecutor.getInstance(codeInsightTestFixture.getProject());
@@ -51,9 +51,9 @@ public class ValeCliExecutorTest extends BaseTest {
 
     @Test
     @Order(1)
-    public void testProject(JavaCodeInsightTestFixture codeInsightTestFixture) throws ValeCliExecutionException {
-        codeInsightTestFixture.copyDirectoryToProject("multiplefiles-example", "content");
-        PsiFile []files = codeInsightTestFixture.configureByFiles("content/readme.md", "content/manual.md");
+    public void testProject(CodeInsightTestFixture codeInsightTestFixture) throws ValeCliExecutionException {
+        codeInsightTestFixture.copyDirectoryToProject("multiplefiles-example", "src");
+        PsiFile []files = codeInsightTestFixture.configureByFiles("src/readme.md", "src/manual.md");
         ValeCliExecutor executor = ValeCliExecutor.getInstance(codeInsightTestFixture.getProject());
         StartedProcess process  = executor.executeValeCliOnProject();
         Map<String, List<JsonObject>> result = executor.parseValeJsonResponse(process.getFuture(), files.length);
@@ -65,7 +65,7 @@ public class ValeCliExecutorTest extends BaseTest {
 
     @Test
     @Order(20)
-    public void testValeConfigurationFileNotFound(JavaCodeInsightTestFixture codeInsightTestFixture) {
+    public void testValeConfigurationFileNotFound(CodeInsightTestFixture codeInsightTestFixture) {
         codeInsightTestFixture.copyDirectoryToProject("multiplefiles-example", "content");
         PsiFile file = codeInsightTestFixture.configureFromTempProjectFile("content/readme.md");
         settings.valeSettingsPath = "/tmp/.valeddd.ini";
@@ -79,7 +79,7 @@ public class ValeCliExecutorTest extends BaseTest {
 
     @Test
     @Order(21)
-    public void testBinaryNotFound(JavaCodeInsightTestFixture codeInsightTestFixture) {
+    public void testBinaryNotFound(CodeInsightTestFixture codeInsightTestFixture) {
         codeInsightTestFixture.copyDirectoryToProject("multiplefiles-example", "content");
         PsiFile file = codeInsightTestFixture.configureFromTempProjectFile("content/readme.md");
         settings.valePath = "/home/tmp/vale";

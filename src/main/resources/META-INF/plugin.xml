@@ -40,9 +40,9 @@
                     factoryClass="org.ideplugins.vale_cli_plugin.toolwindow.ValeToolWindow"
                     icon="/icons/pluginIcon2.svg"/>
         <notificationGroup displayType="STICKY_BALLOON" id="vale-cli-plugin-update" />
-        <postStartupActivity implementation="org.ideplugins.vale_cli_plugin.activity.ValeStartupActivity" />
+        <postStartupActivity implementation="org.ideplugins.vale_cli_plugin.activity.ValeStartupActivity" id="valeStartupActivity" />
         <errorHandler implementation="org.ideplugins.vale_cli_plugin.errorhandling.SentryErrorReporter" />
-
+        <typedHandler implementation="org.ideplugins.vale_cli_plugin.listener.TypedHandler"  id="valeKeyListener" />
     </extensions>
 
     <actions>
@@ -51,10 +51,6 @@
                 class="org.ideplugins.vale_cli_plugin.actions.ValeToolsMenuAction" text="Vale CLI Check"
                 description="Runs vale check on project">
             <add-to-group group-id="ToolsMenu" anchor="last"/>
-            <keyboard-shortcut first-keystroke="shift meta 0" keymap="$default" />
-            <keyboard-shortcut first-keystroke="shift meta 0" keymap="Default for KDE"/>
-            <keyboard-shortcut first-keystroke="shift meta 0" keymap="Default for GNOME" />
-            <keyboard-shortcut first-keystroke="shift meta 0" keymap="Mac OS X 10.5+" />
         </action>
         <action
                 id="org.ideplugins.vale_cli_plugin.actions.ValePopupAction" icon="/icons/logo-alt.svg"
@@ -67,11 +63,6 @@
                 class="org.ideplugins.vale_cli_plugin.actions.ValePopupAction" text="Vale CLI Check"
                 description="Run vale cli vs the current file">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
-            <keyboard-shortcut first-keystroke="shift meta 1" keymap="$default" />
-            <keyboard-shortcut first-keystroke="shift meta 1" keymap="Default for KDE"/>
-            <keyboard-shortcut first-keystroke="shift meta 1" keymap="Default for GNOME" />
-            <keyboard-shortcut first-keystroke="shift meta 1" keymap="Mac OS X 10.5+" />
-
         </action>
     </actions>
 </idea-plugin>

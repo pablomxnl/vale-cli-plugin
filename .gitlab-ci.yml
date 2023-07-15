@@ -52,7 +52,7 @@ cache:
 build_artifact:
   extends: .build_artifact
   script:
-    - gradle test
+    - gradle test --stacktrace --info
     - gradle -Dversion.prerelease=$CI_PIPELINE_ID-SNAPSHOT buildPlugin
 
 release_artifact:

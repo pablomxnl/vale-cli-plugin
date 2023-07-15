@@ -7,10 +7,17 @@ import java.nio.file.Path;
 
 public class TempDirProjectImpl extends TempDirTestFixtureImpl {
 
-    private final Path root;
+    private Path root;
+
+    public TempDirProjectImpl(){
+    }
 
     public TempDirProjectImpl(Path root){
         this.root = root;
+    }
+
+    public void setRoot(Path newRoot){
+        this.root = newRoot;
     }
 
     @Override

@@ -1,11 +1,11 @@
 What's new
 =====
-This document provides an overview of the changes by release.
+This document provides an overview of the changes by release. 
 
-0.0.12 (future release)
+0.0.12
 ------
-
--   [Add fix intention action](https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/19)
+-    [Run the Vale plugin on save](https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/7)  
+-    [Add fix intention action](https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/19)
 
 0.0.11
 ------
