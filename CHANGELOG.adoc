@@ -7,6 +7,11 @@ This document provides an overview of the changes by release.
 [[releasenotes]]
 == Release notes
 
+=== 0.0.13
+
+- Fixes https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/20[#20] NPE reported by plugin users to sentry in TypedHandler
+
+
 === 0.0.12
 
 - https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/7[Run the Vale plugin on save]

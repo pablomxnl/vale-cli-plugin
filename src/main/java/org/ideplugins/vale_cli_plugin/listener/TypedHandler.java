@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class TypedHandler extends TypedHandlerDelegate {
@@ -25,12 +26,14 @@ public class TypedHandler extends TypedHandlerDelegate {
     @Override
     public @NotNull Result charTyped(char c, @NotNull Project project, @NotNull Editor editor, @NotNull PsiFile file) {
         if (settings==null){
-            settings = project.getService(ValePluginSettingsState.class);
+            settings = ValePluginSettingsState.getInstance();
         }
-        if (settings.extensions.contains(file.getVirtualFile().getExtension())) {
-            Instant begin = Instant.now();
-            keyStrokesTimeStamps.put(file.getVirtualFile().getPath(), begin);
-        }
+        Optional.ofNullable(file.getVirtualFile()).ifPresent(virtualFile -> {
+            if (virtualFile.getExtension()!=null && settings.extensions.contains(virtualFile.getExtension())) {
+                Instant begin = Instant.now();
+                keyStrokesTimeStamps.put(file.getVirtualFile().getPath(), begin);
+            }
+        });
         return Result.CONTINUE;
     }
 
