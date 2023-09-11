@@ -69,8 +69,8 @@ build-documentation:
     refs:
       - merge_requests
       - main
-    changes:
-      - Writerside/**/*
+#    changes:
+#      - Writerside/**/*
   script:
     - set -e
     - export DISPLAY=:99
