@@ -7,6 +7,7 @@ variables:
   CI: "gitlab-ci"
   PRODUCT: Writerside/pd
   ARTIFACT: webHelpPD2-all.zip
+  WRS_VERSION: 2.1.1479-p3869
 
 image: registry.gitlab.com/pablomxnl/vale-cli-plugin/builder
 cache:
@@ -62,7 +63,7 @@ release_artifact:
     - gradle buildPlugin
 
 build-documentation:
-  image: registry.jetbrains.team/p/writerside/builder/writerside-builder:2.1.1435-p3718
+  image: registry.jetbrains.team/p/writerside/builder/writerside-builder:$WRS_VERSION
   stage: build
   only:
     refs:
