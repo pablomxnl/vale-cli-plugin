@@ -74,19 +74,11 @@ public class ValeExternalAnnotatorProcessor extends ExternalAnnotator<InitialAnn
     }
 
     private HighlightSeverity getSeverity(@NotNull String valeSeverity) {
-        HighlightSeverity severity;
-        switch (valeSeverity) {
-            case "warning":
-                severity = HighlightSeverity.WARNING;
-                break;
-            case "error":
-                severity = HighlightSeverity.ERROR;
-                break;
-            case "suggestion":
-            default:
-                severity = HighlightSeverity.INFORMATION;
-        }
-        return severity;
+        return switch (valeSeverity) {
+            case "warning" -> HighlightSeverity.WARNING;
+            case "error" -> HighlightSeverity.ERROR;
+            default -> HighlightSeverity.INFORMATION;
+        };
     }
 
 }

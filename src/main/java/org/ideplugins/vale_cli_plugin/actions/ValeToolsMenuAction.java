@@ -2,6 +2,7 @@ package org.ideplugins.vale_cli_plugin.actions;
 
 import com.google.gson.JsonObject;
 import com.intellij.notification.NotificationType;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
@@ -108,4 +109,8 @@ public class ValeToolsMenuAction extends AnAction {
         }
     }
 
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
+    }
 }

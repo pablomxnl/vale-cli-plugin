@@ -1,9 +1,9 @@
 package org.ideplugins.vale_cli_plugin.listener;
 
 import com.google.gson.JsonObject;
-import com.intellij.AppTopics;
 import com.intellij.codeInsight.editorActions.TypedHandlerDelegate;
 import com.intellij.openapi.Disposable;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
@@ -31,6 +31,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Future;
 
+import static com.intellij.AppTopics.FILE_DOCUMENT_SYNC;
+
 @Service(Service.Level.PROJECT)
 final public class FileSavedListener implements Disposable, FileDocumentManagerListener, BulkAwareDocumentListener.Simple {
 
@@ -45,8 +47,8 @@ final public class FileSavedListener implements Disposable, FileDocumentManagerL
 
     public FileSavedListener(@NotNull Project project) {
         myProject = project;
-        settings = myProject.getService(ValePluginSettingsState.class);
-        cliExecutor = myProject.getService(ValeCliExecutor.class);
+        settings = ApplicationManager.getApplication().getService(ValePluginSettingsState.class);
+        cliExecutor = ValeCliExecutor.getInstance(myProject);
         reporter = myProject.getService(ValeIssuesReporter.class);
     }
 
@@ -117,7 +119,8 @@ final public class FileSavedListener implements Disposable, FileDocumentManagerL
 
     public void activate() {
         MessageBusConnection connection = myProject.getMessageBus().connect(this);
-        connection.subscribe(AppTopics.FILE_DOCUMENT_SYNC, this);
+        //FileDocumentManagerListener.TOPIC
+        connection.subscribe(FILE_DOCUMENT_SYNC, this);
     }
 
 

@@ -3,6 +3,7 @@ package org.ideplugins.vale_cli_plugin.actions;
 import com.google.gson.JsonObject;
 import com.intellij.analysis.problemsView.toolWindow.ProblemsView;
 import com.intellij.notification.NotificationType;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
@@ -90,7 +91,7 @@ public class ValePopupAction extends AnAction {
                 event.getPresentation().setEnabled(false);
             } else {
                 ValePluginSettingsState settings = getSettings();
-                List<String> extensions = Arrays.stream(settings.extensions.split(",")).collect(Collectors.toList());
+                List<String> extensions = Arrays.stream(settings.extensions.split(",")).toList();
                 AtomicBoolean shouldBeEnabled = new AtomicBoolean(false);
 
                 PsiFile psiFile = event.getData(CommonDataKeys.PSI_FILE);
@@ -110,4 +111,8 @@ public class ValePopupAction extends AnAction {
         });
     }
 
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
+    }
 }

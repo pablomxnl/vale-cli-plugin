@@ -31,14 +31,15 @@ public class PluginCodeInsightTestFixtureProvider
         String projectName = extensionContext.getRequiredTestMethod().getName() + UUID.randomUUID();
         Path projectPath = Path.of(System.getProperty("java.io.tmpdir", "/tmp"), projectName);
         Class<?> tmpDirFixtureClazz = Class.forName(tempDir.getName());
-        TempDirTestFixture tempDirFixture = (TempDirTestFixture) Arrays.stream(tmpDirFixtureClazz.getConstructors()).filter(p -> p.getParameterCount() == 0).findFirst().get().newInstance();
+        TempDirTestFixture tempDirFixture = (TempDirTestFixture)
+                Arrays.stream(tmpDirFixtureClazz.getConstructors()).filter(p -> p.getParameterCount() == 0).findFirst().get().newInstance();
         final LightProjectDescriptor projectDescriptor = LightProjectDescriptor.EMPTY_PROJECT_DESCRIPTOR;
         final IdeaTestFixtureFactory factory = IdeaTestFixtureFactory.getFixtureFactory();
         final TestFixtureBuilder<IdeaProjectTestFixture> fixtureBuilder =
-                (tempDirFixture instanceof LightTempDirTestFixtureImpl)? factory.createLightFixtureBuilder(projectDescriptor) :
-                factory.createFixtureBuilder(projectName, projectPath, false);
+                (tempDirFixture instanceof LightTempDirTestFixtureImpl) ? factory.createLightFixtureBuilder(projectName) :
+                        factory.createFixtureBuilder(projectName, projectPath, false);
 
-        if (tempDirFixture instanceof TempDirProjectImpl){
+        if (tempDirFixture instanceof TempDirProjectImpl) {
             ((TempDirProjectImpl) tempDirFixture).setRoot(projectPath);
         }
 
@@ -83,10 +84,9 @@ public class PluginCodeInsightTestFixtureProvider
                 pluginTestDataPathAnnotation.map(PluginTestDataPath::value).orElse(DEFAULT_TEST_DATA_PATH);
 
         Optional<PluginTest> pluginAnnotation = Optional.ofNullable(extensionContext.getRequiredTestClass().getAnnotation(PluginTest.class));
-        Class <?> fixtureClass = pluginAnnotation.map(PluginTest::fixture).orElseThrow();
+        Class<?> fixtureClass = pluginAnnotation.map(PluginTest::fixture).orElseThrow();
         initFixture(testDataPath, fixtureClass, extensionContext);
     }
-
 
 
 }

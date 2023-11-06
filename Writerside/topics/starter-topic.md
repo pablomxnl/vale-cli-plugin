@@ -1,4 +1,4 @@
-# Vale CLI Plugin Documentation
+# Vale CLI Plugin Documentation v %plugin_version%
 
 Plugin for JetBrains IDE's that uses [Vale CLI](https://vale.sh) to lint markdown,asciidoc and other documentation formats
 
@@ -62,20 +62,27 @@ The Vale CLI alerts are displayed in
 
 * The plugin tool window as a summary of the types of alerts found. Only displayed when using the Global Tools Menu Action.
 * On the problem view
-* As annotations on the editor of a supported file.
+* As markers on the editor of a supported file.
 
 ### Results in plugin tool window
 
 <img src="results_toolwindow.png" alt="Results in plugin window and editor annotator" border-effect="line" />
 
-The plugin tool window will show a summary of the number of alerts per type the Vale CLI founnd.
+When executing the global tools menu action, the plugin will execute the Vale CLI against the configured file types at the project level. 
+The plugin tool window shows a summary of the number of issues per severity found.
 
 ### Results in problem view
 
 <img src="results_problemview_annotator.png" alt="Results in problem view" border-effect="line" />
 
-The Vale CLI alerts can also be visualized on the problem view clicking on them will navigate to the line 
-where Vale CLI found the problem.
+The Vale CLI alerts can also be visualized on the problem view clicking on them will navigate to the line where Vale CLI found the problem.  
+Additionally, these alerts are also visible on the editor as markers.
+
+## Quick fixes
+
+<img src="quick_fix_replace.png" alt="Quick fixes" border-effect="line" />
+
+When the Vale CLI suggests to replace a phrase, the plugin will offer a Quick Fix action on the problem view and on the editor.
 
 ## Feedback 
 Please report any issues or feature requests at
