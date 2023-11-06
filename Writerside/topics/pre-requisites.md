@@ -1,6 +1,8 @@
 # Pre-requisites
 
-The plugin requires at least the Vale CLI tool installed, optional dependency for asciidoctor and docutils if planning to lint asciidoctor or ReStructured text files.
+The plugin requires at least the Vale CLI tool installed. 
+For asciidoctor files support the [AsciiDoc plugin](https://plugins.jetbrains.com/plugin/7391-asciidoc) and asciidoctor are required. 
+For ReStructured text files support the [ReStructuredText plugin](https://plugins.jetbrains.com/plugin/7124-restructuredtext) and docutils are required . 
 
 
 > **Make sure these dependencies are available on your system path**

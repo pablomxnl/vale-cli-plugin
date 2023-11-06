@@ -43,7 +43,7 @@ public class ValeCliExecutorTest extends BaseTest {
         StartedProcess process  = executor.executeValeCliOnFiles(Arrays.stream(files).map(f -> f.getVirtualFile().getPath()).collect(Collectors.toList()));
         Map<String, List<JsonObject>> result = executor.parseValeJsonResponse(process.getFuture(), files.length);
         Arrays.stream(files).forEach(file -> {
-            assertTrue(result.containsKey(file.getVirtualFile().getPath()), "Results should containe file");
+            assertTrue(result.containsKey(file.getVirtualFile().getPath()), "Results should contain file");
 //            assertEquals(2, result.get(file.getVirtualFile().getPath()).size());
         });
     }
@@ -58,8 +58,7 @@ public class ValeCliExecutorTest extends BaseTest {
         StartedProcess process  = executor.executeValeCliOnProject();
         Map<String, List<JsonObject>> result = executor.parseValeJsonResponse(process.getFuture(), files.length);
         Arrays.stream(files).forEach(file -> {
-            assertTrue(result.containsKey(file.getVirtualFile().getPath()), "Results should containe file");
-//            assertEquals(2, result.get(file.getVirtualFile().getPath()).size());
+            assertTrue(result.containsKey(file.getVirtualFile().getPath()), "Results should contain file");
         });
     }
 

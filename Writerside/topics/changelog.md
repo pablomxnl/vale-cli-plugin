@@ -2,6 +2,12 @@ What's new
 =====
 This document provides an overview of the changes by release.
 
+0.0.14
+------
+- Fixes [\#21](https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/21) PluginException 2264 ms to call on EDT ValePopupAction#update@GoToAction
+- Update pluginUntilBuild to support 233 EAP
+
+
 0.0.13
 ------
 - Fixes [\#20](https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/20) NPE reported by plugin user to sentry in TypedHandler

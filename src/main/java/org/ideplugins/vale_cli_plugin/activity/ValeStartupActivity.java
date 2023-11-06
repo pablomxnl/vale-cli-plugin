@@ -11,7 +11,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.StartupActivity;
 import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.ideplugins.vale_cli_plugin.listener.FileSavedListener;
 import org.ideplugins.vale_cli_plugin.service.ValeCliExecutor;
 import org.ideplugins.vale_cli_plugin.settings.ValeCliPluginConfigurationState;
