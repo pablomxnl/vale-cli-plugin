@@ -64,7 +64,7 @@ final public class ValePluginSettingsState implements PersistentStateComponent<V
         if (StringUtils.isNotBlank(valeSettingsPath)) {
             File file = new File(valeSettingsPath);
             if (!file.exists()) {
-                errors.append("\n* Vale settings file doesn't exist");
+                errors.append("\n* Vale settings file " + file.getAbsolutePath() + " doesn't exist");
                 validationResult = false;
             }
         }

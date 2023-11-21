@@ -1,5 +1,6 @@
 # hidden files
 .idea
+bin
 build
 .gradle
 styles/

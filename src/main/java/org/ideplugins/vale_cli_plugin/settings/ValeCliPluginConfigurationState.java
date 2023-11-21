@@ -11,9 +11,8 @@ import com.intellij.util.xmlb.annotations.MapAnnotation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Map;
-import java.util.Optional;
-import java.util.TreeMap;
+import java.io.IOException;
+import java.util.*;
 
 import static org.ideplugins.vale_cli_plugin.Constants.PLUGIN_ID;
 
@@ -51,10 +50,6 @@ public final class ValeCliPluginConfigurationState
         settings.configuration.put(LAST_VERSION, version);
     }
 
-    public void setSentryDsn(String dsn){
-        settings.configuration.put(SENTRY_DSN, dsn);
-    }
-
     public String getSentryDsn(){
         return settings.configuration.get(SENTRY_DSN);
     }
@@ -65,9 +60,11 @@ public final class ValeCliPluginConfigurationState
 
         static PluginSettings create(final String version){
             final PluginSettings instance = new PluginSettings();
+            ResourceBundle rb = ResourceBundle.getBundle("ValePlugin");
+            String dsn = rb.getString("sentry.dsn");
             instance.configuration = new TreeMap<>(
                     Map.of(LAST_VERSION, version,
-                            SENTRY_DSN , " ")
+                            SENTRY_DSN , dsn)
             );
             return  instance;
         }

@@ -2,7 +2,6 @@
 # libraries
 gson = "2.10.1"
 ztexec = "1.12"
-pluginsettings = "0.0.1"
 sentrysdk = "6.17.0"
 
 # test libraries
@@ -21,7 +20,6 @@ asciidoc = "3.3.2"
 [libraries]
 gson = { group = "com.google.code.gson", name= "gson",  version.ref = "gson" }
 ztexec = { group = "org.zeroturnaround", name= "zt-exec",  version.ref = "ztexec" }
-pluginsettings = { group = "org.ideplugins", name= "pluginSettingsLibrary", version.ref = "pluginsettings" }
 sentrysdk = { group = "io.sentry", name="sentry", version.ref = "sentrysdk" }
 
 #test libraries

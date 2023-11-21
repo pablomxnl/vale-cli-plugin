@@ -25,17 +25,6 @@ configurations.all {
 
 repositories {
     mavenCentral()
-    maven {
-        name = "GITLAB_MAVEN"
-        setUrl("https://gitlab.com/api/v4/projects/44083372/packages/maven")
-        credentials(HttpHeaderCredentials::class) {
-            name = if (isInCI) "Job-Token" else "Private-Token"
-            value = if (isInCI) System.getenv("CI_JOB_TOKEN") else System.getenv("GITLAB_TOKEN")
-        }
-        authentication {
-            create("header", HttpHeaderAuthentication::class)
-        }
-    }
 }
 
 // Configure Gradle IntelliJ Plugin
@@ -51,7 +40,6 @@ dependencies {
     implementation(libs.ztexec) {
         exclude(group = "org.slf4j", module = "slf4j-api")
     }
-    implementation(libs.pluginsettings)
     implementation(libs.sentrysdk){
         exclude(group = "org.slf4j")
     }

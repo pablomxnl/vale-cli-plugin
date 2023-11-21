@@ -16,7 +16,6 @@ import org.ideplugins.vale_cli_plugin.listener.FileSavedListener;
 import org.ideplugins.vale_cli_plugin.service.ValeCliExecutor;
 import org.ideplugins.vale_cli_plugin.settings.ValeCliPluginConfigurationState;
 import org.ideplugins.vale_cli_plugin.settings.ValePluginSettingsState;
-import org.ideplugins.settings.SettingsProvider;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -70,8 +69,6 @@ public class ValeStartupActivity implements StartupActivity {
         if (pluginDescriptor != null) {
             ValeCliPluginConfigurationState pluginSettings = ApplicationManager.getApplication().getService(ValeCliPluginConfigurationState.class);
             String lastKnownVersion = pluginSettings.getLastVersion();
-
-            pluginSettings.setSentryDsn(SettingsProvider.getInstance().getSentryUrl(id.getIdString()));
 
             if (!lastKnownVersion.isEmpty() && !lastKnownVersion.equals(pluginDescriptor.getVersion())) {
                 showUpdateNotification(project, pluginDescriptor, pluginSettings);

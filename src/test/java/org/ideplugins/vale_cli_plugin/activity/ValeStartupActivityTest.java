@@ -4,7 +4,6 @@ import com.intellij.psi.PsiFile;
 import com.intellij.testFramework.TestDataPath;
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture;
 import com.intellij.testFramework.fixtures.impl.LightTempDirTestFixtureImpl;
-import org.ideplugins.settings.SettingsProvider;
 import org.ideplugins.vale_cli_plugin.service.ValeCliExecutor;
 import org.ideplugins.vale_cli_plugin.testing.PluginTest;
 import org.ideplugins.vale_cli_plugin.testing.RunInEdtExtension;
@@ -27,7 +26,6 @@ public class ValeStartupActivityTest {
     @Test
     @Disabled("Works on my machine, fails in gitlab-runner")
     public void runActivity(CodeInsightTestFixture codeInsightTestFixture){
-        mockSettings();
         PsiFile f1 = codeInsightTestFixture.configureByText("readme.md", "### readme.md");
         ValeStartupActivity vsa = new ValeStartupActivity();
         vsa.runActivity(codeInsightTestFixture.getProject());
@@ -35,12 +33,6 @@ public class ValeStartupActivityTest {
         assertEquals(1, executor.getNumberOfFiles(), "Activity didn't initialize number of files");
     }
 
-    private static void mockSettings() {
-        MockedStatic<SettingsProvider> singleton = mockStatic(SettingsProvider.class);
-        SettingsProvider provider = mock(SettingsProvider.class);
-        singleton.when(SettingsProvider::getInstance).thenReturn(provider);
-        when(provider.getSentryUrl(anyString())).thenReturn(UUID.randomUUID().toString());
-    }
 
 }
 

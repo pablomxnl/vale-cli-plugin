@@ -23,6 +23,7 @@ import org.zeroturnaround.exec.StartedProcess;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.ResourceBundle;
 
 import static com.intellij.execution.ui.ConsoleViewContentType.LOG_ERROR_OUTPUT;
 import static com.intellij.execution.ui.ConsoleViewContentType.LOG_INFO_OUTPUT;
@@ -32,6 +33,7 @@ import static org.ideplugins.vale_cli_plugin.actions.ActionHelper.*;
 public class ValeToolsMenuAction extends AnAction {
 
     private static final Logger LOGGER = Logger.getInstance(ValeToolsMenuAction.class);
+    private static final ResourceBundle BUNDLE = ResourceBundle.getBundle("ValePlugin");
 
     private static void executeValeInBackground(ValeCliExecutor cliExecutor, ValeIssuesReporter reporter,
                                                 @NotNull ProgressIndicator indicator, AtomicReference<StartedProcess> processReference)
@@ -103,7 +105,7 @@ public class ValeToolsMenuAction extends AnAction {
                     }
                 }));
             } else {
-                displayNotification(NotificationType.WARNING, "Invalid Vale CLI plugin configuration");
+                displayNotification(NotificationType.WARNING, BUNDLE.getString("invalid.notification.body"));
                 writeTextToConsole(project, validation.getValue(), LOG_ERROR_OUTPUT);
             }
         }

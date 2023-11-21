@@ -34,7 +34,7 @@ import static org.ideplugins.vale_cli_plugin.actions.ActionHelper.*;
 public class ValePopupAction extends AnAction {
 
     private static final Logger LOGGER = Logger.getInstance(ValePopupAction.class);
-
+    private static final ResourceBundle BUNDLE = ResourceBundle.getBundle("ValePlugin");
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent actionEvent) {
@@ -73,7 +73,7 @@ public class ValePopupAction extends AnAction {
                     }
                 });
             } else {
-                displayNotification(NotificationType.WARNING, "Invalid Vale CLI plugin configuration");
+                displayNotification(NotificationType.WARNING, BUNDLE.getString("invalid.notification.body"));
                 writeTextToConsole(project, validation.getValue(), LOG_ERROR_OUTPUT);
             }
         }
