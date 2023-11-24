@@ -5,7 +5,7 @@ This document provides an overview of the changes by release.
 0.0.15
 ------
 - Fixes [\#23](https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/23) asciidoctor installed - but plugin raises E100 Runtime error asciidoctor not found
-
+- Fixes [\#24](https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/24) Forward `System.getenv()` as environment to Vale
 
 0.0.14
 ------
