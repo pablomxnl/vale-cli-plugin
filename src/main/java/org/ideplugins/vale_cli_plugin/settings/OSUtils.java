@@ -18,10 +18,18 @@ public class OSUtils {
     private static final Logger LOG = Logger.getInstance(OSUtils.class);
     private static final String SHELL = Optional.ofNullable(System.getenv("SHELL")).orElse("/bin/sh");
 
+    public static List<String> wrappCommandWithShellEnv(String command){
+        return (SystemInfo.isWindows) ? List.of("cmd.exe","/c", command ) :
+                List.of(SHELL, inCI()? "-lc" : "-ilc", command);
+    }
+
+    private static boolean inCI() {
+        return  Optional.ofNullable(System.getenv("CI_PROJECT_DIR")).isPresent();
+    }
+
     public static String valeVersion() {
         String version = "";
-        List<String> versionCommand = (SystemInfo.isWindows) ? List.of("cmd.exe","/c", "vale.exe --version" ) :
-                List.of(SHELL, "-c", "vale --version");
+        List<String> versionCommand = wrappCommandWithShellEnv(  (SystemInfo.isWindows)? "vale.exe" : "vale" + " --version");
         try {
             StartedProcess startedProcess = new ProcessExecutor()
                     .command(versionCommand)
@@ -45,11 +53,11 @@ public class OSUtils {
 
     public static String findValeBinaryPath() {
         String path = "";
-        List<String> whichCommand = (SystemInfo.isWindows) ? List.of("cmd.exe", "/c", "where vale.exe") :
-                 List.of(SHELL, "-ilc", "which vale");
+        String whichCommand = (SystemInfo.isWindows) ? "where vale.exe" : "which vale";
+        List<String> command = wrappCommandWithShellEnv(whichCommand);
         try {
             StartedProcess startedProcess = new ProcessExecutor()
-                    .command(whichCommand)
+                    .command(command)
                     .readOutput(true)
                     .start();
             Future<ProcessResult> future = startedProcess.getFuture();
@@ -59,11 +67,11 @@ public class OSUtils {
                 LOG.info("Vale detected at " +  path);
             } else {
                 LOG.info("Exit value not zero: " + result.outputUTF8());
-                LOG.info("findVale Commands: " + whichCommand);
+                LOG.info("findVale commands: " + String.join(" ", command));
             }
         } catch (IOException | InterruptedException | ExecutionException exception) {
             LOG.info("Unable to find vale binary", exception);
-            LOG.info("findVale Commands: " + whichCommand);
+            LOG.info("findVale commands: " + String.join(" ", command));
         }
         return path;
     }

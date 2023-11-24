@@ -25,11 +25,10 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.*;
+
+import static org.ideplugins.vale_cli_plugin.settings.OSUtils.wrappCommandWithShellEnv;
 
 
 @Service(Service.Level.PROJECT)
@@ -53,31 +52,31 @@ public final class ValeCliExecutor implements Disposable {
     }
 
     public StartedProcess executeValeCliOnFile(PsiFile file) throws ValeCliExecutionException {
-        String filePath = file.getVirtualFile().getPath();
-        List<String> command = createValeCommand();
-        command.add(filePath);
-        LOGGER.info("Running executeValeCliOnFile on PSI file " + filePath);
-        return executeCommand(command);
+        LOGGER.info("Running executeValeCliOnFile on PSI file ");
+        return executeValeCliOnFile(file.getVirtualFile());
     }
 
     public StartedProcess executeValeCliOnFile(VirtualFile file) throws ValeCliExecutionException {
         List<String> command = createValeCommand();
         command.add(file.getPath());
         LOGGER.info("Running executeValeCliOnFile on VirtualFile file " + file.getPath());
-        return executeCommand(command);
+        List<String> wrapped = wrappCommandWithShellEnv( String.join(" ", command)  );
+        return executeCommand(wrapped);
     }
 
     public StartedProcess executeValeCliOnFiles(List<String> files) throws ValeCliExecutionException {
         List<String> command = createValeCommand();
         command.addAll(files);
+        List<String> wrapped = wrappCommandWithShellEnv( String.join(" ", command) );
         LOGGER.info("Running executeValeCliOnFiles on files " + files);
-        return executeCommand(command);
+        return executeCommand(wrapped);
     }
 
     public StartedProcess executeValeCliOnProject() throws ValeCliExecutionException {
         List<String> command = createValeInProjectCommand();
         LOGGER.info("Running executeValeCliOnFiles on project " + project.getName());
-        return executeCommand(command);
+        List<String> wrapped = wrappCommandWithShellEnv(  String.join(" ", command));
+        return executeCommand(wrapped);
     }
 
     public Boolean isTaskRunning() {
@@ -125,7 +124,8 @@ public final class ValeCliExecutor implements Disposable {
     }
 
     private StartedProcess executeCommand(List<String> command) throws ValeCliExecutionException {
-        LOGGER.info("Executing vale command: " + command);
+        LOGGER.info("Executing vale command: " + String.join(" ", command));
+        LOGGER.info("In directory: " + project.getBasePath());
         ProcessExecutor processExecutor = new ProcessExecutor()
                 .directory(new File(project.getBasePath()))
                 .command(command)
@@ -144,7 +144,7 @@ public final class ValeCliExecutor implements Disposable {
     private List<String> createValeInProjectCommand() {
         ValePluginSettingsState settingsState = ValePluginSettingsState.getInstance();
         List<String> command = createValeCommand();
-        command.add(String.format("--glob=*.{%s}", settingsState.extensions));
+        command.add(String.format("--glob='*.{%s}'", settingsState.extensions));
         command.add(project.getBasePath());
         return command;
     }

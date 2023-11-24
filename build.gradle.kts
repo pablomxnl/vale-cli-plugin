@@ -4,9 +4,6 @@ import org.jsoup.Jsoup
 fun properties(key: String) = providers.gradleProperty(key)
 fun environment(key: String) = providers.environmentVariable(key)
 
-val ciEnvVar: String? = System.getenv("CI")
-val isInCI: Boolean = ciEnvVar?.isNotEmpty() ?: false
-
 group = properties("pluginGroup").get()
 
 plugins {

@@ -6,95 +6,66 @@ image:https://img.shields.io/jetbrains/plugin/d/org.ideplugins.vale-cli-plugin[l
 image:https://img.shields.io/gitlab/issues/open/pablomxnl/vale-cli-plugin?style=plastic[link="https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues", title="GitLab issues"]
 image:https://img.shields.io/jetbrains/plugin/r/stars/org.ideplugins.vale-cli-plugin[link="https://plugins.jetbrains.com/plugin/19613-vale-cli/reviews",title="Ratings"]
 image:https://img.shields.io/jetbrains/plugin/v/org.ideplugins.vale-cli-plugin[link="https://plugins.jetbrains.com/plugin/19613-vale-cli",title="Version"]
-image:https://gitlab.com/pablomxnl/vale-cli-plugin/badges/main/coverage.svg[link="https://gitlab.com/pablomxnl/vale-cli-plugin/-/commits/main",title="Coverage report"]
+image:https://gitlab.com/pablomxnl/vale-cli-plugin/badges/main/coverage.svg[link="https://pablomxnl.gitlab.io/vale-cli-plugin/coverage/html/index.html",title="Coverage report"]
+image:https://img.shields.io/badge/Plugin-Documenation-blue[link="https://plugins.jetbrains.com/plugin/19613-vale-cli/docs",title="Plugin Documentation"]
 
 Plugin for JetBrains IDE's that uses https://vale.sh[Vale CLI] to check markdown,asciidoc and other documentation formats
 
 TIP: Pet project. Not associated with Errata (Vale CLI creators) or JetBrains whatsoever
 
-== Installation
+== Documentation
 
-=== From plugin marketplace
+See the plugin user documentation at the https://plugins.jetbrains.com/plugin/19613-vale-cli/docs[JetBrains Plugin Marketplace, window=_blank] or at the project https://pablomxnl.gitlab.io/vale-cli-plugin/index.html[Gitlab Pages, window=_blank]
 
-`Settings` -> `Plugins` -> `Marketplace` Search for `Vale CLI` -> Click `Install`
+== Build the plugin locally
 
-=== From Gitlab releases
-To install, grab a zip file from the
-https://gitlab.com/pablomxnl/vale-cli-plugin/-/releases[releases distributions] according to your IDE
+[source]
+----
+./gradlew buildPlugin
+----
 
-`Settings` -> `Plugins` -> `⚙` -> `Install Plugin from Disk...`
+== Run the plugin on an IntelliJ sandbox
 
-image::docimages/installPlugin.png[Install Plugin from Disk ...]
+[source]
+----
+./gradlew runForManualTests
+----
+This https://gitlab.com/pablomxnl/vale-cli-plugin/-/blob/main/build.gradle.kts?ref_type=heads#L64-79[task] configures the IntelliJ sandbox to not confirm exit or show tips at startup among other things. It opens a sample project with a couple of markdown files to test with the plugin.
 
+[source]
+----
+./gradlew runIde
+----
+The standard gradle intellij plugin task that runs the IDE with the developed plugin installed.
 
-=== Pre-Requistes
+== Run tests inside container simulating a pipeline run
+. First build the builder docker image
++
+[source]
+----
+docker build  . -t myuser/builder
+----
 
-NOTE: Requires Vale CLI installed.
-Please review the https://vale.sh/docs/vale-cli/installation/[Vale CLI installation guide]
-
-* https://vale.sh[Vale CLI] installed and with minimal https://vale.sh/generator/[styles configured].
-* Install the dependencies of the https://vale.sh/docs/topics/scoping/#formats[vale formats] configured. +
-For example, to check `asciidoctor` and `reStructuredTex` documents, Vale CLI requires `asciidoctor gem` and python package `rst2html` accordingly in the system path. +
-To verify the setup, run `vale adoc_file_or_rst_file` in the integrated terminal. +
-In some operating systems using a version manager like `rvm` or `pyenv` can help to solve these path issues. In others cases, helps to install these dependencies with the OS package manager.
-
-== Configuration
-
-The plugin has 3 configurations:
-
-   . vale binary location: required when the plugin couldn't find it automatically in the system path
-   . vale settings file location: required when want to use a configuration file located in a path different from where the binary looks for it.
-   . file extensions to check:  pre-set to `md,adoc`, it requires at least one extension.
-
-To enter this configuration go to
-`Settings` -> `Tools` -> `Vale CLI`
-
-image::docimages/pluginConfiguration.png["Plugin Configuration"]
-
-== Usage
-The plugin offers three ways to execute Vale CLI
-
-=== Tools menu, project scope
-
-To run Vale against project files use the menu in `Tools` => `Vale CLI Check`
-
-image::docimages/toolsMenu.png["Tools menu"]
-For projects with large amount of documentation files, depending on machine the execution can take a while, the user can stop the process at any time by clicking on the `✖️` button.
-
-image::docimages/background-task.png["Background task execution"]
-As the cancel button can be hard to click, another way to cancel the execution is to click in the "Executing vale cli on project scope" text to show the Background Tasks dialog and from the dialog the `✖️` button is easier to click. To hide the dialog, just click the minimize button or click the "Hide processes" link
-
-image::docimages/background-tasks-dialog.png["Background Tasks dialog"]
-
-Once the process has concluded it prints a summary of the results on the tool window, to see these results, open a supported file and look them on the problem view or in the editor.
-
-image::docimages/toolWindowProjectScopeResult.png["Editor popup menu"]
-
-=== Editor contextual menu
-To check the current opened file in the editor, providing the file extension matches one of the extensions configured in the plugin settings.
-
-image::docimages/fromEditorContextualMenu.png["Editor popup menu"]
-
-Once the process has finished, it activates the problem view with the results, and also the editor has markers annotated to these
-
-image::docimages/vale-cli-plugin-0.4-small.png["Result in problem view and in editor"]
-
-=== Multiple files selected on the Project tree
-
-By selecting several files whose extension matches the configured extensions and selecting the contextual menu option
-
-image::docimages/severalFilesInProjecTree.png["Several files"]
-
-Once the process has finished, it activates the problem view with the results, and also the editor has markers annotated to these
-
-
-image::docimages/vale-cli-plugin-0.4-small.png["Result in problem view and in editor"]
-
-
-== Uninstall
-
-. Go to `Settings` => `Plugins` => `Installed`
-. Click `Vale CLI` entry and click the gear `⚙` icon. Older IntelliJ versions had a `Disabled` dropdown
-. Select `Uninstall`
-
-image::docimages/uninstall.png["Uninstall"]
+. Get an interactive session on the builder container, mounting the project folder.
++
+[source]
+----
+docker run -it --rm -u gradle -v "$PWD":/home/gradle/project -w /home/gradle/project myuser/builder /bin/bash
+----
+. Run the test gradle task
++
+[source]
+----
+./gradlew test
+----
+. Exit the container and inspect test results
++
+[source]
+----
+exit
+----
++
+[source]
+----
+open build/reports/tests/test/index.html
+----
