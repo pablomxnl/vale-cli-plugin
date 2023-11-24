@@ -5,6 +5,7 @@ import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -23,13 +24,17 @@ import static  java.util.Map.Entry;
 @Service(Service.Level.APP)
 final public class ValePluginSettingsState implements PersistentStateComponent<ValePluginSettingsState> {
 
+    private static final Logger LOG = Logger.getInstance(ValePluginSettingsState.class);
     @Override
     public void initializeComponent() {
         String path = OSUtils.findValeBinaryPath();
-        if (path.isEmpty() && !OSUtils.valeVersion().isEmpty()){
+        String valeVersion = OSUtils.valeVersion();
+        if (path.isEmpty() && !valeVersion.isEmpty()){
             valePath = SystemInfo.isWindows? "vale.exe" : "vale";
+            LOG.info( String.format("Guessing vale version:%s  executable:%s" ,  valeVersion, valePath));
         } else {
             valePath = path;
+            LOG.info( String.format("Found vale version:%s at %s" ,  valeVersion, valePath));
         }
     }
 
@@ -53,9 +58,11 @@ final public class ValePluginSettingsState implements PersistentStateComponent<V
     }
 
     public Entry<Boolean,String> areSettingsValid(){
-        StringBuilder errors = new StringBuilder("Invalid Vale CLI plugin configuration, " +
-                "please click on the Notification link to configure it. \n" +
-                "Or check it on Settings(Preferences on Mac) -> Tools -> Vale CLI\nError list: \n");
+        StringBuilder errors = new StringBuilder("""
+                Invalid Vale CLI plugin configuration, please click on the Notification link to configure it.\s
+                Or check it on Settings(Preferences on Mac) -> Tools -> Vale CLI
+                Error list:\s
+                """);
         boolean validationResult = true;
         if (StringUtils.isBlank(valePath)) {
             errors.append("\n* Vale path couldn't be detected automatically, please set it up");
@@ -64,7 +71,7 @@ final public class ValePluginSettingsState implements PersistentStateComponent<V
         if (StringUtils.isNotBlank(valeSettingsPath)) {
             File file = new File(valeSettingsPath);
             if (!file.exists()) {
-                errors.append("\n* Vale settings file " + file.getAbsolutePath() + " doesn't exist");
+                errors.append("\n* Vale settings file ").append(file.getAbsolutePath()).append(" doesn't exist");
                 validationResult = false;
             }
         }

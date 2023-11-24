@@ -13,6 +13,7 @@ import org.zeroturnaround.exec.StartedProcess;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -29,7 +30,7 @@ public class ValeCliExecutorTest extends BaseTest {
         PsiFile file = codeInsightTestFixture.configureFromTempProjectFile("src/readme.md");
         ValeCliExecutor executor = ValeCliExecutor.getInstance(codeInsightTestFixture.getProject());
         StartedProcess process = executor.executeValeCliOnFile(file);
-        Map<String, List<JsonObject>> result = executor.parseValeJsonResponse(process.getFuture(), 1);
+        Map<String, List<JsonObject>> result = executor.parseValeJsonResponse(process.getFuture(), 5);
         assertTrue(result.containsKey(file.getVirtualFile().getPath()), "Results should containe file");
         assertEquals(2, result.get(file.getVirtualFile().getPath()).size());
     }
@@ -57,9 +58,7 @@ public class ValeCliExecutorTest extends BaseTest {
         ValeCliExecutor executor = ValeCliExecutor.getInstance(codeInsightTestFixture.getProject());
         StartedProcess process  = executor.executeValeCliOnProject();
         Map<String, List<JsonObject>> result = executor.parseValeJsonResponse(process.getFuture(), files.length);
-        Arrays.stream(files).forEach(file -> {
-            assertTrue(result.containsKey(file.getVirtualFile().getPath()), "Results should contain file");
-        });
+        Arrays.stream(files).forEach(file -> assertTrue(result.containsKey(file.getVirtualFile().getPath()), "Results should contain file"));
     }
 
     @Test
@@ -78,13 +77,14 @@ public class ValeCliExecutorTest extends BaseTest {
 
     @Test
     @Order(21)
-    public void testBinaryNotFound(CodeInsightTestFixture codeInsightTestFixture) {
+    public void testBinaryNotFound(CodeInsightTestFixture codeInsightTestFixture) throws ValeCliExecutionException {
+        settings.valePath = "/home/tmp/vale";
         codeInsightTestFixture.copyDirectoryToProject("multiplefiles-example", "content");
         PsiFile file = codeInsightTestFixture.configureFromTempProjectFile("content/readme.md");
-        settings.valePath = "/home/tmp/vale";
         ValeCliExecutor executor = ValeCliExecutor.getInstance(codeInsightTestFixture.getProject());
-        ValeCliExecutionException exception = assertThrows(ValeCliExecutionException.class, ()-> executor.executeValeCliOnFile(file));
-        assertThat(exception.getMessage()).isNotNull().contains("Could not execute [/home/tmp/vale");
+        StartedProcess sp = executor.executeValeCliOnFile(file);
+        ExecutionException exception = assertThrows(ExecutionException.class, ()-> sp.getFuture().get());
+        assertThat(exception.getMessage()).isNotNull().contains("/home/tmp/vale");
     }
 
 

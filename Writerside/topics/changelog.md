@@ -2,6 +2,11 @@ What's new
 =====
 This document provides an overview of the changes by release.
 
+0.0.15
+------
+- Fixes [\#23](https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/23) asciidoctor installed - but plugin raises E100 Runtime error asciidoctor not found
+
+
 0.0.14
 ------
 - Fixes [\#21](https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/21) PluginException 2264 ms to call on EDT ValePopupAction#update@GoToAction

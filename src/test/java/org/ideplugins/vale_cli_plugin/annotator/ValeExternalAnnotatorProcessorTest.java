@@ -38,7 +38,7 @@ public class ValeExternalAnnotatorProcessorTest extends BaseTest {
         ValeCliExecutor executor = ValeCliExecutor.getInstance(codeInsightTestFixture.getProject());
         ValeIssuesReporter reporter = codeInsightTestFixture.getProject().getService(ValeIssuesReporter.class);
         StartedProcess process = executor.executeValeCliOnFile(file);
-        Map<String, List<JsonObject>> result = executor.parseValeJsonResponse(process.getFuture(), 1);
+        Map<String, List<JsonObject>> result = executor.parseValeJsonResponse(process.getFuture(), 5);
         reporter.updateIssuesForFile(file.getVirtualFile().getPath(), result.get(file.getVirtualFile().getPath()));
         assertTrue(result.containsKey(file.getVirtualFile().getPath()), "Results should contain file");
         assertEquals(7, result.get(file.getVirtualFile().getPath()).size());
