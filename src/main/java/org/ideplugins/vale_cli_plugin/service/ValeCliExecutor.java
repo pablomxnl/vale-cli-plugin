@@ -130,6 +130,7 @@ public final class ValeCliExecutor implements Disposable {
                 .directory(new File(project.getBasePath()))
                 .command(command)
                 .exitValueNormal()
+                .environment(System.getenv())
                 .listener(new ValeProcessListener())
                 .destroyOnExit()
                 .readOutput(true);
