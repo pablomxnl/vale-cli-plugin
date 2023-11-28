@@ -5,6 +5,7 @@ import com.intellij.diagnostic.IdeaReportingEvent;
 import com.intellij.ide.DataManager;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.application.ApplicationInfo;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.ErrorReportSubmitter;
 import com.intellij.openapi.diagnostic.IdeaLoggingEvent;
@@ -15,6 +16,7 @@ import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.NlsActions;
+import com.intellij.openapi.util.SystemInfo;
 import com.intellij.util.Consumer;
 import io.sentry.Hub;
 import io.sentry.IHub;
@@ -39,7 +41,19 @@ public class SentryErrorReporter extends ErrorReportSubmitter {
         options.setServerName("");
         options.setEnvironment(pluginDescriptor.getPluginId().getIdString());
         options.setDiagnosticLevel(SentryLevel.ERROR);
-        return new Hub(options);
+        Hub hub = new Hub(options);
+        String os = SystemInfo.getOsNameAndVersion();
+        if (SystemInfo.isLinux) {
+            os += (SystemInfo.isChromeOS) ? " [Chrome OS] " : "";
+            os += (SystemInfo.isKDE) ? " [KDE] " : "";
+            os += (SystemInfo.isGNOME) ? " [GNOME] " : "";
+        }
+        hub.setTag("os_name_version", os);
+        ApplicationInfo applicationInfo = ApplicationInfo.getInstance();
+        hub.setTag("jb_platform_type", applicationInfo.getBuild().getProductCode());
+        hub.setTag("jb_platform_version", applicationInfo.getBuild().asStringWithoutProductCode());
+        hub.setTag("jb_ide", applicationInfo.getVersionName());
+        return hub;
     }
 
     private static void submitErrors(IdeaLoggingEvent @NotNull [] events, String additionalInfo, IHub sentryHub) {
