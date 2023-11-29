@@ -1,9 +1,6 @@
 package org.ideplugins.vale_cli_plugin.service;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.diagnostic.Logger;
@@ -60,14 +57,14 @@ public final class ValeCliExecutor implements Disposable {
         List<String> command = createValeCommand();
         command.add(file.getPath());
         LOGGER.info("Running executeValeCliOnFile on VirtualFile file " + file.getPath());
-        List<String> wrapped = wrappCommandWithShellEnv( String.join(" ", command)  );
+        List<String> wrapped = wrappCommandWithShellEnv(String.join(" ", command));
         return executeCommand(wrapped);
     }
 
     public StartedProcess executeValeCliOnFiles(List<String> files) throws ValeCliExecutionException {
         List<String> command = createValeCommand();
         command.addAll(files);
-        List<String> wrapped = wrappCommandWithShellEnv( String.join(" ", command) );
+        List<String> wrapped = wrappCommandWithShellEnv(String.join(" ", command));
         LOGGER.info("Running executeValeCliOnFiles on files " + files);
         return executeCommand(wrapped);
     }
@@ -75,7 +72,7 @@ public final class ValeCliExecutor implements Disposable {
     public StartedProcess executeValeCliOnProject() throws ValeCliExecutionException {
         List<String> command = createValeInProjectCommand();
         LOGGER.info("Running executeValeCliOnFiles on project " + project.getName());
-        List<String> wrapped = wrappCommandWithShellEnv(  String.join(" ", command));
+        List<String> wrapped = wrappCommandWithShellEnv(String.join(" ", command));
         return executeCommand(wrapped);
     }
 
@@ -97,13 +94,15 @@ public final class ValeCliExecutor implements Disposable {
         return parseValeJsonResponse(future, numberOfFiles);
     }
 
-    public Map<String, List<JsonObject>> parseValeJsonResponse(Future<ProcessResult> future, int numberOfFilesToCheck)
+    public Map<String, List<JsonObject>> parseValeJsonResponse(Future<ProcessResult> processResultFuture,
+                                                               int numberOfFilesToCheck)
             throws ValeCliExecutionException {
         String valeJsonResponse;
         try {
-            valeJsonResponse = future.get(numberOfFilesToCheck, TimeUnit.SECONDS).outputUTF8();
+            valeJsonResponse = processResultFuture.get(numberOfFilesToCheck, TimeUnit.SECONDS).outputUTF8();
+            LOGGER.debug(String.format("exec result: %s", valeJsonResponse));
             return parseJsonResponse(valeJsonResponse);
-        } catch (InterruptedException | ExecutionException | TimeoutException exception) {
+        } catch (InterruptedException | ExecutionException | TimeoutException | JsonSyntaxException exception) {
             throw new ValeCliExecutionException(exception);
         }
     }
@@ -195,7 +194,7 @@ public final class ValeCliExecutor implements Disposable {
         public void afterStop(Process process) {
             Instant end = Instant.now();
             taskRunning = false;
-            executionTime = Duration.between(start,end).toSeconds();
+            executionTime = Duration.between(start, end).toSeconds();
         }
     }
 }
