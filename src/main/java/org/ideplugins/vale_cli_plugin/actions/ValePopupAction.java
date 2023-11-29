@@ -44,7 +44,7 @@ public class ValePopupAction extends AnAction {
 
             if (validation.getKey()) {
                 PsiFile psiFile = actionEvent.getData(CommonDataKeys.PSI_FILE);
-                ValeCliExecutor cliExecutor = project.getService(ValeCliExecutor.class);
+                ValeCliExecutor cliExecutor = ValeCliExecutor.getInstance(project);
                 FileDocumentManager.getInstance().saveAllDocuments();
 
                 ApplicationManager.getApplication().invokeLater(() -> {

@@ -7,6 +7,8 @@ import com.intellij.lang.annotation.AnnotationBuilder;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.ExternalAnnotator;
 import com.intellij.lang.annotation.HighlightSeverity;
+import com.intellij.openapi.application.Application;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiDocumentManager;
@@ -35,13 +37,16 @@ public class ValeExternalAnnotatorProcessor extends ExternalAnnotator<InitialAnn
 
     @Override
     public @Nullable AnnotatorResult doAnnotate(InitialAnnotatorInfo collectedInfo) {
+        // https://youtrack.jetbrains.com/issue/IDEA-229905
+        Application application = ApplicationManager.getApplication();
+        if (application != null && application.isReadAccessAllowed() ) return null;
         return new AnnotatorResult(collectedInfo);
     }
 
 
     @Override
     public void apply(@NotNull PsiFile psiFile, AnnotatorResult annotationResult, @NotNull AnnotationHolder holder) {
-        if (annotationResult.getValeResults() !=null ) {
+        if ( annotationResult != null && annotationResult.getValeResults() !=null ) {
             annotationResult.getValeResults().forEach(jsonObject -> {
                 JsonArray span = jsonObject.getAsJsonArray("Span");
                 int line = jsonObject.get("Line").getAsInt();
