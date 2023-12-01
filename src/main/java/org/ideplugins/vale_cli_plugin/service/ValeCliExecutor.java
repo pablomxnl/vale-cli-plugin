@@ -17,13 +17,17 @@ import org.zeroturnaround.exec.StartedProcess;
 import org.zeroturnaround.exec.listener.ProcessListener;
 
 import java.io.File;
-
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
-
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import static org.ideplugins.vale_cli_plugin.settings.OSUtils.wrappCommandWithShellEnv;
 
@@ -163,12 +167,12 @@ public final class ValeCliExecutor implements Disposable {
         return command;
     }
 
-    public void setNumberOfFiles(int numberOfFiles) {
-        this.numberOfFiles = numberOfFiles;
-    }
-
     public int getNumberOfFiles() {
         return numberOfFiles;
+    }
+
+    public void setNumberOfFiles(int numberOfFiles) {
+        this.numberOfFiles = numberOfFiles;
     }
 
     public long getExecutionTime() {

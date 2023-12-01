@@ -56,12 +56,11 @@ final public class FileSavedListener implements Disposable, FileDocumentManagerL
         return project.getService(FileSavedListener.class);
     }
 
-    private static VirtualFile createSyncedFile(Document doc, Path tmp) throws IOException {
+    private static void createSyncedFile(Document doc, Path tmp) throws IOException {
         try {
             try (BufferedWriter out = Files.newBufferedWriter(tmp, StandardCharsets.UTF_8)) {
                 out.write(doc.getText());
             }
-            return LocalFileSystem.getInstance().findFileByPath(tmp.toString());
         } catch (IOException ex) {
             LOGGER.error("There was a problem while preparing a temp file.", ex);
             throw ex;
@@ -94,16 +93,21 @@ final public class FileSavedListener implements Disposable, FileDocumentManagerL
 
     private void executeValeAfterChange(Document document) throws ValeCliExecutionException {
         VirtualFile original = FileDocumentManager.getInstance().getFile(document);
-        LOGGER.info("executeValeAfterChange");
+        LOGGER.debug("executeValeAfterChange");
         Path tmp = null;
         try {
             tmp = Files.createTempFile(null, "." + original.getExtension());
-            VirtualFile file = createSyncedFile(document, tmp);
-            Future<ProcessResult> future = cliExecutor.executeValeCliOnFile(file).getFuture();
-            Map<String, List<JsonObject>> results = cliExecutor.parseValeJsonResponse(future, 6);
-            List<JsonObject> resultsFile = results.get(file.getPath());
-            reporter.remove(file.getPath());
-            reporter.updateIssuesForFile(original.getPath(), resultsFile);
+            LOGGER.debug("tmp file path =" + tmp);
+            createSyncedFile(document, tmp);
+            VirtualFile file = LocalFileSystem.getInstance().findFileByPath(tmp.toString());
+            if (file != null) {
+                Future<ProcessResult> future = cliExecutor.executeValeCliOnFile(file).getFuture();
+                Map<String, List<JsonObject>> results = cliExecutor.parseValeJsonResponse(future, 6);
+                List<JsonObject> resultsFile = results.get(file.getPath());
+                reporter.remove(file.getPath());
+                reporter.updateIssuesForFile(original.getPath(), resultsFile);
+            }
+
         } catch (IOException ex) {
             throw new ValeCliExecutionException(ex);
         } finally {
@@ -112,7 +116,7 @@ final public class FileSavedListener implements Disposable, FileDocumentManagerL
                     Files.delete(tmp);
                 }
             } catch (IOException e) {
-                LOGGER.info("unable to delete tmp file\n" + e.getMessage() );
+                LOGGER.error("unable to delete tmp file" , e);
             }
         }
     }
