@@ -33,7 +33,7 @@ public class ValeStartupActivity implements StartupActivity {
         ValePluginSettingsState settingsState = ValePluginSettingsState.getInstance();
 
         if (StringUtils.isNotBlank(settingsState.extensions)) {
-            ValeCliExecutor executor = project.getService(ValeCliExecutor.class);
+            ValeCliExecutor executor = ValeCliExecutor.getInstance(project);
             GlobalSearchScope scope = GlobalSearchScope.projectScope(project);
             ApplicationManager.getApplication().runReadAction(() -> {
                 int numberOfFiles = Arrays.stream(settingsState.extensions.split(",")).map(extension ->
