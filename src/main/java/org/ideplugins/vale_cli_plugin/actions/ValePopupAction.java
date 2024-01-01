@@ -36,6 +36,10 @@ public class ValePopupAction extends AnAction {
     private static final Logger LOGGER = Logger.getInstance(ValePopupAction.class);
     private static final ResourceBundle BUNDLE = ResourceBundle.getBundle("ValePlugin");
 
+    private static void updateResults(ValeIssuesReporter reporter, Map<String, List<JsonObject>> results) {
+        results.forEach(reporter::updateIssuesForFile);
+    }
+
     @Override
     public void actionPerformed(@NotNull AnActionEvent actionEvent) {
         Project project = actionEvent.getProject();
@@ -44,7 +48,7 @@ public class ValePopupAction extends AnAction {
 
             if (validation.getKey()) {
                 PsiFile psiFile = actionEvent.getData(CommonDataKeys.PSI_FILE);
-                ValeCliExecutor cliExecutor = project.getService(ValeCliExecutor.class);
+                ValeCliExecutor cliExecutor = ValeCliExecutor.getInstance(project);
                 FileDocumentManager.getInstance().saveAllDocuments();
 
                 ApplicationManager.getApplication().invokeLater(() -> {
@@ -52,7 +56,7 @@ public class ValePopupAction extends AnAction {
                     try {
                         if (psiFile != null) {
                             Future<ProcessResult> future = cliExecutor.executeValeCliOnFile(psiFile).getFuture();
-                            Map<String, List<JsonObject>> results = cliExecutor.parseValeJsonResponse(future , 2);
+                            Map<String, List<JsonObject>> results = cliExecutor.parseValeJsonResponse(future, 2);
                             updateResults(reporter, results);
                         } else {
                             VirtualFile[] virtualFiles = actionEvent.getData(CommonDataKeys.VIRTUAL_FILE_ARRAY);
@@ -77,10 +81,6 @@ public class ValePopupAction extends AnAction {
                 writeTextToConsole(project, validation.getValue(), LOG_ERROR_OUTPUT);
             }
         }
-    }
-
-    private static void updateResults(ValeIssuesReporter reporter, Map<String, List<JsonObject>> results) {
-        results.forEach(reporter::updateIssuesForFile);
     }
 
     @Override

@@ -3,7 +3,6 @@ package org.ideplugins.vale_cli_plugin.listener;
 import com.google.gson.JsonObject;
 import com.intellij.codeInsight.editorActions.TypedHandlerDelegate;
 import com.intellij.openapi.Disposable;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
@@ -47,7 +46,7 @@ final public class FileSavedListener implements Disposable, FileDocumentManagerL
 
     public FileSavedListener(@NotNull Project project) {
         myProject = project;
-        settings = ApplicationManager.getApplication().getService(ValePluginSettingsState.class);
+        settings = ValePluginSettingsState.getInstance();
         cliExecutor = ValeCliExecutor.getInstance(myProject);
         reporter = myProject.getService(ValeIssuesReporter.class);
     }
@@ -56,12 +55,12 @@ final public class FileSavedListener implements Disposable, FileDocumentManagerL
         return project.getService(FileSavedListener.class);
     }
 
-    private static VirtualFile createSyncedFile(Document doc, Path tmp) throws IOException {
+
+    private void writeSyncedFile(Document doc, Path tmp) throws IOException {
         try {
             try (BufferedWriter out = Files.newBufferedWriter(tmp, StandardCharsets.UTF_8)) {
                 out.write(doc.getText());
             }
-            return LocalFileSystem.getInstance().findFileByPath(tmp.toString());
         } catch (IOException ex) {
             LOGGER.error("There was a problem while preparing a temp file.", ex);
             throw ex;
@@ -98,12 +97,15 @@ final public class FileSavedListener implements Disposable, FileDocumentManagerL
         Path tmp = null;
         try {
             tmp = Files.createTempFile(null, "." + original.getExtension());
-            VirtualFile file = createSyncedFile(document, tmp);
-            Future<ProcessResult> future = cliExecutor.executeValeCliOnFile(file).getFuture();
-            Map<String, List<JsonObject>> results = cliExecutor.parseValeJsonResponse(future, 6);
-            List<JsonObject> resultsFile = results.get(file.getPath());
-            reporter.remove(file.getPath());
-            reporter.updateIssuesForFile(original.getPath(), resultsFile);
+            writeSyncedFile(document, tmp);
+            VirtualFile file = LocalFileSystem.getInstance().findFileByPath(tmp.toString());
+            if (file != null) {
+                Future<ProcessResult> future = cliExecutor.executeValeCliOnFile(file).getFuture();
+                Map<String, List<JsonObject>> results = cliExecutor.parseValeJsonResponse(future, 6);
+                List<JsonObject> resultsFile = results.get(file.getPath());
+                reporter.remove(file.getPath());
+                reporter.updateIssuesForFile(original.getPath(), resultsFile);
+            }
         } catch (IOException ex) {
             throw new ValeCliExecutionException(ex);
         } finally {
@@ -112,7 +114,7 @@ final public class FileSavedListener implements Disposable, FileDocumentManagerL
                     Files.delete(tmp);
                 }
             } catch (IOException e) {
-                LOGGER.info("unable to delete tmp file\n" + e.getMessage() );
+                LOGGER.info("unable to delete tmp file\n" + e.getMessage());
             }
         }
     }
