@@ -12,6 +12,7 @@ import com.intellij.openapi.fileEditor.FileDocumentManagerListener;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.problems.WolfTheProblemSolver;
 import com.intellij.util.messages.MessageBusConnection;
 import org.ideplugins.vale_cli_plugin.exception.ValeCliExecutionException;
 import org.ideplugins.vale_cli_plugin.service.ValeCliExecutor;
@@ -104,6 +105,8 @@ final public class FileSavedListener implements Disposable, FileDocumentManagerL
                 Map<String, List<JsonObject>> results = cliExecutor.parseValeJsonResponse(future, 6);
                 List<JsonObject> resultsFile = results.get(file.getPath());
                 reporter.remove(file.getPath());
+                WolfTheProblemSolver problemSolver = WolfTheProblemSolver.getInstance(myProject);
+                problemSolver.clearProblems(original);
                 reporter.updateIssuesForFile(original.getPath(), resultsFile);
             }
         } catch (IOException ex) {
