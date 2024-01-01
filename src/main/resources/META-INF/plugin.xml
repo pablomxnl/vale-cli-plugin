@@ -19,7 +19,7 @@
     <depends config-file="org.ideplugins.vale-cli-plugin-markdown.xml">org.intellij.plugins.markdown</depends>
     <depends optional="true" config-file="org.ideplugins.vale-cli-plugin-rest.xml">org.jetbrains.plugins.rest</depends>
     <depends config-file="org.ideplugins.vale-cli-plugin-asciidoc.xml">org.asciidoctor.intellij.asciidoc</depends>
-    <idea-version since-build="222.3345.118" />
+    <idea-version since-build="222.3345.118"/>
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
@@ -29,7 +29,7 @@
                                  id="org.ideplugins.vale_cli_plugin.settings.ValePluginSettingsConfigurable"
                                  displayName="Vale CLI"
         />
-        <applicationService serviceImplementation="org.ideplugins.vale_cli_plugin.settings.ValePluginSettingsState" />
+        <applicationService serviceImplementation="org.ideplugins.vale_cli_plugin.settings.ValePluginSettingsState"/>
 
         <!-- output window -->
         <toolWindow id="Vale CLI"
@@ -38,10 +38,14 @@
                     doNotActivateOnStart="true"
                     factoryClass="org.ideplugins.vale_cli_plugin.toolwindow.ValeToolWindow"
                     icon="/icons/pluginIcon2.svg"/>
-        <notificationGroup displayType="STICKY_BALLOON" id="vale-cli-plugin-update" />
-        <postStartupActivity implementation="org.ideplugins.vale_cli_plugin.activity.ValeStartupActivity" id="valeStartupActivity" />
-        <errorHandler implementation="org.ideplugins.vale_cli_plugin.errorhandling.SentryErrorReporter" />
-        <typedHandler implementation="org.ideplugins.vale_cli_plugin.listener.TypedHandler"  id="valeKeyListener" />
+        <notificationGroup displayType="STICKY_BALLOON" id="vale-cli-plugin-update"/>
+        <postStartupActivity implementation="org.ideplugins.vale_cli_plugin.activity.ValeStartupActivity"
+                             id="valeStartupActivity"/>
+        <errorHandler implementation="org.ideplugins.vale_cli_plugin.errorhandling.SentryErrorReporter"/>
+        <typedHandler implementation="org.ideplugins.vale_cli_plugin.listener.TypedHandler" id="valeKeyListener"/>
+
+        <problemFileHighlightFilter
+                implementation="org.ideplugins.vale_cli_plugin.annotator.ValeProblemHighlightFilter"/>
     </extensions>
 
     <actions>
