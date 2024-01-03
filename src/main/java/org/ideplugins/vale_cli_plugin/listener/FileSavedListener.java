@@ -56,6 +56,7 @@ final public class FileSavedListener implements Disposable, FileDocumentManagerL
         return project.getService(FileSavedListener.class);
     }
 
+
     private void writeSyncedFile(Document doc, Path tmp) throws IOException {
         try {
             try (BufferedWriter out = Files.newBufferedWriter(tmp, StandardCharsets.UTF_8)) {
@@ -93,11 +94,10 @@ final public class FileSavedListener implements Disposable, FileDocumentManagerL
 
     private void executeValeAfterChange(Document document) throws ValeCliExecutionException {
         VirtualFile original = FileDocumentManager.getInstance().getFile(document);
-        LOGGER.debug("executeValeAfterChange");
+        LOGGER.info("executeValeAfterChange");
         Path tmp = null;
         try {
             tmp = Files.createTempFile(null, "." + original.getExtension());
-            LOGGER.debug("tmp file path =" + tmp);
             writeSyncedFile(document, tmp);
             VirtualFile file = LocalFileSystem.getInstance().findFileByPath(tmp.toString());
             if (file != null) {
@@ -105,9 +105,6 @@ final public class FileSavedListener implements Disposable, FileDocumentManagerL
                 Map<String, List<JsonObject>> results = cliExecutor.parseValeJsonResponse(future, 6);
                 List<JsonObject> resultsFile = results.get(file.getPath());
                 reporter.remove(file.getPath());
-                reporter.updateIssuesForFile(original.getPath(), resultsFile);
-            }
-
                 WolfTheProblemSolver problemSolver = WolfTheProblemSolver.getInstance(myProject);
                 problemSolver.clearProblems(original);
                 reporter.updateIssuesForFile(original.getPath(), resultsFile);
