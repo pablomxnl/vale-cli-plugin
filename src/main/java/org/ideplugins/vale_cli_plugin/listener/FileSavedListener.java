@@ -3,7 +3,6 @@ package org.ideplugins.vale_cli_plugin.listener;
 import com.google.gson.JsonObject;
 import com.intellij.codeInsight.editorActions.TypedHandlerDelegate;
 import com.intellij.openapi.Disposable;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
@@ -13,6 +12,7 @@ import com.intellij.openapi.fileEditor.FileDocumentManagerListener;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.problems.WolfTheProblemSolver;
 import com.intellij.util.messages.MessageBusConnection;
 import org.ideplugins.vale_cli_plugin.exception.ValeCliExecutionException;
 import org.ideplugins.vale_cli_plugin.service.ValeCliExecutor;
@@ -47,7 +47,7 @@ final public class FileSavedListener implements Disposable, FileDocumentManagerL
 
     public FileSavedListener(@NotNull Project project) {
         myProject = project;
-        settings = ApplicationManager.getApplication().getService(ValePluginSettingsState.class);
+        settings = ValePluginSettingsState.getInstance();
         cliExecutor = ValeCliExecutor.getInstance(myProject);
         reporter = myProject.getService(ValeIssuesReporter.class);
     }
@@ -56,7 +56,7 @@ final public class FileSavedListener implements Disposable, FileDocumentManagerL
         return project.getService(FileSavedListener.class);
     }
 
-    private static void createSyncedFile(Document doc, Path tmp) throws IOException {
+    private void writeSyncedFile(Document doc, Path tmp) throws IOException {
         try {
             try (BufferedWriter out = Files.newBufferedWriter(tmp, StandardCharsets.UTF_8)) {
                 out.write(doc.getText());
@@ -98,7 +98,7 @@ final public class FileSavedListener implements Disposable, FileDocumentManagerL
         try {
             tmp = Files.createTempFile(null, "." + original.getExtension());
             LOGGER.debug("tmp file path =" + tmp);
-            createSyncedFile(document, tmp);
+            writeSyncedFile(document, tmp);
             VirtualFile file = LocalFileSystem.getInstance().findFileByPath(tmp.toString());
             if (file != null) {
                 Future<ProcessResult> future = cliExecutor.executeValeCliOnFile(file).getFuture();
@@ -108,6 +108,10 @@ final public class FileSavedListener implements Disposable, FileDocumentManagerL
                 reporter.updateIssuesForFile(original.getPath(), resultsFile);
             }
 
+                WolfTheProblemSolver problemSolver = WolfTheProblemSolver.getInstance(myProject);
+                problemSolver.clearProblems(original);
+                reporter.updateIssuesForFile(original.getPath(), resultsFile);
+            }
         } catch (IOException ex) {
             throw new ValeCliExecutionException(ex);
         } finally {
@@ -116,7 +120,7 @@ final public class FileSavedListener implements Disposable, FileDocumentManagerL
                     Files.delete(tmp);
                 }
             } catch (IOException e) {
-                LOGGER.error("unable to delete tmp file" , e);
+                LOGGER.info("unable to delete tmp file\n" + e.getMessage());
             }
         }
     }

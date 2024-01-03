@@ -13,6 +13,8 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.util.TextRange;
+import com.intellij.problems.Problem;
+import com.intellij.problems.WolfTheProblemSolver;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
 import org.ideplugins.vale_cli_plugin.service.ValeIssuesReporter;
@@ -20,6 +22,8 @@ import org.ideplugins.vale_cli_plugin.settings.OSUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Optional;
 
 
@@ -52,8 +56,12 @@ public class ValeExternalAnnotatorProcessor extends ExternalAnnotator<InitialAnn
     public void apply(@NotNull PsiFile psiFile, AnnotatorResult annotationResult, @NotNull AnnotationHolder holder) {
         LOGGER.debug("apply %s".formatted(psiFile.getName()));
         if (annotationResult != null && annotationResult.getValeResults() != null) {
+            WolfTheProblemSolver problemSolver = WolfTheProblemSolver.getInstance(psiFile.getProject());
+            Collection<Problem> problems = new ArrayList<>();
+
             annotationResult.getValeResults().forEach(jsonObject -> {
                 JsonArray span = jsonObject.getAsJsonArray("Span");
+                String message = jsonObject.get("Message").getAsString();
                 int line = jsonObject.get("Line").getAsInt();
                 int initialColumn = span.get(0).getAsInt();
                 int finalColumn = span.get(1).getAsInt();
@@ -61,8 +69,11 @@ public class ValeExternalAnnotatorProcessor extends ExternalAnnotator<InitialAnn
                     if (annotationResult.isValidRangeForAnnotation(range)) {
                         createAnnotation(holder, jsonObject, range);
                     }
+                    problems.add(problemSolver.convertToProblem(psiFile.getVirtualFile(), line,
+                            initialColumn, new String[]{message}));
                 });
             });
+            problemSolver.reportProblems(psiFile.getVirtualFile(), problems);
         }
     }
 
