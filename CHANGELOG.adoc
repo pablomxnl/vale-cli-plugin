@@ -7,11 +7,16 @@ This document provides an overview of the changes by release.
 [[releasenotes]]
 == Release notes
 
+=== 0.0.16
+
+- Implements https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/26[#26] Show issues in Project Errors
+- Fixes https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/27[#27] JsonSyntaxException
+- Fixes https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/27[#29] NPE
+
 === 0.0.15
 
 - Fixes https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/23[#23] asciidoctor installed - but plugin raises E100 Runtime error asciidoctor not found
 - Fixes https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/24[#24] Forward `System.getenv()` as environment to Vale
-
 
 === 0.0.14
 
@@ -22,11 +27,9 @@ This document provides an overview of the changes by release.
 
 - Fixes https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/20[#20] NPE reported by plugin users to sentry in TypedHandler
 
-
 === 0.0.12
 
 - https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/7[Run the Vale plugin on save]
-
 - https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/19[Add fix intention action]
 
 === 0.0.11
