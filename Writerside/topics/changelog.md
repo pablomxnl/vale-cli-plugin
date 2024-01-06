@@ -5,8 +5,9 @@ This document provides an overview of the changes by release.
 0.0.16
 ------
 
-- Fixes [\#25](https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/25) Flickering in problem view
+- Implements [\#26](https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/26) Show issues in Project Errors
 - Fixes [\#27](https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/27) JsonSyntaxException
+- Fixes [\#29](https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/29) NPE
 
 0.0.15
 ------

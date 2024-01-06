@@ -9,8 +9,9 @@ This document provides an overview of the changes by release.
 
 === 0.0.16
 
-- Fixes https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/25[#25] Flickering in problem view
+- Implements https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/26[#26] Show issues in Project Errors
 - Fixes https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/27[#27] JsonSyntaxException
+- Fixes https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/27[#29] NPE
 
 === 0.0.15
 
@@ -29,7 +30,6 @@ This document provides an overview of the changes by release.
 === 0.0.12
 
 - https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/7[Run the Vale plugin on save]
-
 - https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/19[Add fix intention action]
 
 === 0.0.11
