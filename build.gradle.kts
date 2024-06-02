@@ -110,7 +110,7 @@ tasks {
     }
 
     asciidoctor {
-        dependsOn(processTestResources)
+        dependsOn(processTestResources,downloadAndroidStudioProductReleasesXml, downloadIdeaProductReleasesXml)
         setSourceDir(baseDir)
         sources {
             include("CHANGELOG.adoc")
@@ -130,15 +130,12 @@ tasks {
     }
 
     signPlugin {
-        certificateChain = environment("JBM_CERTIFICATE_CHAIN")
-        privateKey = environment("JBM_PRIVATE_KEY")
+        certificateChainFile = file(environment("JBM_CERTIFICATE_CHAIN"))
+        privateKeyFile = file(environment("JBM_PRIVATE_KEY"))
         password = environment("JBM_PRIVATE_KEY_PASSWORD")
     }
 
     publishPlugin {
-        if (semver.preRelease.contains("SNAPSHOT")) {
-            channels = listOf("EAP")
-        }
         token = environment("JBM_PUBLISH_TOKEN")
     }
 

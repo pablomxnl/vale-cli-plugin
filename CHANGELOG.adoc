@@ -7,6 +7,10 @@ This document provides an overview of the changes by release.
 [[releasenotes]]
 == Release notes
 
+=== 0.0.17
+
+- Update pluginUntilBuild to support 2024.x IDE versions
+
 === 0.0.16
 
 - Implements https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/26[#26] Show issues in Project Errors
