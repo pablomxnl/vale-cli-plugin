@@ -2,6 +2,12 @@ What's new
 =====
 This document provides an overview of the changes by release.
 
+0.0.17
+------
+
+- Update pluginUntilBuild to support 2024.x IDE versions
+
+
 0.0.16
 ------
 

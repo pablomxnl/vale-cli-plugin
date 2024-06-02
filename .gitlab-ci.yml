@@ -1,10 +1,10 @@
 stages:
   - build
   - deploy
+  - release
 
 variables:
   GRADLE_OPTS: "-Dorg.gradle.internal.launcher.welcomeMessageEnabled=false"
-  CI: "gitlab-ci"
   PRODUCT: Writerside/pd
   ARTIFACT: webHelpPD2-all.zip
   WRS_VERSION: 2.1.1479-p3869
@@ -22,6 +22,7 @@ cache:
     - saas-linux-medium-amd64
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: '$CI_COMMIT_TAG =~ /^\d+\.\d+\.\d+$/'
   artifacts:
     when: always
     paths:
@@ -55,7 +56,7 @@ build_artifact:
     - gradle test --stacktrace --info
     - gradle -Dversion.prerelease=$CI_PIPELINE_ID-SNAPSHOT buildPlugin
 
-release_artifact:
+build_release_artifact:
   extends: .build_release
   script:
     - gradle test
@@ -95,3 +96,55 @@ pages:
   artifacts:
     paths:
       - public
+
+prepare_release_notes:
+  stage: build
+  image: docker.io/library/node:lts-alpine
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^\d+\.\d+\.\d+$/'
+  script:
+    - npm i -g downdoc
+    - downdoc CHANGELOG.adoc
+    - awk '/^### /{if(x)exit;x=1}x' CHANGELOG.md > release_notes.md
+  artifacts:
+    paths:
+      - release_notes.md
+
+
+release_job:
+  stage: release
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  needs:
+    - job: prepare_release_notes
+      artifacts: true
+    - job: build_release_artifact
+      artifacts: true
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^\d+\.\d+\.\d+$/'
+  script:
+    - echo "Creating release"
+  release:
+    name: 'Release $CI_COMMIT_TAG'
+    description: release_notes.md
+    tag_name: '$CI_COMMIT_TAG'
+    ref: '$CI_COMMIT_SHA'
+    assets:
+      links:
+        - name: "Vale CLI Plugin v$CI_COMMIT_TAG for Jetbrain's IDEs"
+          url: "$CI_SERVER_URL/$CI_PROJECT_PATH/-/jobs/$CI_JOB_ID/artifacts/file/build/distributions/vale-cli-plugin-$CI_COMMIT_TAG.zip"
+  artifacts:
+    when: always
+    paths:
+      - build/distributions/*.zip
+
+upload_marketplace:
+  stage: release
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^\d+\.\d+\.\d+$/'
+  needs:
+    - job: build_release_artifact
+      artifacts: true
+    - job: release_job
+      artifacts: false
+  script:
+    - gradle publishPlugin
