@@ -9,7 +9,8 @@ variables:
   ARTIFACT: webHelpPD2-all.zip
   WRS_VERSION: 2.1.1479-p3869
 
-image: registry.gitlab.com/pablomxnl/vale-cli-plugin/builder
+image: registry.gitlab.com/pablomxnl/vale-cli-plugin/builder:0.0.18
+
 cache:
   key: ${CI_PROJECT_NAME}
   paths:
@@ -19,7 +20,7 @@ cache:
   stage: build
   coverage: '/    - Instruction Coverage: ([0-9.]+)%/'
   tags:
-    - saas-linux-medium-amd64
+    - pluginbuilder
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
     - if: '$CI_COMMIT_TAG =~ /^\d+\.\d+\.\d+$/'
@@ -37,7 +38,7 @@ cache:
   stage: build
   coverage: '/    - Instruction Coverage: ([0-9.]+)%/'
   tags:
-    - saas-linux-medium-amd64
+    - pluginbuilder
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
   artifacts:
@@ -53,14 +54,12 @@ cache:
 build_artifact:
   extends: .build_artifact
   script:
-    - gradle test --stacktrace --info
-    - gradle -Dversion.prerelease=$CI_PIPELINE_ID-SNAPSHOT buildPlugin
+    - gradle -Dversion.prerelease=$CI_PIPELINE_ID-SNAPSHOT build
 
 build_release_artifact:
   extends: .build_release
   script:
-    - gradle test
-    - gradle buildPlugin
+    - gradle build
 
 build-documentation:
   image: registry.jetbrains.team/p/writerside/builder/writerside-builder:$WRS_VERSION

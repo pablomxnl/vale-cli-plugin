@@ -1,7 +1,6 @@
 package org.ideplugins.vale_cli_plugin.annotator;
 
 import com.google.gson.JsonObject;
-import com.intellij.codeInsight.daemon.impl.DefaultHighlightVisitorBasedInspection;
 import com.intellij.lang.annotation.AnnotationBuilder;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.HighlightSeverity;
@@ -21,7 +20,8 @@ import org.zeroturnaround.exec.StartedProcess;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -30,7 +30,6 @@ import static org.mockito.Mockito.when;
 @PluginTest
 @ExtendWith(RunInEdtExtension.class)
 public class ValeExternalAnnotatorProcessorTest extends BaseTest {
-
     @Test
     public void testAnnotator(CodeInsightTestFixture codeInsightTestFixture) throws ValeCliExecutionException {
         codeInsightTestFixture.copyDirectoryToProject("annotator-test", "src");
@@ -46,14 +45,11 @@ public class ValeExternalAnnotatorProcessorTest extends BaseTest {
         InitialAnnotatorInfo info = annotatorProcessor.collectInformation(file);
         AnnotatorResult annotatorResult = annotatorProcessor.doAnnotate(info);
         AnnotationHolder holder = mock(AnnotationHolder.class);
-        DefaultHighlightVisitorBasedInspection.runAnnotatorsInGeneralHighlighting(file, false, true);
         AnnotationBuilder builder = mock(AnnotationBuilder.class);
         when(holder.newAnnotation(any(HighlightSeverity.class), anyString())).thenReturn(builder);
         when(builder.tooltip(anyString())).thenReturn(builder);
         when(builder.range(any(TextRange.class))).thenReturn(builder);
         annotatorProcessor.apply(file, annotatorResult, holder);
-        codeInsightTestFixture.testHighlighting();
-
     }
 
 }

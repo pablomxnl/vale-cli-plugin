@@ -7,6 +7,10 @@ This document provides an overview of the changes by release.
 [[releasenotes]]
 == Release notes
 
+=== 0.0.18
+
+- Updates to support 2024.2 IDE versions
+
 === 0.0.17
 
 - Update pluginUntilBuild to support 2024.x IDE versions

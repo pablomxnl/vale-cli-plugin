@@ -31,8 +31,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Future;
 
-import static com.intellij.AppTopics.FILE_DOCUMENT_SYNC;
-
 @Service(Service.Level.PROJECT)
 final public class FileSavedListener implements Disposable, FileDocumentManagerListener, BulkAwareDocumentListener.Simple {
 
@@ -97,6 +95,7 @@ final public class FileSavedListener implements Disposable, FileDocumentManagerL
         LOGGER.info("executeValeAfterChange");
         Path tmp = null;
         try {
+            assert original != null;
             tmp = Files.createTempFile(null, "." + original.getExtension());
             writeSyncedFile(document, tmp);
             VirtualFile file = LocalFileSystem.getInstance().findFileByPath(tmp.toString());
@@ -124,9 +123,7 @@ final public class FileSavedListener implements Disposable, FileDocumentManagerL
 
     public void activate() {
         MessageBusConnection connection = myProject.getMessageBus().connect(this);
-        //FileDocumentManagerListener.TOPIC
-        connection.subscribe(FILE_DOCUMENT_SYNC, this);
+        connection.subscribe(FileDocumentManagerListener.TOPIC, this);
     }
-
 
 }
