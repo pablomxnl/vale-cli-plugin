@@ -5,3 +5,5 @@ build
 .gradle
 styles/
 CHANGELOG.xml
+.intellijPlatform
+.profileconfig.json

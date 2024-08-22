@@ -17,7 +17,6 @@
     <depends>com.intellij.modules.platform</depends>
     <depends optional="true" config-file="org.ideplugins.vale-cli-plugin-java.xml">com.intellij.java</depends>
     <depends config-file="org.ideplugins.vale-cli-plugin-markdown.xml">org.intellij.plugins.markdown</depends>
-    <depends optional="true" config-file="org.ideplugins.vale-cli-plugin-rest.xml">org.jetbrains.plugins.rest</depends>
     <depends config-file="org.ideplugins.vale-cli-plugin-asciidoc.xml">org.asciidoctor.intellij.asciidoc</depends>
     <idea-version since-build="222.3345.118"/>
 
@@ -30,6 +29,11 @@
                                  displayName="Vale CLI"
         />
         <applicationService serviceImplementation="org.ideplugins.vale_cli_plugin.settings.ValePluginSettingsState"/>
+        <externalAnnotator order="last"
+                           implementationClass="org.ideplugins.vale_cli_plugin.annotator.ValeExternalAnnotatorProcessor"
+                           language="ReST"
+        />
+
 
         <!-- output window -->
         <toolWindow id="Vale CLI"
