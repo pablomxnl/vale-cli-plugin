@@ -1,4 +1,6 @@
+import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
+import org.jetbrains.intellij.platform.gradle.models.ProductRelease
 import org.jsoup.Jsoup
 
 fun properties(key: String) = providers.gradleProperty(key)
@@ -13,6 +15,7 @@ plugins {
     alias(libs.plugins.gradleIntelliJPlugin) // Gradle IntelliJ Plugin
     alias(libs.plugins.semver)
     alias(libs.plugins.jacocolog)
+    alias(libs.plugins.kotlin)
 }
 
 develocity {
@@ -53,7 +56,14 @@ intellijPlatform {
     }
     pluginVerification {
         ides {
-            recommended()
+            select {
+                types = listOf(IntelliJPlatformType.IntellijIdeaCommunity, IntelliJPlatformType.IntellijIdeaUltimate )
+                channels = listOf(ProductRelease.Channel.EAP)
+            }
+            select {
+                types = listOf(IntelliJPlatformType.IntellijIdeaCommunity, IntelliJPlatformType.IntellijIdeaUltimate )
+                channels = listOf(ProductRelease.Channel.RELEASE)
+            }
         }
     }
 
@@ -72,6 +82,17 @@ intellijPlatform {
 }
 
 dependencies {
+    intellijPlatform {
+        create(properties("platformType"), properties("platformVersion"), useInstaller = false)
+        bundledPlugins(properties("platformBundledPlugins").map { it.split(',') })
+        plugins(properties("platformPlugins").map { it.split(',') })
+        instrumentationTools()
+        pluginVerifier()
+        zipSigner()
+        testFramework(TestFrameworkType.Platform)
+        testFramework(TestFrameworkType.Plugin.Java)
+    }
+
     implementation(libs.gson)
     implementation(libs.ztexec) {
         exclude(group = "org.slf4j", module = "slf4j-api")
@@ -79,22 +100,14 @@ dependencies {
     implementation(libs.sentrysdk){
         exclude(group = "org.slf4j")
     }
+    implementation(libs.annotations)
     testImplementation(libs.junit)
     testImplementation(libs.assertj)
     testImplementation(libs.mockito)
 
     testRuntimeOnly(libs.junitplatform)
     testRuntimeOnly(libs.junitengine)
-    intellijPlatform {
-        intellijIdeaCommunity(properties("platformVersion"), useInstaller = false)
-        bundledPlugins(properties("platformBundledPlugins").map { it.split(',') })
-        plugins(properties("platformPlugins").map { it.split(',') })
-        instrumentationTools()
-        pluginVerifier()
-        zipSigner()
-        testFramework(TestFrameworkType.Platform)
-    }
-
+    testImplementation(libs.junit4)
 }
 
 
@@ -122,8 +135,6 @@ val runIdeForManualTests by intellijPlatformTesting.runIde.registering {
 tasks {
     // Set the JVM compatibility versions
     withType<JavaCompile> {
-        sourceCompatibility = "21"
-        targetCompatibility = "21"
         options.compilerArgs = listOf("-Xlint:deprecation","-Xlint:unchecked")
     }
 
@@ -158,4 +169,8 @@ tasks {
     patchPluginXml {
         dependsOn("asciidoctor")
     }
+}
+
+kotlin {
+    jvmToolchain(21)
 }

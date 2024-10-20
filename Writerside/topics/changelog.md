@@ -2,6 +2,16 @@ What's new
 =====
 This document provides an overview of the changes by release.
 
+0.0.19
+------
+
+- Update to support EAP 243
+
+0.0.18
+------
+
+- Updates to support 2024.2 IDE versions
+
 0.0.17
 ------
 
