@@ -54,12 +54,12 @@ cache:
 build_artifact:
   extends: .build_artifact
   script:
-    - gradle -Dversion.prerelease=$CI_PIPELINE_ID-SNAPSHOT build
+    - gradle -Dversion.prerelease=$CI_PIPELINE_ID-SNAPSHOT test buildPlugin
 
 build_release_artifact:
   extends: .build_release
   script:
-    - gradle build
+    - gradle build buildPlugin
 
 build-documentation:
   image: "registry.jetbrains.team/p/writerside/builder/writerside-builder:$WRS_VERSION"
