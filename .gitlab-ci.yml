@@ -7,7 +7,7 @@ variables:
   GRADLE_OPTS: "-Dorg.gradle.internal.launcher.welcomeMessageEnabled=false"
   PRODUCT: Writerside/pd
   ARTIFACT: webHelpPD2-all.zip
-  WRS_VERSION: 242.21870
+  WRS_VERSION: "242.21870"
 
 image: registry.gitlab.com/pablomxnl/vale-cli-plugin/builder:0.0.19
 
@@ -62,7 +62,7 @@ build_release_artifact:
     - gradle build
 
 build-documentation:
-  image: registry.jetbrains.team/p/writerside/builder/writerside-builder:$WRS_VERSION
+  image: "registry.jetbrains.team/p/writerside/builder/writerside-builder:$WRS_VERSION"
   stage: build
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
