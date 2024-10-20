@@ -28,7 +28,6 @@
                                  id="org.ideplugins.vale_cli_plugin.settings.ValePluginSettingsConfigurable"
                                  displayName="Vale CLI"
         />
-        <applicationService serviceImplementation="org.ideplugins.vale_cli_plugin.settings.ValePluginSettingsState"/>
         <externalAnnotator order="last"
                            implementationClass="org.ideplugins.vale_cli_plugin.annotator.ValeExternalAnnotatorProcessor"
                            language="ReST"
