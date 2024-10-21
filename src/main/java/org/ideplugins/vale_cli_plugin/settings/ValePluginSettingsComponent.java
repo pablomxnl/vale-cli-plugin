@@ -21,19 +21,23 @@ public class ValePluginSettingsComponent {
 
     private TextFieldWithBrowseButton createIniBrowseField() {
 
-        final FileChooserDescriptor fileChooserDescriptor = FileChooserDescriptorFactory.createSingleFileDescriptor();
+        final FileChooserDescriptor fileChooserDescriptor =
+                FileChooserDescriptorFactory.createSingleFileDescriptor()
+                    .withTitle("Provide Vale Configuration File")
+                    .withDescription("Locate your .vale.ini file");
         TextFieldWithBrowseButton textField = new TextFieldWithBrowseButton();
-        textField.addBrowseFolderListener("Provide Vale Configuration File", "Locate your .vale.ini file", null,
-            fileChooserDescriptor);
+        textField.addBrowseFolderListener(null, fileChooserDescriptor);
         InsertPathAction.addTo(textField.getTextField(), fileChooserDescriptor);
         return textField;
     }
 
     private TextFieldWithBrowseButton createPathBrowseField() {
-        final FileChooserDescriptor fileChooserDescriptor = FileChooserDescriptorFactory.createSingleFileDescriptor();
+        final FileChooserDescriptor fileChooserDescriptor =
+                FileChooserDescriptorFactory.createSingleFileDescriptor()
+                        .withTitle("Provide Vale Binary Location")
+                        .withDescription("Locate your vale binary");
         TextFieldWithBrowseButton textField = new TextFieldWithBrowseButton();
-        textField.addBrowseFolderListener("Provide Vale Binary Location", "Locate your vale binary", null,
-            fileChooserDescriptor);
+        textField.addBrowseFolderListener(null,fileChooserDescriptor);
         InsertPathAction.addTo(textField.getTextField(), fileChooserDescriptor);
         return textField;
 
