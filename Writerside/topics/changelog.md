@@ -6,6 +6,8 @@ This document provides an overview of the changes by release.
 ------
 
 - Update to support EAP 243
+- Fixes [\#30](https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/30) menu vale action doesn't work on Windows 10
+- Add file filter to vale configuration file chooser ( `vale.ini` | `.vale.ini` | `.ini` )
 
 0.0.18
 ------
