@@ -15,7 +15,7 @@
     <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
          on how to target different products -->
     <depends>com.intellij.modules.platform</depends>
-    <depends optional="true" config-file="org.ideplugins.vale-cli-plugin-java.xml">com.intellij.java</depends>
+    <depends optional="true" config-file="org.ideplugins.vale-cli-plugin-restructuredtext.xml">org.jetbrains.plugins.rest</depends>
     <depends config-file="org.ideplugins.vale-cli-plugin-markdown.xml">org.intellij.plugins.markdown</depends>
     <depends config-file="org.ideplugins.vale-cli-plugin-asciidoc.xml">org.asciidoctor.intellij.asciidoc</depends>
 
@@ -27,11 +27,6 @@
                                  id="org.ideplugins.vale_cli_plugin.settings.ValePluginSettingsConfigurable"
                                  displayName="Vale CLI"
         />
-        <externalAnnotator order="last"
-                           implementationClass="org.ideplugins.vale_cli_plugin.annotator.ValeExternalAnnotatorProcessor"
-                           language="ReST"
-        />
-
 
         <!-- output window -->
         <toolWindow id="Vale CLI"
