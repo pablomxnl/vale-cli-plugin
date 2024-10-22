@@ -144,7 +144,7 @@ public final class ValeCliExecutor implements Disposable {
     private List<String> createValeInProjectCommand() {
         ValePluginSettingsState settingsState = ValePluginSettingsState.getInstance();
         List<String> command = createValeCommand();
-        command.add(String.format("--glob='*.{%s}'", settingsState.extensions));
+        command.add(String.format("--glob=\"*.{%s}\"", settingsState.extensions));
         command.add(project.getBasePath());
         return command;
     }
