@@ -2,13 +2,16 @@ package org.ideplugins.vale_cli_plugin.settings;
 
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
+import com.intellij.openapi.ui.TextBrowseFolderListener;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.ui.InsertPathAction;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.FormBuilder;
+
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+
 import org.jetbrains.annotations.NotNull;
 
 public class ValePluginSettingsComponent {
@@ -20,33 +23,38 @@ public class ValePluginSettingsComponent {
 
 
     private TextFieldWithBrowseButton createIniBrowseField() {
-
-        final FileChooserDescriptor fileChooserDescriptor = FileChooserDescriptorFactory.createSingleFileDescriptor();
+        final FileChooserDescriptor fileChooserDescriptor = FileChooserDescriptorFactory.createSingleFileDescriptor()
+            .withTitle("Provide Vale Configuration File")
+            .withDescription("Locate your .vale.ini file")
+            .withShowHiddenFiles(true)
+            .withFileFilter(file -> {
+                String fileName = file.getName();
+                return fileName.equals(".vale.ini") || fileName.equals("vale.ini") || fileName.endsWith(".ini");
+            });
         TextFieldWithBrowseButton textField = new TextFieldWithBrowseButton();
-        textField.addBrowseFolderListener("Provide Vale Configuration File", "Locate your .vale.ini file", null,
-            fileChooserDescriptor);
+        textField.addBrowseFolderListener(new TextBrowseFolderListener(fileChooserDescriptor));
         InsertPathAction.addTo(textField.getTextField(), fileChooserDescriptor);
         return textField;
     }
 
     private TextFieldWithBrowseButton createPathBrowseField() {
-        final FileChooserDescriptor fileChooserDescriptor = FileChooserDescriptorFactory.createSingleFileDescriptor();
+        final FileChooserDescriptor fileChooserDescriptor =
+                FileChooserDescriptorFactory.createSingleFileDescriptor()
+                        .withTitle("Provide Vale Binary Location")
+                        .withDescription("Locate your vale binary");
         TextFieldWithBrowseButton textField = new TextFieldWithBrowseButton();
-        textField.addBrowseFolderListener("Provide Vale Binary Location", "Locate your vale binary", null,
-            fileChooserDescriptor);
+        textField.addBrowseFolderListener(new TextBrowseFolderListener(fileChooserDescriptor));
         InsertPathAction.addTo(textField.getTextField(), fileChooserDescriptor);
         return textField;
-
     }
-
 
     public ValePluginSettingsComponent() {
         myMainPanel = FormBuilder.createFormBuilder()
-            .addLabeledComponent(new JBLabel("Enter vale executable location"), valePath, 1, false)
-            .addLabeledComponent(new JBLabel("Enter .vale.ini full absolute path"), configurationFilePath, 2, false)
-            .addLabeledComponent(new JBLabel("File extensions to check"), extensionsTextField, 3, false)
-            .addComponentFillVertically(new JPanel(), 0)
-            .getPanel();
+                .addLabeledComponent(new JBLabel("Enter vale executable location"), valePath, 1, false)
+                .addLabeledComponent(new JBLabel("Enter .vale.ini full absolute path"), configurationFilePath, 2, false)
+                .addLabeledComponent(new JBLabel("File extensions to check"), extensionsTextField, 3, false)
+                .addComponentFillVertically(new JPanel(), 0)
+                .getPanel();
     }
 
     public JComponent getPreferredFocusedComponent() {
@@ -67,11 +75,11 @@ public class ValePluginSettingsComponent {
     }
 
     @NotNull
-    public String getExtensionsText(){
+    public String getExtensionsText() {
         return extensionsTextField.getText();
     }
 
-    public void setExtensionsText(@NotNull String newValue){
+    public void setExtensionsText(@NotNull String newValue) {
         extensionsTextField.setText(newValue);
     }
 

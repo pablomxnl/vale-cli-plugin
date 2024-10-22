@@ -42,11 +42,14 @@ public class SentryErrorReporter extends ErrorReportSubmitter {
         options.setEnvironment(pluginDescriptor.getPluginId().getIdString());
         options.setDiagnosticLevel(SentryLevel.ERROR);
         Hub hub = new Hub(options);
-        String os = SystemInfo.getOsNameAndVersion();
+        String os = SystemInfo.getOsNameAndVersion() + "-" + SystemInfo.OS_ARCH;
         if (SystemInfo.isLinux) {
             os += (SystemInfo.isChromeOS) ? " [Chrome OS] " : "";
             os += (SystemInfo.isKDE) ? " [KDE] " : "";
             os += (SystemInfo.isGNOME) ? " [GNOME] " : "";
+            os += (SystemInfo.isXfce) ? " [XFCE] " : "";
+            os += (SystemInfo.isWayland) ? " [Wayland] " : "";
+            os += (SystemInfo.isXWindow) ? " [XWindow] " : "";
         }
         hub.setTag("os_name_version", os);
         ApplicationInfo applicationInfo = ApplicationInfo.getInstance();
