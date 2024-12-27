@@ -65,6 +65,8 @@ build_release_artifact:
 build-documentation:
   image: "registry.jetbrains.team/p/writerside/builder/writerside-builder:$WRS_VERSION"
   stage: build
+  variables:
+    GIT_DEPTH: 0
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH

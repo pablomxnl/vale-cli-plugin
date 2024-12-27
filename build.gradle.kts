@@ -86,7 +86,6 @@ dependencies {
         create(properties("platformType"), properties("platformVersion"), useInstaller = false)
         bundledPlugins(properties("platformBundledPlugins").map { it.split(',') })
         plugins(properties("platformPlugins").map { it.split(',') })
-        instrumentationTools()
         pluginVerifier()
         zipSigner()
         testFramework(TestFrameworkType.Platform)
