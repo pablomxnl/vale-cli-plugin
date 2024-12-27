@@ -7,6 +7,9 @@ This document provides an overview of the changes by release.
 [[releasenotes]]
 == Release notes
 
+=== 0.0.20
+- Fixes https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/31[#31] NPE reported by plugin user through sentry error reporter in ValePluginSettingsConfigurable
+
 === 0.0.19
 
 - Update to support EAP 243

@@ -7,7 +7,7 @@ For ReStructured text files support the [ReStructuredText plugin](https://plugin
 
 > **Make sure these dependencies are available on your system path**
 >
-> For the Vale CLI, the plugin tries to find it's location, if it fails, there is still the option to specify it's location on the [plugin settings](starter-topic.md#configuration). For asciidoctor or docutils, these
+> For the Vale CLI executable, the plugin tries to guess it's location, if it fails, there is still the option to specify the location on the [plugin settings](starter-topic.md#configuration). For asciidoctor or docutils, these
 > need to be included in the <code>$PATH</code> environment variable, as the Vale CLI binary invokes them from there.
 >
 {style="note"}
