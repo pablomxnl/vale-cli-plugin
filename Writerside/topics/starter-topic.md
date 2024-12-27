@@ -29,8 +29,8 @@ Then select the zip file just downloaded from gitlab releases.
 
 ## Configuration
 
-The plugin has 3 setings
-To setup this up go to 
+The plugin has 3 settings
+To set this up go to 
 
 <kbd>Settings</kbd> (or <kbd>Preferences</kbd> if using mac) -> <kbd>Tools</kbd> -> <kbd>Vale CLI</kbd> 
 
