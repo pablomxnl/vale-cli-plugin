@@ -1,7 +1,9 @@
 package org.ideplugins.vale_cli_plugin.settings;
 
 import com.intellij.openapi.options.Configurable;
+
 import javax.swing.JComponent;
+
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nls.Capitalization;
 import org.jetbrains.annotations.Nullable;
@@ -9,6 +11,10 @@ import org.jetbrains.annotations.Nullable;
 public class ValePluginSettingsConfigurable implements Configurable {
 
     private ValePluginSettingsComponent settingsComponent;
+
+    public ValePluginSettingsConfigurable() {
+        settingsComponent = new ValePluginSettingsComponent();
+    }
 
     @Nls(capitalization = Capitalization.Title)
     @Override
@@ -24,7 +30,6 @@ public class ValePluginSettingsConfigurable implements Configurable {
     @Nullable
     @Override
     public JComponent createComponent() {
-        settingsComponent = new ValePluginSettingsComponent();
         return settingsComponent.getPanel();
     }
 

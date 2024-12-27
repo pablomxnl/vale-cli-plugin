@@ -2,6 +2,12 @@ What's new
 =====
 This document provides an overview of the changes by release.
 
+0.0.20
+------
+
+- Fixes [\#31](https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/31) NPE reported by plugin user through sentry error reporter in ValePluginSettingsConfigurable
+
+
 0.0.19
 ------
 
