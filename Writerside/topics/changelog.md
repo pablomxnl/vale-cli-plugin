@@ -2,6 +2,11 @@ What's new
 =====
 This document provides an overview of the changes by release.
 
+0.0.21
+------
+
+- Update to support EAP 251
+
 0.0.20
 ------
 
