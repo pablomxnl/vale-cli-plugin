@@ -2,8 +2,8 @@
 # libraries
 gson = "2.11.0"
 ztexec = "1.12"
-sentrysdk = "7.19.0"
-annotations = "26.0.0"
+sentrysdk = "7.20.0"
+annotations = "26.0.1"
 
 # test libraries
 junit = "5.9.2"

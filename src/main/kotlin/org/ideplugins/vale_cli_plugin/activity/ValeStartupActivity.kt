@@ -11,7 +11,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.ProjectActivity
 import com.intellij.psi.search.FilenameIndex
 import com.intellij.psi.search.GlobalSearchScope
-import org.apache.commons.lang3.StringUtils
 import org.ideplugins.vale_cli_plugin.Constants
 import org.ideplugins.vale_cli_plugin.listener.FileSavedListener
 import org.ideplugins.vale_cli_plugin.service.ValeCliExecutor
@@ -51,7 +50,7 @@ private fun getValeFilesCount(project: Project) {
     }
     val settingsState = ValePluginSettingsState.getInstance()
 
-    if (StringUtils.isNotBlank(settingsState.extensions)) {
+    if (settingsState.extensions.isNotEmpty()) {
         val executor = ValeCliExecutor.getInstance(project)
         val scope = GlobalSearchScope.projectScope(project)
         ApplicationManager.getApplication().runReadAction {
