@@ -99,7 +99,7 @@ public final class ValeCliExecutor implements Disposable {
             throws ValeCliExecutionException {
         String valeJsonResponse;
         try {
-            valeJsonResponse = processResultFuture.get(numberOfFilesToCheck, TimeUnit.SECONDS).outputUTF8();
+            valeJsonResponse = processResultFuture.get(numberOfFilesToCheck*5L, TimeUnit.SECONDS).outputUTF8();
             LOGGER.debug(String.format("exec result: %s", valeJsonResponse));
             return parseJsonResponse(valeJsonResponse);
         } catch (InterruptedException | ExecutionException | TimeoutException | JsonSyntaxException exception) {
