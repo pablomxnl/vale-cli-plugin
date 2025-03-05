@@ -1,6 +1,9 @@
 package org.ideplugins.vale_cli_plugin.errorhandling;
 
 import com.intellij.ide.DataManager;
+import com.intellij.ide.IdeBundle;
+import com.intellij.ide.plugins.InstalledPluginsState;
+import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.application.ApplicationInfo;
@@ -9,6 +12,7 @@ import com.intellij.openapi.diagnostic.ErrorReportSubmitter;
 import com.intellij.openapi.diagnostic.IdeaLoggingEvent;
 import com.intellij.openapi.diagnostic.SubmittedReportInfo;
 import com.intellij.openapi.extensions.PluginDescriptor;
+import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
@@ -25,6 +29,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.Component;
+
+import static org.ideplugins.vale_cli_plugin.actions.ActionHelper.displayNotificationWithAction;
 
 
 public class SentryErrorReporter extends ErrorReportSubmitter {
@@ -65,6 +71,18 @@ public class SentryErrorReporter extends ErrorReportSubmitter {
         }
     }
 
+    private void showOutdatedPluginErrorNotification(PluginDescriptor descriptor) {
+        ApplicationManager.getApplication().invokeLater( () ->
+                displayNotificationWithAction(NotificationType.ERROR,
+                        "Error won't be submitted because there is a newer version available",
+                        "Update %s Plugin".formatted(descriptor.getName()),
+                        () ->
+                                ShowSettingsUtil.getInstance()
+                                        .showSettingsDialog(null, IdeBundle.message("title.plugins"))
+                )
+        );
+    }
+
     public @NlsActions.ActionText @NotNull String getReportActionText() {
         return "Report to Plugin Author";
     }
@@ -86,6 +104,14 @@ public class SentryErrorReporter extends ErrorReportSubmitter {
                           @NotNull Consumer<? super SubmittedReportInfo> consumer) {
         DataContext context = DataManager.getInstance().getDataContext(parentComponent);
         Project project = CommonDataKeys.PROJECT.getData(context);
+        PluginDescriptor pluginDescriptor = getPluginDescriptor();
+        InstalledPluginsState pluginState = InstalledPluginsState.getInstance();
+        if ( pluginState.hasNewerVersion(pluginDescriptor.getPluginId()) ) {
+            showOutdatedPluginErrorNotification(pluginDescriptor);
+            consumer.consume(new SubmittedReportInfo(SubmittedReportInfo.SubmissionStatus.DUPLICATE));
+            return true;
+        }
+
         IHub sentryHub = initSentry();
         new Task.Backgroundable(project, "Sending error report") {
             @Override

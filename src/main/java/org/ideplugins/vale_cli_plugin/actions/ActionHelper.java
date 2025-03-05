@@ -28,11 +28,19 @@ public class ActionHelper {
     private static final String GROUP_ID = "org.ideplugins.vale-cli-plugin";
 
     public static void displayNotification(final NotificationType notificationType, final String notificationBody) {
+        displayNotificationWithAction(notificationType, notificationBody, "Click here to configure Vale CLI",
+                () -> ShowSettingsUtil.getInstance()
+                        .showSettingsDialog(null, ValePluginSettingsConfigurable.class));
+    }
+
+    public static void displayNotificationWithAction(final NotificationType notificationType,
+                                                     final String notificationBody,
+                                                     final String actionTitle, Runnable r) {
         Notification notification = new Notification(GROUP_ID, "Vale CLI", notificationBody, notificationType);
-        notification.addAction(new NotificationAction("Click here to configure Vale CLI") {
+        notification.addAction(new NotificationAction(actionTitle) {
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent, @NotNull Notification notification) {
-                ShowSettingsUtil.getInstance().showSettingsDialog(null, ValePluginSettingsConfigurable.class);
+                r.run();
             }
         });
         Notifications.Bus.notify(notification);
@@ -53,7 +61,7 @@ public class ActionHelper {
                 content = Optional.ofNullable(contentManager.findContent("Vale Results"));
             }
             content.ifPresent(console -> {
-                ConsoleView consoleView = (ConsoleView) console.getComponent();
+                ConsoleView consoleView = (ConsoleView) console.getComponent().getComponent(0);
                 consoleView.clear();
                 consoleView.print(text, level);
                 toolWindow.show(null);

@@ -40,6 +40,7 @@ cache:
   coverage: '/    - Instruction Coverage: ([0-9.]+)%/'
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "web"'
   artifacts:
     when: always
     paths:
@@ -55,6 +56,11 @@ build_artifact:
   script:
     - gradle -Dversion.prerelease=$CI_PIPELINE_ID-SNAPSHOT build
     - gradle buildPlugin
+    - >
+      if [ -v PUSH_EAP ]; then 
+        gradle publishPlugin
+      fi
+
 
 build_release_artifact:
   extends: .build_release

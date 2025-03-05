@@ -3,7 +3,7 @@ What's new
 This document provides an overview of the changes by release.
 0.0.22
 ------
-
+- Added toolbar with feedback buttons to plugin tool window
 - Fixes [\#32](https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/32) TimeoutException when executing ValePopupAction on single asciidoc file
 
 0.0.21
