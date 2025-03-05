@@ -97,12 +97,18 @@ public final class ValeCliExecutor implements Disposable {
     public Map<String, List<JsonObject>> parseValeJsonResponse(Future<ProcessResult> processResultFuture,
                                                                int numberOfFilesToCheck)
             throws ValeCliExecutionException {
-        String valeJsonResponse;
+        String valeJsonResponse = null;
         try {
             valeJsonResponse = processResultFuture.get(numberOfFilesToCheck*5L, TimeUnit.SECONDS).outputUTF8();
             LOGGER.debug(String.format("exec result: %s", valeJsonResponse));
             return parseJsonResponse(valeJsonResponse);
-        } catch (InterruptedException | ExecutionException | TimeoutException | JsonSyntaxException exception) {
+        } catch (JsonSyntaxException exception){
+            String message = exception.getMessage();
+            if (valeJsonResponse!=null) {
+                message+= "\nInvalid JSON\n: " + valeJsonResponse;
+            }
+            throw new ValeCliExecutionException(message, exception);
+        } catch (InterruptedException | ExecutionException | TimeoutException exception) {
             throw new ValeCliExecutionException(exception);
         }
     }
