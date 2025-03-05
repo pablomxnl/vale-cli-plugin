@@ -6,6 +6,9 @@ This document provides an overview of the changes by release.
 
 [[releasenotes]]
 == Release notes
+=== 0.0.22
+- Fixes https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/32[#32] TimeoutException when executing ValePopupAction on single asciidoc file.
+
 === 0.0.21
 - Update to support EAP 251
 
