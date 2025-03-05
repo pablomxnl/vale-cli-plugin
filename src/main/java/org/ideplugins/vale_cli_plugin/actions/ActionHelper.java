@@ -53,7 +53,7 @@ public class ActionHelper {
                 content = Optional.ofNullable(contentManager.findContent("Vale Results"));
             }
             content.ifPresent(console -> {
-                ConsoleView consoleView = (ConsoleView) console.getComponent();
+                ConsoleView consoleView = (ConsoleView) console.getComponent().getComponent(0);
                 consoleView.clear();
                 consoleView.print(text, level);
                 toolWindow.show(null);
