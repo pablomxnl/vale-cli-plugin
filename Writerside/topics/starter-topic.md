@@ -98,11 +98,16 @@ Each one of these buttons opens your default browser to create a gitlab issue wi
 
 ### Automatic error reporting
 
+Sometimes fatal errors like the pesky NPE or other runtime exceptions ship with the plugin. When this happens there is a little blinking notification with a link "See details and submit report". 
+
 <img src="error_handler_notification.png" alt="Notification of a fatal internal error" />
 
-Sometimes pesky fatal errors like the pesky NPE or other exceptions ship with the plugin. When this happens there is a little blinking notification with a link "See details and submit report". If clicked the submit error report screen it's shown as follows
+If clicked the submit error report screen it's shown as follows
 
 <img src="error_handler_report.png" alt="Notification of a fatal internal error" />
 
+Similar to the bug report it gathers automatically information about the IDE, Operating System,JDK and plugin version installed and submits this information to Sentry. The author then gets a notification and possibly later you will see a new gitlab issue with `sentry` label.
 
-Similar to the bug report it gathers automatically information about the IDE, Operating System,JDK and plugin version installed and submits this information to Sentry. The author then gets a notification and possibly later you will see a new gitlab issue with `sentry` label.   
+Except, if the plugin is outdated, the error it is ignored and a notification like the following appears after submitting the error report:
+
+<img src="error_handler_report_outdated_version.png" alt="Notification of error report ignored due to outdated plugin version" />
