@@ -20,10 +20,8 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.NlsActions;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.util.Consumer;
-import io.sentry.Hub;
-import io.sentry.IHub;
+import io.sentry.Sentry;
 import io.sentry.SentryLevel;
-import io.sentry.SentryOptions;
 import org.ideplugins.vale_cli_plugin.settings.ValeCliPluginConfigurationState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -35,17 +33,36 @@ import static org.ideplugins.vale_cli_plugin.actions.ActionHelper.displayNotific
 
 public class SentryErrorReporter extends ErrorReportSubmitter {
 
-    private IHub initSentry() {
-        PluginDescriptor pluginDescriptor = getPluginDescriptor();
-        ValeCliPluginConfigurationState pluginSettings =
-                ApplicationManager.getApplication().getService(ValeCliPluginConfigurationState.class);
-        SentryOptions options = new SentryOptions();
-        options.setDsn(pluginSettings.getSentryDsn());
-        options.setRelease(pluginDescriptor.getVersion());
-        options.setServerName("");
-        options.setEnvironment(pluginDescriptor.getPluginId().getIdString());
-        options.setDiagnosticLevel(SentryLevel.ERROR);
-        Hub hub = new Hub(options);
+    private static boolean isSentryInit;
+
+    static synchronized void initSentry(final PluginDescriptor pluginDescriptor) {
+        if (!isSentryInit) {
+            ValeCliPluginConfigurationState pluginSettings =
+                    ApplicationManager.getApplication().getService(ValeCliPluginConfigurationState.class);
+            ApplicationInfo applicationInfo = ApplicationInfo.getInstance();
+            final String operatingSystem = getOperatingSystem();
+            Sentry.init(options -> {
+                options.setDsn(pluginSettings.getSentryDsn());
+                options.setRelease(pluginDescriptor.getVersion());
+                options.setServerName("");
+                options.setSendDefaultPii(false);
+                options.setEnvironment(pluginDescriptor.getPluginId().getIdString());
+                options.setDiagnosticLevel(SentryLevel.ERROR);
+            });
+
+            Sentry.configureScope(scope -> {
+                scope.setUser(null);
+                scope.setTag("os_name_version", operatingSystem);
+                scope.setTag("jb_platform_type", applicationInfo.getBuild().getProductCode());
+                scope.setTag("jb_platform_version", applicationInfo.getBuild().asStringWithoutProductCode());
+                scope.setTag("jb_ide", applicationInfo.getVersionName());
+
+            });
+            isSentryInit = true;
+        }
+    }
+
+    private static @NotNull String getOperatingSystem() {
         String os = SystemInfo.getOsNameAndVersion() + "-" + SystemInfo.OS_ARCH;
         if (SystemInfo.isLinux) {
             os += (SystemInfo.isChromeOS) ? " [Chrome OS] " : "";
@@ -55,24 +72,21 @@ public class SentryErrorReporter extends ErrorReportSubmitter {
             os += (SystemInfo.isWayland) ? " [Wayland] " : "";
             os += (SystemInfo.isXWindow) ? " [XWindow] " : "";
         }
-        hub.setTag("os_name_version", os);
-        ApplicationInfo applicationInfo = ApplicationInfo.getInstance();
-        hub.setTag("jb_platform_type", applicationInfo.getBuild().getProductCode());
-        hub.setTag("jb_platform_version", applicationInfo.getBuild().asStringWithoutProductCode());
-        hub.setTag("jb_ide", applicationInfo.getVersionName());
-        hub.configureScope(scope -> scope.setUser(null));
-        return hub;
+        return os;
     }
 
-    private static void submitErrors(IdeaLoggingEvent @NotNull [] events, String additionalInfo, IHub sentryHub) {
+    private static void submitErrors(IdeaLoggingEvent @NotNull [] events, String additionalInfo) {
         for (IdeaLoggingEvent ideaEvent : events) {
-                sentryHub.setExtra("userMessage", additionalInfo);
-                sentryHub.captureMessage(ideaEvent.getThrowableText(), SentryLevel.ERROR);
+            Sentry.captureMessage(ideaEvent.getThrowableText(),
+                    SentryLevel.ERROR, cb -> {
+                        cb.setExtra("userMessage", additionalInfo);
+                        cb.setUser(null);
+                    });
         }
     }
 
     private void showOutdatedPluginErrorNotification(PluginDescriptor descriptor) {
-        ApplicationManager.getApplication().invokeLater( () ->
+        ApplicationManager.getApplication().invokeLater(() ->
                 displayNotificationWithAction(NotificationType.ERROR,
                         "Error won't be submitted because there is a newer version available",
                         "Update %s Plugin".formatted(descriptor.getName()),
@@ -105,27 +119,24 @@ public class SentryErrorReporter extends ErrorReportSubmitter {
         DataContext context = DataManager.getInstance().getDataContext(parentComponent);
         Project project = CommonDataKeys.PROJECT.getData(context);
         PluginDescriptor pluginDescriptor = getPluginDescriptor();
+        initSentry(pluginDescriptor);
         InstalledPluginsState pluginState = InstalledPluginsState.getInstance();
-        if ( pluginState.hasNewerVersion(pluginDescriptor.getPluginId()) ) {
+        if (pluginState.hasNewerVersion(pluginDescriptor.getPluginId())) {
             showOutdatedPluginErrorNotification(pluginDescriptor);
             consumer.consume(new SubmittedReportInfo(SubmittedReportInfo.SubmissionStatus.DUPLICATE));
             return true;
         }
-
-        IHub sentryHub = initSentry();
         new Task.Backgroundable(project, "Sending error report") {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
                 ApplicationManager.getApplication().invokeLater(() -> {
-                    submitErrors(events, additionalInfo, sentryHub);
+                    submitErrors(events, additionalInfo);
                     Messages.showInfoMessage(parentComponent,
-                            "Thank you for submitting your report!", "Error Report");
+                            "Thanks!! Error will be reviewed in a few days.", "Error Report Submitted");
                     consumer.consume(new SubmittedReportInfo(SubmittedReportInfo.SubmissionStatus.NEW_ISSUE));
                 });
             }
         }.queue();
-
         return true;
     }
-
 }

@@ -2,7 +2,7 @@
 # libraries
 gson = "2.11.0"
 ztexec = "1.12"
-sentrysdk = "7.20.0"
+sentrysdk = "8.5.0"
 annotations = "26.0.1"
 
 # test libraries
@@ -13,7 +13,7 @@ assertj = "3.27.0"
 mockito = "5.2.0"
 
 # plugins
-gradleIntelliJPlugin = "2.3.0"
+gradleIntelliJPlugin = "2.5.0"
 semver = "1.0.4"
 jacocolog = "3.1.0"
 asciidoc = "4.0.2"
