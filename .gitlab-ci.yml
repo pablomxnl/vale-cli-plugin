@@ -7,12 +7,12 @@ variables:
   GRADLE_OPTS: "-Dorg.gradle.internal.launcher.welcomeMessageEnabled=false"
   PRODUCT: Writerside/pd
   ARTIFACT: webHelpPD2-all.zip
-  WRS_VERSION: "242.21870"
+  WRS_VERSION: "2025.03.8312"
 
-image: registry.gitlab.com/pablomxnl/vale-cli-plugin/builder:0.0.19
+image: registry.gitlab.com/pablomxnl/vale-cli-plugin/builder:0.0.22
 default:
   tags:
-    - pluginbuilder
+    - saas-linux-medium-amd64
 
 cache:
   key: ${CI_PROJECT_NAME}
