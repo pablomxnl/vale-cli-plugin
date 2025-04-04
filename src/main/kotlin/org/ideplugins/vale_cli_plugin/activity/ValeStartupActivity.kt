@@ -9,14 +9,17 @@ import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.extensions.PluginId
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.ProjectActivity
-import com.intellij.psi.search.FilenameIndex
-import com.intellij.psi.search.GlobalSearchScope
+import com.intellij.openapi.vfs.VfsUtilCore
+import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.openapi.vfs.VirtualFileManager
 import org.ideplugins.vale_cli_plugin.Constants
 import org.ideplugins.vale_cli_plugin.listener.FileSavedListener
 import org.ideplugins.vale_cli_plugin.service.ValeCliExecutor
 import org.ideplugins.vale_cli_plugin.settings.ValeCliPluginConfigurationState
 import org.ideplugins.vale_cli_plugin.settings.ValePluginSettingsState
+import java.nio.file.Path
 import java.util.*
+import java.util.concurrent.atomic.AtomicInteger
 
 class ValeStartupActivity : ProjectActivity {
     override suspend fun execute(project: Project) {
@@ -52,40 +55,36 @@ private fun getValeFilesCount(project: Project) {
 
     if (settingsState.extensions.isNotEmpty()) {
         val executor = ValeCliExecutor.getInstance(project)
-        val scope = GlobalSearchScope.projectScope(project)
-        ApplicationManager.getApplication().runReadAction {
-            val numberOfFiles = Arrays.stream(
-                settingsState.extensions.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-            )
-                .map { extension: String? ->
-                    FilenameIndex.getAllFilesByExt(
-                        project,
-                        extension!!, scope
-                    ).size
-                }.reduce { a: Int, b: Int -> Integer.sum(a, b) }
-                .orElse(0)
-            executor.numberOfFiles = numberOfFiles
-        }
+        executor.numberOfFiles = countFilesToLint(project, settingsState.extensionsAsList())
     }
 }
 
+private fun countFilesToLint(project: Project, extensions: List<String?>): Int {
+    val count = AtomicInteger(0)
+    val projectFile: VirtualFile? = VirtualFileManager.getInstance().findFileByNioPath(Path.of(project.basePath!!))
+    if (projectFile != null){
+        VfsUtilCore.processFilesRecursively(projectFile) { virtualFile: VirtualFile ->
+            if (!virtualFile.isDirectory && extensions.contains(virtualFile.extension)) {
+                count.incrementAndGet()
+            }
+            true
+        }
+    }
+    return count.get()
+}
+
 private fun showUpdateNotification(
-    project: Project, pluginDescriptor: IdeaPluginDescriptor,
-    pluginSettings: ValeCliPluginConfigurationState
+    project: Project, pluginDescriptor: IdeaPluginDescriptor, pluginSettings: ValeCliPluginConfigurationState
 ) {
     ApplicationManager.getApplication().invokeLater {
         Optional.ofNullable(
-            NotificationGroupManager.getInstance()
-                .getNotificationGroup(Constants.NOTIFICATION_GROUP)
+            NotificationGroupManager.getInstance().getNotificationGroup(Constants.NOTIFICATION_GROUP)
         ).ifPresent { group: NotificationGroup ->
-            val action =
-                NotificationAction.createSimple(
-                    Constants.UPDATE_NOTIFICATION_BODY
-                ) { BrowserUtil.browse(Constants.JB_MARKETPLACE_URL) }
+            val action = NotificationAction.createSimple(
+                Constants.UPDATE_NOTIFICATION_BODY
+            ) { BrowserUtil.browse(Constants.JB_MARKETPLACE_URL) }
             val notification = group.createNotification(
-                Constants.UPDATE_NOTIFICATION_TITLE,
-                "",
-                NotificationType.INFORMATION
+                Constants.UPDATE_NOTIFICATION_TITLE, "", NotificationType.INFORMATION
             ).addAction(action)
             Notifications.Bus.notify(notification, project)
             pluginSettings.lastVersion = pluginDescriptor.version

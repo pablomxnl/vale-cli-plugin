@@ -69,9 +69,9 @@ public final class ValeCliExecutor implements Disposable {
         return executeCommand(wrapped);
     }
 
-    public StartedProcess executeValeCliOnProject() throws ValeCliExecutionException {
-        List<String> command = createValeInProjectCommand();
-        LOGGER.info("Running executeValeCliOnFiles on project " + project.getName());
+    public StartedProcess executeValeCliOnPath(String directory) throws ValeCliExecutionException {
+        LOGGER.info("Running executeValeCliOnPath  " + directory);
+        List<String> command = createValeInPathCommand(directory);
         List<String> wrapped = wrappCommandWithShellEnv(String.join(" ", command));
         return executeCommand(wrapped);
     }
@@ -146,12 +146,11 @@ public final class ValeCliExecutor implements Disposable {
         }
     }
 
-
-    private List<String> createValeInProjectCommand() {
+    private List<String> createValeInPathCommand(final String path) {
         ValePluginSettingsState settingsState = ValePluginSettingsState.getInstance();
         List<String> command = createValeCommand();
         command.add(String.format("--glob=\"*.{%s}\"", settingsState.extensions));
-        command.add(project.getBasePath());
+        command.add(path);
         return command;
     }
 

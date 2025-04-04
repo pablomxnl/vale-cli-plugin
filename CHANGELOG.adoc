@@ -6,6 +6,9 @@ This document provides an overview of the changes by release.
 
 [[releasenotes]]
 == Release notes
+=== 0.0.23
+- Implements https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/34[#34] Add popup action to lint a folder
+
 === 0.0.22
 - Added toolbar with feedback buttons to plugin tool window
 - Fixes https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/32[#32] TimeoutException when executing ValePopupAction on single asciidoc file.

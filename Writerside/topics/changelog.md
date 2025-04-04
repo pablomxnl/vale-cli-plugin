@@ -2,6 +2,11 @@ What's new
 =====
 This document provides an overview of the changes by release.
 
+0.0.23
+------
+
+Implements [\#34](https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/34) Add popup action to lint a folder
+
 0.0.22
 ------
 
