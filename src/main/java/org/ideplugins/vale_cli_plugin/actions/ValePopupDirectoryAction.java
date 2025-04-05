@@ -3,10 +3,10 @@ package org.ideplugins.vale_cli_plugin.actions;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.util.CommonProcessors;
 import org.ideplugins.vale_cli_plugin.service.ValeCliExecutor;
 import org.ideplugins.vale_cli_plugin.settings.ValePluginSettingsState;
 import org.jetbrains.annotations.NotNull;
@@ -52,9 +52,22 @@ public class ValePopupDirectoryAction extends ValeToolsMenuAction {
     }
 
     private boolean dirContainsFilesToLint(VirtualFile directory, List<String> extensions) {
-        return !VfsUtilCore.processFilesRecursively(directory, virtualFile -> !virtualFile.isDirectory()
-                && extensions.contains(virtualFile.getExtension()));
+        if (!directory.isDirectory()) {
+            return false;
+        }
+
+        CommonProcessors.FindFirstProcessor<VirtualFile> processor = new CommonProcessors.FindFirstProcessor<>() {
+            @Override
+            protected boolean accept(@NotNull VirtualFile file) {
+                if (!file.isDirectory()) {
+                    String extension = file.getExtension();
+                    return extension != null && extensions.contains(extension);
+                }
+                return false;
+            }
+        };
+
+        VfsUtilCore.processFilesRecursively(directory, processor);
+        return processor.isFound();
     }
-
-
 }

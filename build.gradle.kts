@@ -35,9 +35,29 @@ dependencies {
         plugins(properties("platformPlugins").map { it.split(',') })
         pluginVerifier()
         zipSigner()
+        testFramework(TestFrameworkType.Starter)
         testFramework(TestFrameworkType.Platform)
         testFramework(TestFrameworkType.Plugin.Java)
     }
+
+    /*
+    sourceSets {
+        create("integrationTest") {
+            compileClasspath += sourceSets.main.get().output
+            runtimeClasspath += sourceSets.main.get().output
+        }
+    }
+
+    val integrationTestImplementation by configurations.getting {
+        extendsFrom(configurations.testImplementation.get())
+    }
+
+    dependencies {
+        integrationTestImplementation(libs.junit)
+        integrationTestImplementation(libs.kodeinDi)
+        integrationTestImplementation(libs.kotlinxCoroutines)
+    }
+    */
 
     implementation(libs.gson)
     implementation(libs.ztexec) {
@@ -54,6 +74,7 @@ dependencies {
     testRuntimeOnly(libs.junitplatform)
     testRuntimeOnly(libs.junitengine)
     testImplementation(libs.junit4)
+
 }
 
 // Configure Gradle IntelliJ Platform Plugin
@@ -91,6 +112,15 @@ intellijPlatform {
     }
 
 }
+
+//val integrationTest = task<Test>("integrationTest") {
+//    val integrationTestSourceSet = sourceSets.getByName("integrationTest")
+//    testClassesDirs = integrationTestSourceSet.output.classesDirs
+//    classpath = integrationTestSourceSet.runtimeClasspath
+//    systemProperty("path.to.build.plugin", tasks.prepareSandbox.get().pluginDirectory.get().asFile)
+//    useJUnitPlatform()
+//    dependsOn(tasks.prepareSandbox)
+//}
 
 val runIdeForManualTests by intellijPlatformTesting.runIde.registering {
     prepareSandboxTask {
@@ -158,25 +188,5 @@ tasks {
         dependsOn("asciidoctor")
     }
 
-    intellijPlatformTesting {
-        runIde {
-            register("runIdeForUiTests") {
-                task {
-                    jvmArgumentProviders += CommandLineArgumentProvider {
-                        listOf(
-                            "-Drobot-server.port=8082",
-                            "-Dide.mac.message.dialogs.as.sheets=false",
-                            "-Djb.privacy.policy.text=<!--999.999-->",
-                            "-Djb.consents.confirmation.enabled=false",
-                        )
-                    }
-                }
-
-                plugins {
-                    robotServerPlugin()
-                }
-            }
-        }
-    }
 
 }

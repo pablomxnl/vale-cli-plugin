@@ -1,0 +1,10 @@
+<application>
+  <component name="Logs.Categories"><![CDATA[{
+  "categories": [
+    {
+      "category": "org.ideplugins.vale_cli_plugin.service.ValeCliExecutor",
+      "level": "TRACE"
+    }
+  ]
+}]]></component>
+</application>

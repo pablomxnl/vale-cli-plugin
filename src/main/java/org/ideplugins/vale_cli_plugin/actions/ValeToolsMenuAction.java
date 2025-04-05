@@ -14,6 +14,7 @@ import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.util.FileContentUtil;
 import com.jetbrains.rd.util.AtomicReference;
 import org.ideplugins.vale_cli_plugin.exception.ValeCliExecutionException;
@@ -24,10 +25,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.zeroturnaround.exec.StartedProcess;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.nio.file.Path;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.intellij.execution.ui.ConsoleViewContentType.LOG_ERROR_OUTPUT;
@@ -41,9 +40,11 @@ public class ValeToolsMenuAction extends AnAction {
     protected static final ResourceBundle BUNDLE = ResourceBundle.getBundle("ValePlugin");
 
     protected static void executeValeInBackground(ValeCliExecutor cliExecutor, ValeIssuesReporter reporter,
-                                                  @NotNull ProgressIndicator indicator, AtomicReference<StartedProcess> processReference)
+                                                  @NotNull ProgressIndicator indicator,
+                                                  AtomicReference<StartedProcess> processReference, int filesNumber)
             throws ValeCliExecutionException {
-        Map<String, List<JsonObject>> results = cliExecutor.parseValeJsonResponse(processReference.get().getFuture(), indicator);
+        Map<String, List<JsonObject>> results =
+                cliExecutor.parseValeJsonResponse(processReference.get().getFuture(), indicator, filesNumber);
         reporter.populateIssuesFromValeResponse(results);
     }
 
@@ -85,24 +86,13 @@ public class ValeToolsMenuAction extends AnAction {
         }
     }
 
-    protected int countFilesToLint(VirtualFile directory, List<String> extensions) {
-        AtomicInteger count = new AtomicInteger(0);
-        VfsUtilCore.processFilesRecursively(directory, virtualFile -> {
-            if (!virtualFile.isDirectory() && extensions.contains(virtualFile.getExtension())){
-                count.incrementAndGet();
-            }
-            return true;
-        });
-        return count.get();
-    }
-
     protected void createBackgroundValeProcess(@NotNull Project project,
                                                @Nullable VirtualFile dir) {
         ValePluginSettingsState settings = ValePluginSettingsState.getInstance();
         ValeCliExecutor cliExecutor = ValeCliExecutor.getInstance(project);
         ValeIssuesReporter reporter = project.getService(ValeIssuesReporter.class);
         String path = (dir == null)? project.getBasePath() : dir.getPath();
-        int numberOfFiles = (dir == null)? cliExecutor.getNumberOfFiles() :
+        int numberOfFiles = (dir == null)? countFilesToLint(project, settings.extensionsAsList()) :
                 countFilesToLint(dir, settings.extensionsAsList());
         String title = (dir == null)?
                 "Executing vale cli on project scope for %s files".formatted(numberOfFiles) :
@@ -115,7 +105,7 @@ public class ValeToolsMenuAction extends AnAction {
             public void run(@NotNull ProgressIndicator indicator) {
                 try {
                     processReference.getAndSet(cliExecutor.executeValeCliOnPath(path));
-                    executeValeInBackground(cliExecutor, reporter, indicator, processReference);
+                    executeValeInBackground(cliExecutor, reporter, indicator, processReference, numberOfFiles);
                 } catch (ValeCliExecutionException exception) {
                     LOGGER.info("Error executing Vale CLI\n" + exception.getMessage());
                     handleError(project, exception);
@@ -139,6 +129,25 @@ public class ValeToolsMenuAction extends AnAction {
 
     }
 
+    protected int countFilesToLint(VirtualFile directory, List<String> extensions) {
+        AtomicInteger count = new AtomicInteger(0);
+        VfsUtilCore.processFilesRecursively(directory, virtualFile -> {
+            if (!virtualFile.isDirectory() && extensions.contains(virtualFile.getExtension())){
+                count.incrementAndGet();
+            }
+            return true;
+        });
+        return count.get();
+    }
+
+    private int countFilesToLint(Project project, List<String> extensions){
+        int result = 0;
+        String path = project.getBasePath();
+        if (path != null) {
+            result = countFilesToLint(VirtualFileManager.getInstance().findFileByNioPath(Path.of(path)), extensions);
+        }
+        return result;
+    }
 
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
