@@ -12,6 +12,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.List;
 
 import static  java.util.AbstractMap.SimpleEntry;
 import static  java.util.Map.Entry;
@@ -81,4 +83,9 @@ final public class ValePluginSettingsState implements PersistentStateComponent<V
         }
         return new SimpleEntry<>(validationResult, errors.toString());
     }
+
+    public List<String> extensionsAsList(){
+        return Arrays.asList(extensions.split(","));
+    }
+
 }

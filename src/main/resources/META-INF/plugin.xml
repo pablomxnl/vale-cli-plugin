@@ -1,9 +1,8 @@
 <idea-plugin>
     <id>org.ideplugins.vale-cli-plugin</id>
     <name>Vale CLI</name>
-    <vendor email="plugin_dude@yeahwellyouknowthatsjustlikeuhyouropinionman.com"
-            url="https://gitlab.com/pablomxnl/vale-cli-plugin/">
-        The Plugin Dude
+    <vendor>
+        The Dude Plugins
     </vendor>
     <description><![CDATA[
         <p>
@@ -54,13 +53,18 @@
         </action>
         <action
                 id="org.ideplugins.vale_cli_plugin.actions.ValePopupAction" icon="/icons/logo-alt.svg"
-                class="org.ideplugins.vale_cli_plugin.actions.ValePopupAction" text="Vale CLI Check"
-                description="Run vale cli vs the current file">
+                class="org.ideplugins.vale_cli_plugin.actions.ValePopupAction" text="Lint File(s) with Vale"
+                description="Run vale cli vs the selected file(s)">
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+        </action>
+        <action id="org.ideplugins.vale_cli_plugin.actions.ValePopupDirectoryAction" icon="/icons/folder-check.svg"
+                class="org.ideplugins.vale_cli_plugin.actions.ValePopupDirectoryAction" text="Lint Folder with Vale"
+                description="Run vale cli vs the selected directory">
             <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
         </action>
         <action
                 id="org.ideplugins.vale_cli_plugin.actions.ValeEditorPopupAction" icon="/icons/logo-alt.svg"
-                class="org.ideplugins.vale_cli_plugin.actions.ValePopupAction" text="Vale CLI Check"
+                class="org.ideplugins.vale_cli_plugin.actions.ValePopupAction" text="Lint File with Vale"
                 description="Run vale cli vs the current file">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>

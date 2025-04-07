@@ -5,8 +5,8 @@
 <instance-profile id="pd"
                  name="vale-cli-plugin-docs"
                  start-page="starter-topic.md">
-
     <toc-element topic="starter-topic.md"/>
     <toc-element topic="pre-requisites.md"/>
     <toc-element topic="changelog.md"/>
+    <toc-element topic="feedback.md"/>
 </instance-profile>

@@ -35,8 +35,6 @@ public final class ValeCliExecutor implements Disposable {
 
     private final Project project;
 
-    private int numberOfFiles;
-
     private Boolean taskRunning = Boolean.FALSE;
     private Long executionTime = 0L;
 
@@ -69,9 +67,9 @@ public final class ValeCliExecutor implements Disposable {
         return executeCommand(wrapped);
     }
 
-    public StartedProcess executeValeCliOnProject() throws ValeCliExecutionException {
-        List<String> command = createValeInProjectCommand();
-        LOGGER.info("Running executeValeCliOnFiles on project " + project.getName());
+    public StartedProcess executeValeCliOnPath(String directory) throws ValeCliExecutionException {
+        LOGGER.info("Running executeValeCliOnPath  " + directory);
+        List<String> command = createValeInPathCommand(directory);
         List<String> wrapped = wrappCommandWithShellEnv(String.join(" ", command));
         return executeCommand(wrapped);
     }
@@ -80,7 +78,9 @@ public final class ValeCliExecutor implements Disposable {
         return taskRunning;
     }
 
-    public Map<String, List<JsonObject>> parseValeJsonResponse(Future<ProcessResult> future, ProgressIndicator indicator)
+    public Map<String, List<JsonObject>> parseValeJsonResponse(Future<ProcessResult> future,
+                                                               ProgressIndicator indicator,
+                                                               int filesNumber)
             throws ValeCliExecutionException {
 
         while (!future.isDone()) {
@@ -91,7 +91,7 @@ public final class ValeCliExecutor implements Disposable {
                 throw new ValeCliExecutionException(exception);
             }
         }
-        return parseValeJsonResponse(future, numberOfFiles);
+        return parseValeJsonResponse(future, filesNumber);
     }
 
     public Map<String, List<JsonObject>> parseValeJsonResponse(Future<ProcessResult> processResultFuture,
@@ -103,9 +103,10 @@ public final class ValeCliExecutor implements Disposable {
             LOGGER.debug(String.format("exec result: %s", valeJsonResponse));
             return parseJsonResponse(valeJsonResponse);
         } catch (JsonSyntaxException exception){
-            String message = exception.getMessage();
+            String message = "Shell vale command response has invalid json, most likely shell configuration issue\n" +
+                    exception.getMessage();
             if (valeJsonResponse!=null) {
-                message+= "\nInvalid JSON\n: " + valeJsonResponse;
+                message+= "\nInvalid JSON response\n: " + valeJsonResponse;
             }
             throw new ValeCliExecutionException(message, exception);
         } catch (InterruptedException | ExecutionException | TimeoutException exception) {
@@ -146,12 +147,11 @@ public final class ValeCliExecutor implements Disposable {
         }
     }
 
-
-    private List<String> createValeInProjectCommand() {
+    private List<String> createValeInPathCommand(final String path) {
         ValePluginSettingsState settingsState = ValePluginSettingsState.getInstance();
         List<String> command = createValeCommand();
         command.add(String.format("--glob=\"*.{%s}\"", settingsState.extensions));
-        command.add(project.getBasePath());
+        command.add(path);
         return command;
     }
 
@@ -167,14 +167,6 @@ public final class ValeCliExecutor implements Disposable {
         command.add("--no-wrap");
         command.add("--output=JSON");
         return command;
-    }
-
-    public void setNumberOfFiles(int numberOfFiles) {
-        this.numberOfFiles = numberOfFiles;
-    }
-
-    public int getNumberOfFiles() {
-        return numberOfFiles;
     }
 
     public long getExecutionTime() {

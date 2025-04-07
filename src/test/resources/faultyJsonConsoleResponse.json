@@ -1,0 +1,23 @@
+TERM environment variable not set.
+zsh:1: command not found: TERM
+{
+  "/home/gradle/examples/vale-cli-plugin/src/test/resources/multiplefiles-example/manual.md": [
+    {
+      "Action": {
+        "Name": "",
+        "Params": null
+      },
+      "Span": [
+        3,
+        4
+      ],
+      "Check": "write-good.E-Prime",
+      "Description": "",
+      "Link": "",
+      "Message": "Try to avoid using 'am'.",
+      "Severity": "suggestion",
+      "Match": "am",
+      "Line": 3
+    }
+  ]
+}

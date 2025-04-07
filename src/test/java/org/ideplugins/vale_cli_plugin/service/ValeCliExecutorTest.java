@@ -1,6 +1,7 @@
 package org.ideplugins.vale_cli_plugin.service;
 
 import com.google.gson.JsonObject;
+import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture;
 import org.ideplugins.vale_cli_plugin.BaseTest;
@@ -55,8 +56,9 @@ public class ValeCliExecutorTest extends BaseTest {
     public void testProject(CodeInsightTestFixture codeInsightTestFixture) throws ValeCliExecutionException {
         codeInsightTestFixture.copyDirectoryToProject("multiplefiles-example", "src");
         PsiFile []files = codeInsightTestFixture.configureByFiles("src/readme.md", "src/manual.md");
-        ValeCliExecutor executor = ValeCliExecutor.getInstance(codeInsightTestFixture.getProject());
-        StartedProcess process  = executor.executeValeCliOnProject();
+        Project project = codeInsightTestFixture.getProject();
+        ValeCliExecutor executor = ValeCliExecutor.getInstance(project);
+        StartedProcess process  = executor.executeValeCliOnPath(project.getBasePath());
         Map<String, List<JsonObject>> result = executor.parseValeJsonResponse(process.getFuture(), files.length);
         Arrays.stream(files).forEach(file -> assertTrue(result.containsKey(file.getVirtualFile().getPath()), "Results should contain file"));
     }
