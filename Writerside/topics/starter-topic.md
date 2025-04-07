@@ -63,7 +63,7 @@ To lint documentation files, do one of the following:
 
 ![Project view directory popup action](usage_project_context_menu_folder.png){border-effect="line"}
 
-### Background long running lint tasks
+## Cancelling Background long running lint tasks
 
 The global Tools Menu Action and the Folder popup action may take long to complete depending on the amount of files.
 If taking too long or deciding to cancel, click the `x` circle button of the background tasks widget on the status bar.
@@ -97,4 +97,5 @@ Additionally, these alerts are also visible on the editor as markers.
 
 <img src="quick_fix_replace.png" alt="Quick fixes" border-effect="line" />
 
-When the Vale CLI suggests to replace a phrase, the plugin will offer a Quick Fix action on the problem view and on the editor.
+When the Vale CLI suggests to replace a phrase, 
+the plugin will offer a Quick Fix action on the problem view and on the editor.
