@@ -2,6 +2,12 @@ What's new
 =====
 This document provides an overview of the changes by release.
 
+0.0.24
+------
+
+- Fixes [\#37](https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/37) Diagnostic Freeze error report
+- Add Vale version label in settings
+
 0.0.23
 ------
 

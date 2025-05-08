@@ -11,7 +11,6 @@ import com.intellij.util.xmlb.annotations.MapAnnotation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
 import java.util.*;
 
 import static org.ideplugins.vale_cli_plugin.Constants.PLUGIN_ID;
@@ -54,7 +53,7 @@ public final class ValeCliPluginConfigurationState
         return settings.configuration.get(SENTRY_DSN);
     }
 
-    static class PluginSettings {
+    public static class PluginSettings {
         @MapAnnotation
         private Map<String,String> configuration;
 

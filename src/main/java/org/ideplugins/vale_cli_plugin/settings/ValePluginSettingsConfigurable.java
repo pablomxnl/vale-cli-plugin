@@ -11,15 +11,12 @@ import org.jetbrains.annotations.Nullable;
 public class ValePluginSettingsConfigurable implements Configurable {
 
     private ValePluginSettingsComponent settingsComponent;
-
-    public ValePluginSettingsConfigurable() {
-        settingsComponent = new ValePluginSettingsComponent();
-    }
+    private ValePluginSettingsState settings;
 
     @Nls(capitalization = Capitalization.Title)
     @Override
     public String getDisplayName() {
-        return "Vale CLI Plugin";
+        return "Vale CLI";
     }
 
     @Override
@@ -30,21 +27,25 @@ public class ValePluginSettingsConfigurable implements Configurable {
     @Nullable
     @Override
     public JComponent createComponent() {
+        settings = ValePluginSettingsState.getInstance();
+        settingsComponent = new ValePluginSettingsComponent();
         return settingsComponent.getPanel();
     }
 
     @Override
     public boolean isModified() {
-        ValePluginSettingsState settings = ValePluginSettingsState.getInstance();
-        boolean modified = !settingsComponent.getValePathText().equals(settings.valePath);
-        modified |= settingsComponent.getConfigurationFilePathText().equals(settings.valeSettingsPath);
-        modified |= settingsComponent.getExtensionsText().equals(settings.extensions);
-        return modified;
+        boolean pathModified = !settingsComponent.getValePathText().equals(settings.valePath);
+        boolean settingsModified = !settingsComponent.getConfigurationFilePathText().equals(settings.valeSettingsPath);
+        boolean extensionsModified = !settingsComponent.getExtensionsText().equals(settings.extensions);
+        return pathModified || settingsModified || extensionsModified;
     }
 
     @Override
     public void apply() {
-        ValePluginSettingsState settings = ValePluginSettingsState.getInstance();
+        if (!settingsComponent.getValePathText().equals(settings.valePath)){
+            settings.valeVersion = OSUtils.valeVersion(settingsComponent.getValePathText());
+            settingsComponent.setValeVersion(settings.valeVersion);
+        }
         settings.valePath = settingsComponent.getValePathText();
         settings.valeSettingsPath = settingsComponent.getConfigurationFilePathText();
         settings.extensions = settingsComponent.getExtensionsText();
@@ -53,10 +54,10 @@ public class ValePluginSettingsConfigurable implements Configurable {
 
     @Override
     public void reset() {
-        ValePluginSettingsState settings = ValePluginSettingsState.getInstance();
         settingsComponent.setValePathText(settings.valePath);
         settingsComponent.setConfigurationFilePathText(settings.valeSettingsPath);
         settingsComponent.setExtensionsText(settings.extensions);
+        settingsComponent.setValeVersion(settings.valeVersion);
     }
 
     @Override
