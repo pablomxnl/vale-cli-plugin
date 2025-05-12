@@ -2,6 +2,13 @@ What's new
 =====
 This document provides an overview of the changes by release.
 
+0.0.24
+------
+
+- Fixes [\#37](https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/37) Diagnostic Freeze error report
+- Fixes [\#38](https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/38) Settings always show "Revert changes" with no changes
+- Fixes [\#39](https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/39) Run vale after document change doesn't work on windows
+
 0.0.23
 ------
 

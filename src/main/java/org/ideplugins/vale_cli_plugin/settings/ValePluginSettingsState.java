@@ -6,7 +6,6 @@ import com.intellij.openapi.components.Service;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.util.SystemInfo;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -15,8 +14,8 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import static  java.util.AbstractMap.SimpleEntry;
-import static  java.util.Map.Entry;
+import static java.util.AbstractMap.SimpleEntry;
+import static java.util.Map.Entry;
 
 
 @State(
@@ -24,26 +23,22 @@ import static  java.util.Map.Entry;
         storages = {@Storage("valeCliSettings.xml")}
 )
 @Service(Service.Level.APP)
-final public class ValePluginSettingsState implements PersistentStateComponent<ValePluginSettingsState> {
+public final class ValePluginSettingsState implements PersistentStateComponent<ValePluginSettingsState> {
 
     private static final Logger LOG = Logger.getInstance(ValePluginSettingsState.class);
     @Override
     public void initializeComponent() {
-        String path = OSUtils.findValeBinaryPath();
-        String valeVersion = OSUtils.valeVersion();
-        if (path.isEmpty() && !valeVersion.isEmpty()){
-            valePath = SystemInfo.isWindows? "vale.exe" : "vale";
-            LOG.info( String.format("Guessing vale version:%s  executable:%s" ,  valeVersion, valePath));
-        } else {
-            valePath = path;
-            LOG.info( String.format("Found vale version:%s at %s" ,  valeVersion, valePath));
+        if (valePath.isEmpty() ){
+            valePath = OSUtils.findValeBinaryPath();
+            valeVersion = OSUtils.valeVersion(valePath);
+            LOG.info( String.format("Found vale version:%s  executable:%s" ,  valeVersion, valePath));
         }
     }
 
     public String valePath = "";
-
     public String valeSettingsPath = "";
     public String extensions = "md,adoc,rst";
+    public String valeVersion = "";
 
     @Override
     public ValePluginSettingsState getState() {

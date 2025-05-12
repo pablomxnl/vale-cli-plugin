@@ -18,7 +18,7 @@ public class OSUtils {
     private static final Logger LOG = Logger.getInstance(OSUtils.class);
     private static final String SHELL = Optional.ofNullable(System.getenv("SHELL")).orElse("/bin/sh");
 
-    public static List<String> wrappCommandWithShellEnv(String command){
+    public static List<String> wrapCommandWithShellEnv(String command){
         return (SystemInfo.isWindows) ? List.of("cmd.exe","/c", command ) :
                 List.of(SHELL, inCI()? "-lc" : "-ilc", command);
     }
@@ -27,9 +27,10 @@ public class OSUtils {
         return  Optional.ofNullable(System.getenv("CI_PROJECT_DIR")).isPresent();
     }
 
-    public static String valeVersion() {
+    public static String valeVersion(String fullPath){
         String version = "";
-        List<String> versionCommand = wrappCommandWithShellEnv(  (SystemInfo.isWindows)? "vale.exe" : "vale" + " --version");
+        List<String> versionCommand = wrapCommandWithShellEnv( fullPath + " --version");
+        LOG.info("Executing version command: " + versionCommand);
         try {
             StartedProcess startedProcess = new ProcessExecutor()
                     .command(versionCommand)
@@ -38,15 +39,13 @@ public class OSUtils {
             Future<ProcessResult> future = startedProcess.getFuture();
             ProcessResult result = future.get();
             if (result.getExitValue() == 0) {
-                version = result.outputUTF8().trim();
+                version = result.outputUTF8().replaceAll("vale version ", "").trim();
                 LOG.info("Vale version found:" +  version);
             } else {
                 LOG.info("Version command Exit value not zero: " + result.outputUTF8());
-                LOG.info("Version Commands: " + versionCommand);
             }
         } catch (IOException | InterruptedException | ExecutionException exception) {
             LOG.info("Unable to find vale version ", exception);
-            LOG.info("Version Commands: " + versionCommand);
         }
         return version;
     }
@@ -54,7 +53,8 @@ public class OSUtils {
     public static String findValeBinaryPath() {
         String path = "";
         String whichCommand = (SystemInfo.isWindows) ? "where vale.exe" : "which vale";
-        List<String> command = wrappCommandWithShellEnv(whichCommand);
+        List<String> command = wrapCommandWithShellEnv(whichCommand);
+        LOG.info("Executing whichWhere command: " + String.join(" ", command));
         try {
             StartedProcess startedProcess = new ProcessExecutor()
                     .command(command)
@@ -67,11 +67,9 @@ public class OSUtils {
                 LOG.info("Vale detected at " +  path);
             } else {
                 LOG.info("Exit value not zero: " + result.outputUTF8());
-                LOG.info("findVale commands: " + String.join(" ", command));
             }
         } catch (IOException | InterruptedException | ExecutionException exception) {
             LOG.info("Unable to find vale binary", exception);
-            LOG.info("findVale commands: " + String.join(" ", command));
         }
         return path;
     }

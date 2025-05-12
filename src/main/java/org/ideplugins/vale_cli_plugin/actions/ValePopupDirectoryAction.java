@@ -44,9 +44,9 @@ public class ValePopupDirectoryAction extends ValeToolsMenuAction {
             if (cliExecutor.isTaskRunning()) {
                 event.getPresentation().setEnabled(false);
             } else {
-                Optional.ofNullable(event.getData(CommonDataKeys.VIRTUAL_FILE)).ifPresent(dir -> {
-                    event.getPresentation().setEnabled(dirContainsFilesToLint(dir, settings.extensionsAsList()));
-                });
+                Optional.ofNullable(event.getData(CommonDataKeys.VIRTUAL_FILE))
+                        .ifPresent(dir -> event.getPresentation()
+                                .setEnabled(dirContainsFilesToLint(dir, settings.extensionsAsList())));
             }
         });
     }

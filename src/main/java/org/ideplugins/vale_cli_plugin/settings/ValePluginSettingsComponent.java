@@ -20,6 +20,7 @@ public class ValePluginSettingsComponent {
     private final TextFieldWithBrowseButton valePath = createPathBrowseField();
     private final TextFieldWithBrowseButton configurationFilePath = createIniBrowseField();
     private final JBTextField extensionsTextField = new JBTextField();
+    private final JBLabel valeVersion = new JBLabel();
 
 
     private TextFieldWithBrowseButton createIniBrowseField() {
@@ -38,7 +39,7 @@ public class ValePluginSettingsComponent {
     }
 
     private TextFieldWithBrowseButton createPathBrowseField() {
-        final FileChooserDescriptor fileChooserDescriptor =
+        FileChooserDescriptor fileChooserDescriptor =
                 FileChooserDescriptorFactory.createSingleFileDescriptor()
                         .withTitle("Provide Vale Binary Location")
                         .withDescription("Locate your vale binary");
@@ -51,8 +52,9 @@ public class ValePluginSettingsComponent {
     public ValePluginSettingsComponent() {
         myMainPanel = FormBuilder.createFormBuilder()
                 .addLabeledComponent(new JBLabel("Enter vale executable location"), valePath, 1, false)
-                .addLabeledComponent(new JBLabel("Enter .vale.ini full absolute path"), configurationFilePath, 2, false)
-                .addLabeledComponent(new JBLabel("File extensions to check"), extensionsTextField, 3, false)
+                .addLabeledComponent(new JBLabel("Vale version"),valeVersion, 2, false)
+                .addLabeledComponent(new JBLabel("Enter .vale.ini full absolute path"), configurationFilePath, 3, false)
+                .addLabeledComponent(new JBLabel("File extensions to check"), extensionsTextField, 4, false)
                 .addComponentFillVertically(new JPanel(), 0)
                 .getPanel();
     }
@@ -81,6 +83,10 @@ public class ValePluginSettingsComponent {
 
     public void setExtensionsText(@NotNull String newValue) {
         extensionsTextField.setText(newValue);
+    }
+
+    public void setValeVersion(String newVersion){
+        valeVersion.setText(newVersion);
     }
 
     @NotNull
