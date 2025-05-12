@@ -15,19 +15,16 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class TypedHandler extends TypedHandlerDelegate {
 
-
     private final Map<String, Instant> keyStrokesTimeStamps;
-    private ValePluginSettingsState settings;
+    private final ValePluginSettingsState settings;
 
     public TypedHandler() {
+        settings = ValePluginSettingsState.getInstance();
         keyStrokesTimeStamps = new ConcurrentHashMap<>();
     }
 
     @Override
     public @NotNull Result charTyped(char c, @NotNull Project project, @NotNull Editor editor, @NotNull PsiFile file) {
-        if (settings==null){
-            settings = ValePluginSettingsState.getInstance();
-        }
         Optional.ofNullable(file.getVirtualFile()).ifPresent(virtualFile -> {
             if (virtualFile.getExtension()!=null && settings.extensions.contains(virtualFile.getExtension())) {
                 Instant begin = Instant.now();
@@ -42,8 +39,8 @@ public class TypedHandler extends TypedHandlerDelegate {
         boolean isIdle = false;
         Instant begin = keyStrokesTimeStamps.get(filePath);
         if (begin != null){
-            long duration = Duration.between(begin, Instant.now()).toMillis();
-            if (duration >= 2000){
+            long duration = Duration.between(begin, Instant.now()).toSeconds();
+            if (duration >= 3){
                 isIdle = true;
                 keyStrokesTimeStamps.put(filePath, Instant.now());
             }

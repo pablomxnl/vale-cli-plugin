@@ -86,10 +86,6 @@ intellijPlatform {
                     .select("#releasenotes")[0].nextElementSibling()?.children()
                     ?.toString()
         }
-        ideaVersion {
-            sinceBuild = properties("pluginSinceBuild")
-            untilBuild = properties("pluginUntilBuild")
-        }
     }
 
     signing {
@@ -107,7 +103,7 @@ intellijPlatform {
 
     pluginVerification {
         ides {
-            recommended()
+	        ides( properties("pluginVerifierIdeVersions").get().split(',') )
         }
     }
 
@@ -145,7 +141,7 @@ val runIdeForManualTests by intellijPlatformTesting.runIde.registering {
 
 val runIdeEAP by intellijPlatformTesting.runIde.registering {
     type = IntelliJPlatformType.IntellijIdeaCommunity
-    version = "251-EAP-SNAPSHOT"
+    version = "251.23774.435"
 }
 
 tasks {
@@ -186,6 +182,8 @@ tasks {
 
     patchPluginXml {
         dependsOn("asciidoctor")
+	    sinceBuild = properties("pluginSinceBuild")
+	    untilBuild = provider { null }
     }
 
 

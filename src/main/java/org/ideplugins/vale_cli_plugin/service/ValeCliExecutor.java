@@ -8,7 +8,6 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
-import org.apache.commons.lang3.StringUtils;
 import org.ideplugins.vale_cli_plugin.exception.ValeCliExecutionException;
 import org.ideplugins.vale_cli_plugin.settings.ValePluginSettingsState;
 import org.zeroturnaround.exec.ProcessExecutor;
@@ -25,7 +24,7 @@ import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.*;
 
-import static org.ideplugins.vale_cli_plugin.settings.OSUtils.wrappCommandWithShellEnv;
+import static org.ideplugins.vale_cli_plugin.settings.OSUtils.wrapCommandWithShellEnv;
 
 
 @Service(Service.Level.PROJECT)
@@ -55,14 +54,14 @@ public final class ValeCliExecutor implements Disposable {
         List<String> command = createValeCommand();
         command.add(file.getPath());
         LOGGER.info("Running executeValeCliOnFile on VirtualFile file " + file.getPath());
-        List<String> wrapped = wrappCommandWithShellEnv(String.join(" ", command));
+        List<String> wrapped = wrapCommandWithShellEnv(String.join(" ", command));
         return executeCommand(wrapped);
     }
 
     public StartedProcess executeValeCliOnFiles(List<String> files) throws ValeCliExecutionException {
         List<String> command = createValeCommand();
         command.addAll(files);
-        List<String> wrapped = wrappCommandWithShellEnv(String.join(" ", command));
+        List<String> wrapped = wrapCommandWithShellEnv(String.join(" ", command));
         LOGGER.info("Running executeValeCliOnFiles on files " + files);
         return executeCommand(wrapped);
     }
@@ -70,7 +69,7 @@ public final class ValeCliExecutor implements Disposable {
     public StartedProcess executeValeCliOnPath(String directory) throws ValeCliExecutionException {
         LOGGER.info("Running executeValeCliOnPath  " + directory);
         List<String> command = createValeInPathCommand(directory);
-        List<String> wrapped = wrappCommandWithShellEnv(String.join(" ", command));
+        List<String> wrapped = wrapCommandWithShellEnv(String.join(" ", command));
         return executeCommand(wrapped);
     }
 
@@ -133,7 +132,7 @@ public final class ValeCliExecutor implements Disposable {
         LOGGER.info("Executing vale command: " + String.join(" ", command));
         LOGGER.info("In directory: " + project.getBasePath());
         ProcessExecutor processExecutor = new ProcessExecutor()
-                .directory(new File(project.getBasePath()))
+                .directory(new File(Objects.requireNonNull(project.getBasePath())))
                 .command(command)
                 .exitValueNormal()
                 .environment(System.getenv())
@@ -159,7 +158,7 @@ public final class ValeCliExecutor implements Disposable {
         ValePluginSettingsState settingsState = ValePluginSettingsState.getInstance();
         List<String> command = new ArrayList<>();
         command.add(settingsState.valePath);
-        if (StringUtils.isNotBlank(settingsState.valeSettingsPath)) {
+        if (!settingsState.valeSettingsPath.isBlank()) {
             command.add("--config");
             command.add(settingsState.valeSettingsPath);
         }

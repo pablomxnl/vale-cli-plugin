@@ -106,10 +106,13 @@ public class SentryErrorReporter extends ErrorReportSubmitter {
         String path = getClass().getPackageName().replaceAll("\\.", "/");
         String fileName = getClass().getSimpleName();
         String url = "https://gitlab.com/pablomxnl/vale-cli-plugin/-/blob/main/src/main/java/%s/%s.java";
+        String example = "https://plugins.jetbrains.com/plugin/19613-vale-cli/docs/feedback.html" +
+                "#information-sent-by-the-error-reporter";
         String gitlabSourceLink =
                 String.format(url, path, fileName);
-        return "This error reporter doesn't log any PII or system information, just the stacktrace, \n" +
-                String.format("For more information review the code <a href='%s'>here</a> ", gitlabSourceLink);
+        return "This error reporter doesn't log any PII information, just the stacktrace and system version information" +
+                String.format("<br/>For more information review the code <a href='%s'>here</a> ", gitlabSourceLink) +
+                String.format("<br/>Example of information being sent: <a href='%s'>here</a>", example);
     }
 
     @Override

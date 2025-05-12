@@ -8,6 +8,8 @@ import org.ideplugins.vale_cli_plugin.settings.ValeCliPluginConfigurationState;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class FeedbackActionHelper {
     final String ideVersion;
@@ -18,6 +20,7 @@ public class FeedbackActionHelper {
     final String description;
 
     private static final String SYSTEM_INFO_TEMPLATE = """
+            ## Version Information
             | Attribute                | Value |
             |--------------------------|-------|
             | **OS**                   |   %s  |
@@ -38,32 +41,37 @@ public class FeedbackActionHelper {
             """;
 
     private static final String BUG_TEMPLATE = """
+# Checklist
+- [X] Version Information
+- [ ] Summary
+- [ ] Steps to reproduce
+- [ ] Actual results
+- [ ] Attach or paste relevant plugin logs (review no sensitive information is in them)
+- [ ] Screenshots / Screencast (review no sensitive information is displayed)
+
 ## Summary
-- [ ] Brief summary
+Brief summary
 
 ## Steps to reproduce
-
-1. - [ ] Steps to reproduce
+1. Step number 1
 
 ## Actual results
+What does it happen?
 
-1. - [ ] What does it happen?
-
-## Attach or paste relevant plugin logs
-
+## Attach or paste relevant plugin logs (review no sensitive information is in them)
 Get relevant logs of the plugin by running this grep command:
 
 ```bash
 grep -i "org.ideplugins.vale_cli_plugin" ~/.cache/JetBrains/IdeaIC2023.3/log/idea.log
 ```
 
-please
-read [Directories used by the IDE to store settings caches plugins and logs](https://intellij-support.jetbrains.com/hc/en-us/articles/206544519-Directories-used-by-the-IDE-to-store-settings-caches-plugins-and-logs)
-to find out the directory where to look for the log file according to your OS.
-
 **Make sure these logs have no sensitive information.**
 
-## Screenshots or screencast
+please
+read [Directories used by the IDE to store settings caches plugins and logs](https://intellij-support.jetbrains.com/hc/en-us/articles/206544519-Directories-used-by-the-IDE-to-store-settings-caches-plugins-and-logs)
+to find out the directory where to look for the log file according to your operating system.
+
+## Screenshots or screencast (review no sensitive information is displayed)
 Attach a screencast/screenshot to help reproduce the issue.
 
 **Make sure the screenshot or screencast have no sensitive information.**
@@ -74,8 +82,9 @@ Attach a screencast/screenshot to help reproduce the issue.
 
 
     public FeedbackActionHelper(AnActionEvent actionEvent){
+        String date = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyy"));
         title = "Bug Report".equals(actionEvent.getPresentation().getText())?
-                "Plugin Bug Report" : "Plugin Feature Request";
+                "Plugin Bug Report " + date : "Plugin Feature Request " + date ;
         ApplicationInfo applicationInfo = ApplicationInfo.getInstance();
         operatingSystem = SystemInfo.getOsNameAndVersion() + "-" + SystemInfo.OS_ARCH;
         ideVersion = String.join(" ", applicationInfo.getVersionName(),
