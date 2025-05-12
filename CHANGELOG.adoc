@@ -8,7 +8,8 @@ This document provides an overview of the changes by release.
 == Release notes
 === 0.0.24
 - Fixes https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/37[#37] Diagnostic Freeze error report
-- Add Vale version label in settings
+- Fixes https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/38[#38] Settings always show "Revert changes" with no changes
+- Fixes https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/39[#39] Run vale after document change doesn't work on windows
 
 === 0.0.23
 - Implements https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/34[#34] Add popup action to lint a folder

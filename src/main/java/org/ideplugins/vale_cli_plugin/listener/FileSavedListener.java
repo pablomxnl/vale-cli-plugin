@@ -19,6 +19,7 @@ import org.ideplugins.vale_cli_plugin.actions.ActionHelper;
 import org.ideplugins.vale_cli_plugin.exception.ValeCliExecutionException;
 import org.ideplugins.vale_cli_plugin.service.ValeCliExecutor;
 import org.ideplugins.vale_cli_plugin.service.ValeIssuesReporter;
+import org.ideplugins.vale_cli_plugin.settings.OSUtils;
 import org.ideplugins.vale_cli_plugin.settings.ValePluginSettingsState;
 import org.jetbrains.annotations.NotNull;
 import org.zeroturnaround.exec.ProcessResult;
@@ -28,6 +29,8 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -59,7 +62,7 @@ final public class FileSavedListener implements Disposable, FileDocumentManagerL
     }
 
 
-    private void writeSyncedFile(Document doc, Path tmp) throws IOException {
+    private void writeSyncedFile(@NotNull Document doc, Path tmp) throws IOException {
         try (BufferedWriter out = Files.newBufferedWriter(tmp, StandardCharsets.UTF_8)) {
             out.write(doc.getText());
         } catch (IOException ex) {
@@ -70,7 +73,8 @@ final public class FileSavedListener implements Disposable, FileDocumentManagerL
 
     @Override
     public void dispose() {
-
+        cliExecutor.dispose();
+        reporter.dispose();
     }
 
     @Override
@@ -78,7 +82,6 @@ final public class FileSavedListener implements Disposable, FileDocumentManagerL
         VirtualFile file = FileDocumentManager.getInstance().getFile(document);
         TypedHandler handler = TypedHandlerDelegate.EP_NAME.findExtension(TypedHandler.class);
         if (handler != null && file != null && file.getExtension() != null
-                && reporter.hasIssuesForFile(file.getPath())
                 && settings.areSettingsValid().getKey()
                 && settings.extensions.contains(file.getExtension())) {
             if (handler.isEditorIdle(file.getPath())) {
@@ -91,7 +94,7 @@ final public class FileSavedListener implements Disposable, FileDocumentManagerL
         }
     }
 
-    private void executeValeAfterChange(Document document) throws ValeCliExecutionException {
+    private void executeValeAfterChange(@NotNull Document document) throws ValeCliExecutionException {
         VirtualFile original = FileDocumentManager.getInstance().getFile(document);
         Objects.requireNonNull(original);
         AtomicReference<ValeCliExecutionException> error = new AtomicReference<>();
@@ -109,8 +112,9 @@ final public class FileSavedListener implements Disposable, FileDocumentManagerL
         }
     }
 
-    private void syncFileAndExecuteVale(Document document, VirtualFile original)
+    private void syncFileAndExecuteVale(@NotNull Document document, @NotNull VirtualFile original)
             throws IOException, ValeCliExecutionException {
+        Instant start = Instant.now();
         Path tmp = null;
         try {
             tmp = Files.createTempFile(null, "." + original.getExtension());
@@ -119,8 +123,7 @@ final public class FileSavedListener implements Disposable, FileDocumentManagerL
             if (file != null) {
                 Future<ProcessResult> future = cliExecutor.executeValeCliOnFile(file).getFuture();
                 Map<String, List<JsonObject>> results = cliExecutor.parseValeJsonResponse(future, 6);
-                List<JsonObject> resultsFile = results.get(file.getPath());
-                reporter.remove(file.getPath());
+                List<JsonObject> resultsFile = results.get(OSUtils.normalizeFilePath(file.getPath()));
                 problemSolver.clearProblems(original);
                 reporter.updateIssuesForFile(original.getPath(), resultsFile);
             }
@@ -133,6 +136,8 @@ final public class FileSavedListener implements Disposable, FileDocumentManagerL
                 LOGGER.warn("Unable to delete tmp file", e);
             }
         }
+        Instant end = Instant.now();
+        LOGGER.info("syncFileAndExecuteVale took: %s ms".formatted(Duration.between(start, end).toMillis()));
     }
 
     public void activate() {

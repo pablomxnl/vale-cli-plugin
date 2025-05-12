@@ -39,8 +39,8 @@ public class TypedHandler extends TypedHandlerDelegate {
         boolean isIdle = false;
         Instant begin = keyStrokesTimeStamps.get(filePath);
         if (begin != null){
-            long duration = Duration.between(begin, Instant.now()).toMillis();
-            if (duration >= 2500){
+            long duration = Duration.between(begin, Instant.now()).toSeconds();
+            if (duration >= 3){
                 isIdle = true;
                 keyStrokesTimeStamps.put(filePath, Instant.now());
             }

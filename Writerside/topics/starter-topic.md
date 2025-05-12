@@ -25,6 +25,16 @@ Then select the zip file just downloaded from gitlab releases.
     </tab>
 </tabs>
 
+### EAP versions
+
+These versions are available either when a new EAP is available (around 3 per year), 
+or before releasing a new version of the plugin, a snapshot eap version is available on the EAP channel.
+
+To enable the EAP channel add `http://plugins.jetbrains.com/plugin/19613-vale-cli/versions/eap` 
+to the plugin repositories via <kbd>Plugins</kbd> -> <kbd>⚙</kbd> -> <kbd>Manage Plugin Repositories ...</kbd>
+
+<img src="eap-vale-cli.png" alt="EAP Plugin repository" border-effect="line" />
+
 ## Configuration
 
 The plugin has 3 settings
@@ -75,7 +85,7 @@ If taking too long or deciding to cancel, click the `x` circle button of the bac
 
 The Vale CLI alerts are displayed in 
 
-* The plugin tool window as a summary of the types of alerts found. Only displayed when using the Global Tools Menu Action.
+* The plugin tool window as a summary of the types of alerts found. Only displayed after using the Global Tools Menu Action or Folder popup action
 * On the problem view
 * As markers on the editor of a supported file.
 
@@ -83,7 +93,7 @@ The Vale CLI alerts are displayed in
 
 <img src="results_toolwindow.png" alt="Results in plugin window and editor annotator" border-effect="line" />
 
-When executing the global tools menu action, the plugin will execute the Vale CLI against the configured file types at the project level. 
+When executing the global Tools Menu action or the Folder popup action, the plugin will execute the Vale CLI against the configured file types at the project or directory level respectively. 
 The plugin tool window shows a summary of the number of issues per severity found.
 
 ### Results in problem view
