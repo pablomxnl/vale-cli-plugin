@@ -52,7 +52,7 @@ public final class ValeCliExecutor implements Disposable {
 
     public StartedProcess executeValeCliOnFile(VirtualFile file) throws ValeCliExecutionException {
         List<String> command = createValeCommand();
-        command.add(file.getPath());
+        command.add("\"" + file.getPath() + "\"");
         LOGGER.info("Running executeValeCliOnFile on VirtualFile file " + file.getPath());
         List<String> wrapped = wrapCommandWithShellEnv(String.join(" ", command));
         return executeCommand(wrapped);
@@ -150,7 +150,7 @@ public final class ValeCliExecutor implements Disposable {
         ValePluginSettingsState settingsState = ValePluginSettingsState.getInstance();
         List<String> command = createValeCommand();
         command.add(String.format("--glob=\"*.{%s}\"", settingsState.extensions));
-        command.add(path);
+        command.add("\"" + path + "\"");
         return command;
     }
 
