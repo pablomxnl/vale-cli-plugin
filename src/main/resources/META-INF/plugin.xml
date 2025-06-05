@@ -15,10 +15,13 @@
          on how to target different products -->
     <resource-bundle>ValePlugin</resource-bundle>
     <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.lang</depends>
     <depends optional="true" config-file="org.ideplugins.vale-cli-plugin-restructuredtext.xml">org.jetbrains.plugins.rest</depends>
     <depends optional="true" config-file="org.ideplugins.vale-cli-plugin-markdown.xml">org.intellij.plugins.markdown</depends>
     <depends optional="true" config-file="org.ideplugins.vale-cli-plugin-asciidoc.xml">org.asciidoctor.intellij.asciidoc</depends>
-
+    <depends optional="true" config-file="org.ideplugins.vale-cli-plugin-python.xml">com.intellij.modules.python</depends>
+    <depends optional="true" config-file="org.ideplugins.vale-cli-plugin-rust.xml">com.jetbrains.rust</depends>
+    <depends optional="true" config-file="org.ideplugins.vale-cli-plugin-java.xml">com.intellij.modules.java</depends>
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
         <!-- plugin settings -->
