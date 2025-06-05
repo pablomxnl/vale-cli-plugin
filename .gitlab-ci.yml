@@ -60,7 +60,7 @@ build_artifact:
 publish_eap:
   stage: deploy
   variables:
-    PUBLISH_EAP: true
+    PUSH_EAP: true
   script:
     - gradle publishPlugin
   needs:
