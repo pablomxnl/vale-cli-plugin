@@ -1,8 +1,0 @@
-<idea-plugin>
-    <extensions defaultExtensionNs="com.intellij">
-        <externalAnnotator order="last"
-                           implementationClass="org.ideplugins.vale_cli_plugin.annotator.ValeExternalAnnotatorProcessor"
-                           language="Java"
-        />
-    </extensions>
-</idea-plugin>
