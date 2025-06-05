@@ -10,6 +10,7 @@ This document provides an overview of the changes by release.
 === 0.0.25
 - Fixes https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/40[#40] File linting fails when there are spaces in path
 - Fixes https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/43[#43] Linting multiple files from the project view only lints 1 file
+- Implements https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/42[#42] Add vale linting for source code
 
 === 0.0.24
 - Fixes https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/37[#37] Diagnostic Freeze error report
