@@ -60,7 +60,8 @@ public final class ValeCliExecutor implements Disposable {
 
     public StartedProcess executeValeCliOnFiles(List<String> files) throws ValeCliExecutionException {
         List<String> command = createValeCommand();
-        command.addAll(files);
+        List<String> quotedFilenames = files.stream().map(file ->  "\""+file + "\"").toList();
+        command.addAll(quotedFilenames);
         List<String> wrapped = wrapCommandWithShellEnv(String.join(" ", command));
         LOGGER.info("Running executeValeCliOnFiles on files " + files);
         return executeCommand(wrapped);

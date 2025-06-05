@@ -47,6 +47,7 @@ public class ValePopupAction extends AnAction {
             Entry<Boolean, String> validation = getSettings().areSettingsValid();
 
             if (validation.getKey()) {
+                VirtualFile[] virtualFiles = actionEvent.getData(CommonDataKeys.VIRTUAL_FILE_ARRAY);
                 PsiFile psiFile = actionEvent.getData(CommonDataKeys.PSI_FILE);
                 ValeCliExecutor cliExecutor = ValeCliExecutor.getInstance(project);
                 FileDocumentManager.getInstance().saveAllDocuments();
@@ -54,18 +55,15 @@ public class ValePopupAction extends AnAction {
                 ApplicationManager.getApplication().invokeLater(() -> {
                     ValeIssuesReporter reporter = project.getService(ValeIssuesReporter.class);
                     try {
-                        if (psiFile != null) {
+                        if (virtualFiles != null && virtualFiles.length > 1) {
+                            List<String> filesToCheck = Arrays.stream(virtualFiles).map(VirtualFile::getPath).collect(Collectors.toList());
+                            Future<ProcessResult> future = cliExecutor.executeValeCliOnFiles(filesToCheck).getFuture();
+                            Map<String, List<JsonObject>> results = cliExecutor.parseValeJsonResponse(future, filesToCheck.size());
+                            updateResults(reporter, results);
+                        } else if (psiFile != null) {
                             Future<ProcessResult> future = cliExecutor.executeValeCliOnFile(psiFile).getFuture();
                             Map<String, List<JsonObject>> results = cliExecutor.parseValeJsonResponse(future, 2);
                             updateResults(reporter, results);
-                        } else {
-                            VirtualFile[] virtualFiles = actionEvent.getData(CommonDataKeys.VIRTUAL_FILE_ARRAY);
-                            if (virtualFiles != null && virtualFiles.length > 1) {
-                                List<String> filesToCheck = Arrays.stream(virtualFiles).map(VirtualFile::getPath).collect(Collectors.toList());
-                                Future<ProcessResult> future = cliExecutor.executeValeCliOnFiles(filesToCheck).getFuture();
-                                Map<String, List<JsonObject>> results = cliExecutor.parseValeJsonResponse(future, filesToCheck.size());
-                                updateResults(reporter, results);
-                            }
                         }
                         Optional.ofNullable(ToolWindowManager.getInstance(project).getToolWindow(ProblemsView.ID))
                                 .ifPresent(toolWindow -> toolWindow.show(() -> ApplicationManager.getApplication()
