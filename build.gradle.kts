@@ -141,7 +141,7 @@ val runIdeForManualTests by intellijPlatformTesting.runIde.registering {
 
 val runIdeEAP by intellijPlatformTesting.runIde.registering {
     type = IntelliJPlatformType.IntellijIdeaCommunity
-    version = "251.23774.435"
+    version = "252-EAP-SNAPSHOT"
 }
 
 tasks {
@@ -183,7 +183,6 @@ tasks {
     patchPluginXml {
         dependsOn("asciidoctor")
 	    sinceBuild = properties("pluginSinceBuild")
-	    untilBuild = provider { null }
     }
 
 

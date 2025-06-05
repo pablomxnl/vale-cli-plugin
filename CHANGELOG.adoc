@@ -6,6 +6,10 @@ This document provides an overview of the changes by release.
 
 [[releasenotes]]
 == Release notes
+
+=== 0.0.25
+- Fixes https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/40[#40] File linting fails when there are spaces in path
+
 === 0.0.24
 - Fixes https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/37[#37] Diagnostic Freeze error report
 - Fixes https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/38[#38] Settings always show "Revert changes" with no changes

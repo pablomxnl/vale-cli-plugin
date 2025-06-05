@@ -2,6 +2,11 @@ What's new
 =====
 This document provides an overview of the changes by release.
 
+0.0.25
+------
+
+- Fixes [\#40](https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/40) File linting fails when there are spaces in path
+
 0.0.24
 ------
 

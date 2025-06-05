@@ -16,8 +16,8 @@
     <resource-bundle>ValePlugin</resource-bundle>
     <depends>com.intellij.modules.platform</depends>
     <depends optional="true" config-file="org.ideplugins.vale-cli-plugin-restructuredtext.xml">org.jetbrains.plugins.rest</depends>
-    <depends config-file="org.ideplugins.vale-cli-plugin-markdown.xml">org.intellij.plugins.markdown</depends>
-    <depends config-file="org.ideplugins.vale-cli-plugin-asciidoc.xml">org.asciidoctor.intellij.asciidoc</depends>
+    <depends optional="true" config-file="org.ideplugins.vale-cli-plugin-markdown.xml">org.intellij.plugins.markdown</depends>
+    <depends optional="true" config-file="org.ideplugins.vale-cli-plugin-asciidoc.xml">org.asciidoctor.intellij.asciidoc</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
