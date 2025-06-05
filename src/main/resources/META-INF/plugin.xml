@@ -15,12 +15,16 @@
          on how to target different products -->
     <resource-bundle>ValePlugin</resource-bundle>
     <depends>com.intellij.modules.platform</depends>
-    <depends optional="true" config-file="org.ideplugins.vale-cli-plugin-restructuredtext.xml">org.jetbrains.plugins.rest</depends>
-    <depends optional="true" config-file="org.ideplugins.vale-cli-plugin-markdown.xml">org.intellij.plugins.markdown</depends>
-    <depends optional="true" config-file="org.ideplugins.vale-cli-plugin-asciidoc.xml">org.asciidoctor.intellij.asciidoc</depends>
-
+    <depends>com.intellij.modules.lang</depends>
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
+        <!-- Use the `ANY` Language for the external annotator instead of having to put
+            each language with their dependencies -->
+        <externalAnnotator order="last"
+                           implementationClass="org.ideplugins.vale_cli_plugin.annotator.ValeExternalAnnotatorProcessor"
+                           language=""
+        />
+
         <!-- plugin settings -->
         <applicationConfigurable parentId="tools"
                                  instance="org.ideplugins.vale_cli_plugin.settings.ValePluginSettingsConfigurable"

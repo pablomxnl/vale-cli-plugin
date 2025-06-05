@@ -54,7 +54,8 @@ public class ValePluginSettingsComponent {
                 .addLabeledComponent(new JBLabel("Enter vale executable location"), valePath, 1, false)
                 .addLabeledComponent(new JBLabel("Vale version"),valeVersion, 2, false)
                 .addLabeledComponent(new JBLabel("Enter .vale.ini full absolute path"), configurationFilePath, 3, false)
-                .addLabeledComponent(new JBLabel("File extensions to check"), extensionsTextField, 4, false)
+                .addLabeledComponent(new JBLabel(
+                        "<html><body>File extensions to check.<br/>Default:adoc,md,rst <br/>Examples: adoc,md,rst,py,rs,java</body></html>"), extensionsTextField, 4, false)
                 .addComponentFillVertically(new JPanel(), 0)
                 .getPanel();
     }

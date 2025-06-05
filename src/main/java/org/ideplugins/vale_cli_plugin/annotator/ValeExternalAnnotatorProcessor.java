@@ -8,6 +8,7 @@ import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.ExternalAnnotator;
 import com.intellij.lang.annotation.HighlightSeverity;
 import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.problems.Problem;
 import com.intellij.problems.WolfTheProblemSolver;
@@ -23,7 +24,8 @@ import java.util.Collection;
 import java.util.Optional;
 
 
-public class ValeExternalAnnotatorProcessor extends ExternalAnnotator<InitialAnnotatorInfo, AnnotatorResult> {
+public class ValeExternalAnnotatorProcessor
+        extends ExternalAnnotator<InitialAnnotatorInfo, AnnotatorResult> implements DumbAware {
 
 
     @Override

@@ -56,10 +56,18 @@ build_artifact:
   script:
     - gradle -Dversion.prerelease=$CI_PIPELINE_ID-SNAPSHOT build
     - gradle buildPlugin
-    - >
-      if [ -v PUSH_EAP ]; then 
-        gradle publishPlugin
-      fi
+
+publish_eap:
+  stage: deploy
+  variables:
+    PUSH_EAP: true
+  script:
+    - gradle publishPlugin
+  needs:
+    - build_artifact
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: manual
 
 
 build_release_artifact:
