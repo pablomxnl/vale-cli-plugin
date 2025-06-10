@@ -2,6 +2,11 @@ What's new
 =====
 This document provides an overview of the changes by release.
 
+0.0.26
+------
+
+- Fixes [\#45](https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/45) Ignore vale process execution error output
+
 0.0.25
 ------
 
