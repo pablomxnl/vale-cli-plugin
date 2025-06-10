@@ -5,6 +5,7 @@ import com.intellij.openapi.application.ApplicationInfo;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.util.SystemInfo;
 import org.ideplugins.vale_cli_plugin.settings.ValeCliPluginConfigurationState;
+import org.ideplugins.vale_cli_plugin.settings.ValePluginSettingsState;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -27,6 +28,7 @@ public class FeedbackActionHelper {
             | **IDE**                  |   %s  |
             | **JDK**                  |   %s  |
             | **Vale Plugin Version**  |   %s  |
+            | **Vale Version**         |   %s  |
             
             /label ~bug-report
             """;
@@ -42,21 +44,25 @@ public class FeedbackActionHelper {
 
     private static final String BUG_TEMPLATE = """
 # Checklist
-- [X] Version Information
-- [ ] Summary
+**Mandatory**
 - [ ] Steps to reproduce
 - [ ] Actual results
-- [ ] Attach or paste relevant plugin logs (review no sensitive information is in them)
-- [ ] Screenshots / Screencast (review no sensitive information is displayed)
+- [X] Version Information
 
-## Summary
-Brief summary
+_Optional but helpful_
+- [ ] Screenshots / Screencast (review no sensitive information is displayed)
+- [ ] Attach or paste relevant plugin logs (review no sensitive information is in them)
 
 ## Steps to reproduce
 1. Step number 1
 
 ## Actual results
 What does it happen?
+
+## Screenshots or screencast (review no sensitive information is displayed)
+Attach a screencast/screenshot to help reproduce the issue.
+
+**Make sure the screenshot or screencast have no sensitive information.**
 
 ## Attach or paste relevant plugin logs (review no sensitive information is in them)
 Get relevant logs of the plugin by running this grep command:
@@ -70,11 +76,6 @@ grep -i "org.ideplugins.vale_cli_plugin" ~/.cache/JetBrains/IdeaIC2023.3/log/ide
 please
 read [Directories used by the IDE to store settings caches plugins and logs](https://intellij-support.jetbrains.com/hc/en-us/articles/206544519-Directories-used-by-the-IDE-to-store-settings-caches-plugins-and-logs)
 to find out the directory where to look for the log file according to your operating system.
-
-## Screenshots or screencast (review no sensitive information is displayed)
-Attach a screencast/screenshot to help reproduce the issue.
-
-**Make sure the screenshot or screencast have no sensitive information.**
             """;
 
     private static final String ISSUES_URL =
@@ -95,7 +96,8 @@ Attach a screencast/screenshot to help reproduce the issue.
                 ApplicationManager.getApplication().getService(ValeCliPluginConfigurationState.class);
         pluginVersion = pluginSettings.getLastVersion();
         description = "Bug Report".equals(actionEvent.getPresentation().getText())? BUG_TEMPLATE +
-                SYSTEM_INFO_TEMPLATE.formatted(operatingSystem, ideVersion, jdkVersion, pluginVersion) :
+                SYSTEM_INFO_TEMPLATE.formatted(operatingSystem, ideVersion, jdkVersion, pluginVersion,
+                        ValePluginSettingsState.getInstance().valeVersion) :
                 FEATURE_REQUEST_TEMPLATE;
     }
 

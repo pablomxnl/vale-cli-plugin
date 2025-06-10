@@ -132,6 +132,7 @@ public final class ValeCliExecutor implements Disposable {
     private StartedProcess executeCommand(List<String> command) throws ValeCliExecutionException {
         LOGGER.info("Executing vale command: " + String.join(" ", command));
         LOGGER.info("In directory: " + project.getBasePath());
+        boolean redirectError = System.getenv("VALE_PLUGIN_DEBUG") != null;
         ProcessExecutor processExecutor = new ProcessExecutor()
                 .directory(new File(Objects.requireNonNull(project.getBasePath())))
                 .command(command)
@@ -139,6 +140,7 @@ public final class ValeCliExecutor implements Disposable {
                 .environment(System.getenv())
                 .listener(new ValeProcessListener())
                 .destroyOnExit()
+                .redirectErrorStream(redirectError)
                 .readOutput(true);
         try {
             return processExecutor.start();
