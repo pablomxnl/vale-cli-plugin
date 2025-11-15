@@ -12,6 +12,7 @@ import com.intellij.openapi.diagnostic.ErrorReportSubmitter;
 import com.intellij.openapi.diagnostic.IdeaLoggingEvent;
 import com.intellij.openapi.diagnostic.SubmittedReportInfo;
 import com.intellij.openapi.extensions.PluginDescriptor;
+import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.Task;
@@ -20,6 +21,7 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.NlsActions;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.util.Consumer;
+import com.intellij.util.system.OS;
 import io.sentry.Sentry;
 import io.sentry.SentryLevel;
 import org.ideplugins.vale_cli_plugin.settings.ValeCliPluginConfigurationState;
@@ -27,7 +29,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.Component;
+import java.io.File;
 
+import static com.intellij.ide.plugins.PluginManagerCore.getPlugin;
+import static org.ideplugins.vale_cli_plugin.Constants.PLUGIN_ID;
 import static org.ideplugins.vale_cli_plugin.actions.ActionHelper.displayNotificationWithAction;
 
 
@@ -63,16 +68,29 @@ public class SentryErrorReporter extends ErrorReportSubmitter {
     }
 
     private static @NotNull String getOperatingSystem() {
-        String os = SystemInfo.getOsNameAndVersion() + "-" + SystemInfo.OS_ARCH;
+        String os = OS.CURRENT.name() + " " + SystemInfo.OS_VERSION + "-" + SystemInfo.OS_ARCH;
         if (SystemInfo.isLinux) {
-            os += (SystemInfo.isChromeOS) ? " [Chrome OS] " : "";
-            os += (SystemInfo.isKDE) ? " [KDE] " : "";
-            os += (SystemInfo.isGNOME) ? " [GNOME] " : "";
-            os += (SystemInfo.isXfce) ? " [XFCE] " : "";
-            os += (SystemInfo.isWayland) ? " [Wayland] " : "";
-            os += (SystemInfo.isXWindow) ? " [XWindow] " : "";
+            os += getLinuxDetails();
         }
         return os;
+    }
+
+    private static String getLinuxDetails() {
+        String linuxDetails = "";
+        File chromebookOSCheck = new File("/dev/.cros_milestone");
+        linuxDetails += (chromebookOSCheck.exists()) ? " [Chrome OS] " : "";
+        String windowManager = System.getenv("XDG_CURRENT_DESKTOP");
+        if (windowManager == null || windowManager.isEmpty()) {
+            windowManager = System.getenv("XDG_SESSION_DESKTOP");
+        }
+        if (windowManager != null && !windowManager.trim().isEmpty()) {
+            linuxDetails += " [" + windowManager + "] ";
+        }
+        String sessionType = System.getenv("XDG_SESSION_TYPE");
+        if (sessionType != null && !sessionType.trim().isEmpty()) {
+            linuxDetails += " ( " + sessionType.toLowerCase() + " )";
+        }
+        return linuxDetails;
     }
 
     private static void submitErrors(IdeaLoggingEvent @NotNull [] events, String additionalInfo) {
@@ -83,6 +101,11 @@ public class SentryErrorReporter extends ErrorReportSubmitter {
                         cb.setUser(null);
                     });
         }
+    }
+
+    private PluginDescriptor getMyPluginDescriptor() {
+        var pluginId = PluginId.getId(PLUGIN_ID);
+        return getPlugin(pluginId);
     }
 
     private void showOutdatedPluginErrorNotification(PluginDescriptor descriptor) {
@@ -121,7 +144,7 @@ public class SentryErrorReporter extends ErrorReportSubmitter {
                           @NotNull Consumer<? super SubmittedReportInfo> consumer) {
         DataContext context = DataManager.getInstance().getDataContext(parentComponent);
         Project project = CommonDataKeys.PROJECT.getData(context);
-        PluginDescriptor pluginDescriptor = getPluginDescriptor();
+        PluginDescriptor pluginDescriptor = getMyPluginDescriptor();
         initSentry(pluginDescriptor);
         InstalledPluginsState pluginState = InstalledPluginsState.getInstance();
         if (pluginState.hasNewerVersion(pluginDescriptor.getPluginId())) {
