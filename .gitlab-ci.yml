@@ -61,7 +61,7 @@ publish_eap:
   variables:
     PUSH_EAP: true
   script:
-    - gradle Dversion.prerelease=$CI_PIPELINE_ID-SNAPSHOT publishPlugin
+    - gradle -Dversion.prerelease=$CI_PIPELINE_ID-SNAPSHOT publishPlugin
   needs:
     - job: build_artifact
       artifacts: true
