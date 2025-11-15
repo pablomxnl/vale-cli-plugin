@@ -30,14 +30,12 @@ repositories {
 
 dependencies {
     intellijPlatform {
-        create(properties("platformType"), properties("platformVersion"), useInstaller = false)
+        create(properties("platformType"), properties("platformVersion"))
         bundledPlugins(properties("platformBundledPlugins").map { it.split(',') })
         plugins(properties("platformPlugins").map { it.split(',') })
         pluginVerifier()
         zipSigner()
-        testFramework(TestFrameworkType.Starter)
         testFramework(TestFrameworkType.Platform)
-        testFramework(TestFrameworkType.Plugin.Java)
     }
 
     /*
@@ -103,7 +101,7 @@ intellijPlatform {
 
     pluginVerification {
         ides {
-	        ides( properties("pluginVerifierIdeVersions").get().split(',') )
+            recommended()
         }
     }
 
