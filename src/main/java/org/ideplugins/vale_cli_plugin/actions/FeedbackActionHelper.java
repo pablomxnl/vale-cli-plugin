@@ -4,6 +4,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationInfo;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.util.SystemInfo;
+import com.intellij.util.system.OS;
 import org.ideplugins.vale_cli_plugin.settings.ValeCliPluginConfigurationState;
 import org.ideplugins.vale_cli_plugin.settings.ValePluginSettingsState;
 
@@ -87,7 +88,7 @@ to find out the directory where to look for the log file according to your opera
         title = "Bug Report".equals(actionEvent.getPresentation().getText())?
                 "Plugin Bug Report " + date : "Plugin Feature Request " + date ;
         ApplicationInfo applicationInfo = ApplicationInfo.getInstance();
-        operatingSystem = SystemInfo.getOsNameAndVersion() + "-" + SystemInfo.OS_ARCH;
+        operatingSystem = OS.CURRENT.name() + " " + SystemInfo.OS_VERSION + "-" + SystemInfo.OS_ARCH;
         ideVersion = String.join(" ", applicationInfo.getVersionName(),
                 applicationInfo.getFullVersion(), applicationInfo.getBuild().asString());
         jdkVersion = String.join(" ", System.getProperty("java.vm.name"),
