@@ -2,6 +2,11 @@ What's new
 =====
 This document provides an overview of the changes by release.
 
+0.0.27
+------
+
+- Updates to support `2025.3`. This is the last version supporting IDE versions `2024.*`
+
 0.0.26
 ------
 
