@@ -13,7 +13,6 @@ plugins {
     alias(libs.plugins.asciidoc)
     alias(libs.plugins.gradleIntelliJPlugin) // Gradle IntelliJ Plugin
     alias(libs.plugins.semver)
-    alias(libs.plugins.jacocolog)
     alias(libs.plugins.kotlin)
 }
 
@@ -28,6 +27,64 @@ repositories {
     }
 }
 
+asciidoc {
+    publications {
+        named("main") {
+            sourceSet {
+                setSourceDir(project.projectDir.path)
+                sources {
+                    include("CHANGELOG.adoc")
+                }
+            }
+            output("asciidoctorj", "html")
+        }
+    }
+}
+
+tasks.named("asciidoctorHtml"){
+    dependsOn(listOf("generateManifest","compileKotlin","compileJava"))
+    doNotTrackState("doNotTrack")
+    outputs.cacheIf { false }
+}
+
+@Suppress("unused")
+val runIdeForManualTests by intellijPlatformTesting.runIde.registering {
+    prepareSandboxTask {
+        sandboxDirectory = project.layout.buildDirectory.dir("custom-sandbox")
+        sandboxSuffix = ""
+    }
+    task {
+        autoReload = true
+        doFirst {
+            copy {
+                from("${projectDir}/src/test/resources/ide/options/")
+                into(project.layout.buildDirectory.dir("custom-sandbox/config/options"))
+                include("*.xml")
+            }
+        }
+        systemProperty("idea.trust.all.projects", "true")
+        systemProperty("ide.show.tips.on.startup.default.value", "false")
+        systemProperty("nosplash", "true")
+        args = listOf("${projectDir}/src/test/resources/multiplefiles-example/")
+    }
+}
+
+@Suppress("unused")
+val runIdeEAP by intellijPlatformTesting.runIde.registering {
+    type = IntelliJPlatformType.IntellijIdeaCommunity
+    version = "252-EAP-SNAPSHOT"
+}
+
+tasks.register("printCoverageForGitlab") {
+    outputs.cacheIf { false }
+    var report = file("build/reports/jacoco/test/html/index.html")
+    if (report.exists()){
+        var coverage = Jsoup.parse(report)
+            .select("tfoot td")[2]?.text()
+        print("    - Instruction Coverage: $coverage")
+    }
+}
+
 dependencies {
     intellijPlatform {
         create(properties("platformType"), properties("platformVersion"))
@@ -37,25 +94,6 @@ dependencies {
         zipSigner()
         testFramework(TestFrameworkType.Platform)
     }
-
-    /*
-    sourceSets {
-        create("integrationTest") {
-            compileClasspath += sourceSets.main.get().output
-            runtimeClasspath += sourceSets.main.get().output
-        }
-    }
-
-    val integrationTestImplementation by configurations.getting {
-        extendsFrom(configurations.testImplementation.get())
-    }
-
-    dependencies {
-        integrationTestImplementation(libs.junit)
-        integrationTestImplementation(libs.kodeinDi)
-        integrationTestImplementation(libs.kotlinxCoroutines)
-    }
-    */
 
     implementation(libs.gson)
     implementation(libs.ztexec) {
@@ -79,11 +117,14 @@ dependencies {
 intellijPlatform {
     pluginConfiguration {
         name = properties("pluginName")
-        changeNotes = provider {
-            Jsoup.parse(file("build/docs/CHANGELOG.html"))
+        var changelog = file("build/docs/asciidoc/html/CHANGELOG.html")
+        if (changelog.exists()){
+            changeNotes = provider {
+                Jsoup.parse(changelog)
                     .select("#releasenotes")[0].nextElementSibling()?.children()
                     ?.toString()
-        }
+            }
+        }        
     }
 
     signing {
@@ -107,41 +148,6 @@ intellijPlatform {
 
 }
 
-//val integrationTest = task<Test>("integrationTest") {
-//    val integrationTestSourceSet = sourceSets.getByName("integrationTest")
-//    testClassesDirs = integrationTestSourceSet.output.classesDirs
-//    classpath = integrationTestSourceSet.runtimeClasspath
-//    systemProperty("path.to.build.plugin", tasks.prepareSandbox.get().pluginDirectory.get().asFile)
-//    useJUnitPlatform()
-//    dependsOn(tasks.prepareSandbox)
-//}
-
-val runIdeForManualTests by intellijPlatformTesting.runIde.registering {
-    prepareSandboxTask {
-        sandboxDirectory = project.layout.buildDirectory.dir("custom-sandbox")
-        sandboxSuffix = ""
-    }
-    task {
-        doFirst {
-            copy {
-                from("${projectDir}/src/test/resources/ide/options/")
-                into(project.layout.buildDirectory.dir("custom-sandbox/config/options"))
-                include("*.xml")
-            }
-        }
-        systemProperty("idea.auto.reload.plugins", "false")
-        systemProperty("idea.trust.all.projects", "true")
-        systemProperty("ide.show.tips.on.startup.default.value", "false")
-        systemProperty("nosplash", "true")
-        args = listOf("${projectDir}/src/test/resources/multiplefiles-example/")
-    }
-}
-
-val runIdeEAP by intellijPlatformTesting.runIde.registering {
-    type = IntelliJPlatformType.IntellijIdeaCommunity
-    version = "252-EAP-SNAPSHOT"
-}
-
 tasks {
     // Set the JVM compatibility versions
     withType<JavaCompile> {
@@ -159,29 +165,22 @@ tasks {
         finalizedBy(jacocoTestReport)
     }
 
-    init {
-        version = semver.version
-    }
-
-    asciidoctor {
-        setSourceDir(baseDir)
-        sources {
-            include("CHANGELOG.adoc")
-        }
-        setOutputDir(file("build/docs"))
-    }
-
     jacocoTestReport {
         classDirectories.setFrom(instrumentCode)
         reports {
             xml.required = true
         }
+        finalizedBy("printCoverageForGitlab")
     }
 
     patchPluginXml {
-        dependsOn("asciidoctor")
+        dependsOn("asciidoctorHtml")
 	    sinceBuild = properties("pluginSinceBuild")
     }
 
+    runIde {
+        autoReload = true
+        outputs.cacheIf { false }
+    }
 
 }

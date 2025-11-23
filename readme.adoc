@@ -28,9 +28,9 @@ See the plugin user documentation at the https://plugins.jetbrains.com/plugin/19
 
 [source]
 ----
-./gradlew runForManualTests
+./gradlew runForManualTests --no-configuration-cache
 ----
-This https://gitlab.com/pablomxnl/vale-cli-plugin/-/blob/main/build.gradle.kts?ref_type=heads#L64-79[task] configures the IntelliJ sandbox to not confirm exit or show tips at startup among other things. It opens a sample project with a couple of markdown files to test with the plugin.
+This https://gitlab.com/pablomxnl/vale-cli-plugin/-/blob/main/build.gradle.kts?ref_type=heads#L49-68[task] configures the IntelliJ sandbox to not confirm exit or show tips at startup among other things. It opens a sample project with a couple of markdown files to test with the plugin.
 
 [source]
 ----
@@ -39,31 +39,13 @@ This https://gitlab.com/pablomxnl/vale-cli-plugin/-/blob/main/build.gradle.kts?r
 The standard gradle intellij plugin task that runs the IDE with the developed plugin installed.
 
 == Run tests inside container simulating a pipeline run
-. First build the builder docker image
+. Issue a docker run command mounting the project folder.
 +
 [source]
 ----
-docker build  . -t myuser/builder
+docker run --rm --env-file .env.empty -u gradle -v "$PWD":/home/gradle/project -w /home/gradle/project registry.gitlab.com/pablomxnl/vale-cli-plugin/builder:0.0.27 gradle test
 ----
-
-. Get an interactive session on the builder container, mounting the project folder.
-+
-[source]
-----
-docker run -it --rm -u gradle -v "$PWD":/home/gradle/project -w /home/gradle/project myuser/builder /bin/bash
-----
-. Run the test gradle task
-+
-[source]
-----
-./gradlew test
-----
-. Exit the container and inspect test results
-+
-[source]
-----
-exit
-----
+. Open the test results
 +
 [source]
 ----

@@ -5,19 +5,22 @@ stages:
 
 variables:
   GRADLE_OPTS: "-Dorg.gradle.internal.launcher.welcomeMessageEnabled=false"
+  GRADLE_USER_HOME: "$CI_PROJECT_DIR/.gradle"
   PRODUCT: Writerside/pd
   ARTIFACT: webHelpPD2-all.zip
   WRS_VERSION: "2025.03.8312"
 
-image: registry.gitlab.com/pablomxnl/vale-cli-plugin/builder:0.0.24
+image: registry.gitlab.com/pablomxnl/vale-cli-plugin/builder:0.0.27
 default:
   tags:
     - saas-linux-medium-amd64
 
 cache:
-  key: ${CI_PROJECT_NAME}
+  key: "$CI_JOB_NAME"
   paths:
-    - .gradle
+    - .gradle/caches/modules-2
+    - .gradle/caches/build-cache-1
+    - .intellijPlatform
 
 .build_release:
   stage: build
@@ -55,7 +58,8 @@ build_artifact:
   script:
     - gradle -Dversion.prerelease=$CI_PIPELINE_ID-SNAPSHOT build
     - gradle buildPlugin
-
+  after_script:
+    - gradle printCoverageForGitlab
 publish_eap:
   stage: deploy
   variables:
@@ -75,6 +79,8 @@ build_release_artifact:
   script:
     - gradle build
     - gradle buildPlugin
+  after_script:
+    - gradle printCoverageForGitlab
 
 build-documentation:
   image: "registry.jetbrains.team/p/writerside/builder/writerside-builder:$WRS_VERSION"
