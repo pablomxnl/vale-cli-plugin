@@ -2,7 +2,7 @@
 # libraries
 gson = "2.11.0"
 ztexec = "1.12"
-sentrysdk = "8.5.0"
+sentrysdk = "8.26.0"
 annotations = "26.0.1"
 
 # test libraries
@@ -11,14 +11,11 @@ junitplatform = "1.9.2"
 junit4 = "4.13.2"
 assertj = "3.27.0"
 mockito = "5.2.0"
-#kodeinDi = "7.20.2"
-#kotlinxCoroutines = "1.10.1"
 
 # plugins
 gradleIntelliJPlugin = "2.10.4"
 semver = "1.0.4"
-jacocolog = "3.1.0"
-asciidoc = "4.0.2"
+asciidoc = "5.0.0-alpha.1"
 kotlin = "2.1.20"
 
 [libraries]
@@ -34,12 +31,9 @@ junitplatform = { group = "org.junit.platform", name= "junit-platform-launcher",
 junit4 = { group = "junit", name="junit", version.ref="junit4"}
 assertj = { group = "org.assertj", name= "assertj-core", version.ref = "assertj" }
 mockito = { group = "org.mockito", name="mockito-core", version.ref = "mockito" }
-#kodeinDi = { group = "org.kodein.di", name="kodein-di-jvm", version.ref = "kodeinDi" }
-#kotlinxCoroutines = { group = "org.jetbrains.kotlinx", name="kotlinx-coroutines-core-jvm", version.ref = "kotlinxCoroutines" }
 
 [plugins]
 gradleIntelliJPlugin = { id = "org.jetbrains.intellij.platform", version.ref = "gradleIntelliJPlugin" }
 semver = { id="net.thauvin.erik.gradle.semver" , version.ref="semver"}
-jacocolog = {id= "org.barfuin.gradle.jacocolog", version.ref= "jacocolog"}
-asciidoc = {id="org.asciidoctor.jvm.convert", version.ref="asciidoc"}
+asciidoc = {id="org.asciidoctor.jvm", version.ref="asciidoc"}
 kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

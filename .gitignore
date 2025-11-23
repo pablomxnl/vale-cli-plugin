@@ -7,3 +7,4 @@ styles/
 CHANGELOG.xml
 .intellijPlatform
 .profileconfig.json
+*.env
