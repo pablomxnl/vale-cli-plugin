@@ -1,17 +1,15 @@
 package org.ideplugins.vale_cli_plugin.settings;
 
+import com.intellij.execution.ExecutionException;
+import com.intellij.execution.configurations.GeneralCommandLine;
+import com.intellij.execution.process.CapturingProcessHandler;
+import com.intellij.execution.process.ProcessOutput;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.SystemInfo;
-import org.zeroturnaround.exec.ProcessExecutor;
-import org.zeroturnaround.exec.ProcessResult;
-import org.zeroturnaround.exec.StartedProcess;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 public class OSUtils {
 
@@ -24,27 +22,24 @@ public class OSUtils {
     }
 
     private static boolean inCI() {
-        return  Optional.ofNullable(System.getenv("CI_PROJECT_DIR")).isPresent();
+        return Optional.ofNullable(System.getenv("CI_PROJECT_DIR")).isPresent();
     }
 
     public static String valeVersion(String fullPath){
         String version = "";
-        List<String> versionCommand = wrapCommandWithShellEnv( fullPath + " --version");
+        List<String> versionCommand = wrapCommandWithShellEnv(fullPath + " --version");
         LOG.info("Executing version command: " + versionCommand);
         try {
-            StartedProcess startedProcess = new ProcessExecutor()
-                    .command(versionCommand)
-                    .readOutput(true)
-                    .start();
-            Future<ProcessResult> future = startedProcess.getFuture();
-            ProcessResult result = future.get();
-            if (result.getExitValue() == 0) {
-                version = result.outputUTF8().replaceAll("vale version ", "").trim();
+            GeneralCommandLine cmd = new GeneralCommandLine(versionCommand.toArray(new String[0]));
+            CapturingProcessHandler handler = new CapturingProcessHandler(cmd);
+            ProcessOutput output = handler.runProcess();
+            if (output.getExitCode() == 0) {
+                version = output.getStdout().replaceAll("vale version ", "").trim();
                 LOG.info("Vale version found:" +  version);
             } else {
-                LOG.info("Version command Exit value not zero: " + result.outputUTF8());
+                LOG.info("Version command Exit value not zero: " + output.getStdout() + " " + output.getStderr());
             }
-        } catch (IOException | InterruptedException | ExecutionException exception) {
+        } catch (ExecutionException exception) {
             LOG.info("Unable to find vale version ", exception);
         }
         return version;
@@ -56,19 +51,16 @@ public class OSUtils {
         List<String> command = wrapCommandWithShellEnv(whichCommand);
         LOG.info("Executing whichWhere command: " + String.join(" ", command));
         try {
-            StartedProcess startedProcess = new ProcessExecutor()
-                    .command(command)
-                    .readOutput(true)
-                    .start();
-            Future<ProcessResult> future = startedProcess.getFuture();
-            ProcessResult result = future.get();
-            if (result.getExitValue() == 0) {
-                path = result.outputUTF8().trim();
+            GeneralCommandLine cmd = new GeneralCommandLine(command.toArray(new String[0]));
+            CapturingProcessHandler handler = new CapturingProcessHandler(cmd);
+            ProcessOutput output = handler.runProcess();
+            if (output.getExitCode() == 0) {
+                path = output.getStdout().trim();
                 LOG.info("Vale detected at " +  path);
             } else {
-                LOG.info("Exit value not zero: " + result.outputUTF8());
+                LOG.info("Exit value not zero: " + output.getStdout() + " " + output.getStderr());
             }
-        } catch (IOException | InterruptedException | ExecutionException exception) {
+        } catch (ExecutionException exception) {
             LOG.info("Unable to find vale binary", exception);
         }
         return path;

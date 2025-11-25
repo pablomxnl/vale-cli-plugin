@@ -1,7 +1,6 @@
 [versions]
 # libraries
 gson = "2.11.0"
-ztexec = "1.12"
 sentrysdk = "8.26.0"
 annotations = "26.0.1"
 
@@ -20,7 +19,6 @@ kotlin = "2.1.20"
 
 [libraries]
 gson = { group = "com.google.code.gson", name= "gson",  version.ref = "gson" }
-ztexec = { group = "org.zeroturnaround", name= "zt-exec",  version.ref = "ztexec" }
 sentrysdk = { group = "io.sentry", name="sentry", version.ref = "sentrysdk" }
 annotations = { group = "org.jetbrains", name = "annotations", version.ref = "annotations" }
 

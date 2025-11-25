@@ -96,9 +96,6 @@ dependencies {
     }
 
     implementation(libs.gson)
-    implementation(libs.ztexec) {
-        exclude(group = "org.slf4j", module = "slf4j-api")
-    }
     implementation(libs.sentrysdk){
         exclude(group = "org.slf4j")
     }
