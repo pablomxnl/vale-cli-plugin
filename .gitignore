@@ -4,6 +4,7 @@ bin
 build
 .gradle
 styles/
+.kotlin
 CHANGELOG.xml
 .intellijPlatform
 .profileconfig.json

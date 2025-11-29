@@ -20,10 +20,6 @@
         <!-- Add your extensions here -->
         <!-- Use the `ANY` Language for the external annotator instead of having to put
             each language with their dependencies -->
-        <externalAnnotator order="last"
-                           implementationClass="org.ideplugins.vale_cli_plugin.annotator.ValeExternalAnnotatorProcessor"
-                           language=""
-        />
 
         <!-- plugin settings -->
         <applicationConfigurable parentId="tools"
@@ -40,37 +36,19 @@
                     doNotActivateOnStart="true"
                     factoryClass="org.ideplugins.vale_cli_plugin.toolwindow.ValeToolWindow"
                     icon="/icons/pluginIcon2.svg"/>
+
         <notificationGroup displayType="STICKY_BALLOON" id="vale-cli-plugin-update" bundle="ValePlugin"
                            key="notification.group.vale.cli.plugin.update"/>
+
         <postStartupActivity implementation="org.ideplugins.vale_cli_plugin.activity.ValeStartupActivity"
                              id="valeStartupActivity"/>
         <errorHandler implementation="org.ideplugins.vale_cli_plugin.errorhandling.SentryErrorReporter"/>
-        <typedHandler implementation="org.ideplugins.vale_cli_plugin.listener.TypedHandler" id="valeKeyListener"/>
 
-        <problemFileHighlightFilter
-                implementation="org.ideplugins.vale_cli_plugin.annotator.ValeProblemHighlightFilter"/>
+
     </extensions>
 
     <actions>
-        <!-- Add your actions here -->
-        <action id="org.ideplugins.vale_cli_plugin.actions.ValeToolsMenuAction" icon="/icons/logo-alt.svg"
-                class="org.ideplugins.vale_cli_plugin.actions.ValeToolsMenuAction">
-            <add-to-group group-id="ToolsMenu" anchor="last"/>
-        </action>
-        <action
-                id="org.ideplugins.vale_cli_plugin.actions.ValePopupAction" icon="/icons/logo-alt.svg"
-                class="org.ideplugins.vale_cli_plugin.actions.ValePopupAction" >
-            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
-        </action>
-        <action id="org.ideplugins.vale_cli_plugin.actions.ValePopupDirectoryAction" icon="/icons/folder-check.svg"
-                class="org.ideplugins.vale_cli_plugin.actions.ValePopupDirectoryAction" >
-            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
-        </action>
-        <action
-                id="org.ideplugins.vale_cli_plugin.actions.ValeEditorPopupAction" icon="/icons/logo-alt.svg"
-                class="org.ideplugins.vale_cli_plugin.actions.ValePopupAction">
-            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
-        </action>
+
         <action id="org.ideplugins.vale_cli_plugin.actions.ValeFeedbackAction"
                 class="org.ideplugins.vale_cli_plugin.actions.FeedbackToolwindowToolbarAction"
                 icon="/icons/feature-request.svg"  />
