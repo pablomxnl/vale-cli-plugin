@@ -5,14 +5,19 @@ import com.intellij.ide.plugins.IdeaPluginDescriptor
 import com.intellij.ide.plugins.PluginManagerCore.getPlugin
 import com.intellij.notification.*
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.extensions.PluginId
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.ProjectActivity
 import org.ideplugins.vale_cli_plugin.Constants
 import org.ideplugins.vale_cli_plugin.settings.ValeCliPluginConfigurationState
+import org.ideplugins.vale_cli_plugin.settings.ValePluginProjectSettingsState
 import java.util.*
 
 class ValeStartupActivity : ProjectActivity {
+
+    private val LOGGER: Logger = Logger.getInstance(ValeStartupActivity::class.java)
+
     override suspend fun execute(project: Project) {
         val id = PluginId.getId(Constants.PLUGIN_ID)
         val pluginDescriptor = getPlugin(id)
@@ -25,6 +30,12 @@ class ValeStartupActivity : ProjectActivity {
             if (lastKnownVersion.isNotEmpty() && lastKnownVersion != pluginDescriptor.version) {
                 showUpdateNotification(project, pluginDescriptor, pluginSettings)
             }
+        }
+        val projectSettings = ValePluginProjectSettingsState.getInstance(project)
+        if (projectSettings.runSyncOnStartup){
+            LOGGER.info("Running vale sync")
+        } else {
+            LOGGER.info("Not running vale sync")
         }
     }
 
