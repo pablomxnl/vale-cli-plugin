@@ -1,41 +1,46 @@
 package org.ideplugins.vale_cli_plugin.settings;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.ui.TextBrowseFolderListener;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
+import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.InsertPathAction;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.FormBuilder;
-
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-
 import org.jetbrains.annotations.NotNull;
+
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
 
 public class ValePluginSettingsComponent {
 
     private final JPanel myMainPanel;
-    private final TextFieldWithBrowseButton valePath = createPathBrowseField();
-    private final TextFieldWithBrowseButton configurationFilePath = createIniBrowseField();
     private final JBTextField extensionsTextField = new JBTextField();
     private final JBLabel valeVersion = new JBLabel();
+    private final TextFieldWithBrowseButton valePath = createPathBrowseField();
 
+    public ValePluginSettingsComponent() {
+        JButton locateValeButton = createButton();
+        myMainPanel = FormBuilder.createFormBuilder()
+                .addLabeledComponent(new JBLabel("Enter vale executable location"), valePath, 1, false)
+                .addLabeledComponent(new JBLabel("Vale version"), valeVersion, 2, false)
+                .addLabeledComponent(new JBLabel("Auto detect"), locateValeButton, 3, false)
+                .addLabeledComponent(new JBLabel(
+                        "<html><body>File extensions to check.<br/>Default:adoc,md,rst <br/>Examples: adoc,md,rst,py,rs,java</body></html>"), extensionsTextField, 4, false)
+                .addComponentFillVertically(new JPanel(), 0)
+                .getPanel();
+    }
 
-    private TextFieldWithBrowseButton createIniBrowseField() {
-        final FileChooserDescriptor fileChooserDescriptor = FileChooserDescriptorFactory.createSingleFileDescriptor()
-            .withTitle("Provide Vale Configuration File")
-            .withDescription("Locate your .vale.ini file")
-            .withShowHiddenFiles(true)
-            .withFileFilter(file -> {
-                String fileName = file.getName();
-                return fileName.equals(".vale.ini") || fileName.equals("vale.ini") || fileName.endsWith(".ini");
-            });
-        TextFieldWithBrowseButton textField = new TextFieldWithBrowseButton();
-        textField.addBrowseFolderListener(new TextBrowseFolderListener(fileChooserDescriptor));
-        InsertPathAction.addTo(textField.getTextField(), fileChooserDescriptor);
-        return textField;
+    private JButton createButton() {
+        JButton result = new JButton("Auto Detect");
+        result.addActionListener(e -> ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            valePath.setText(OSUtils.findValeBinaryPath());
+            valeVersion.setText(OSUtils.valeVersion(valePath.getText()));
+        }));
+        return result;
     }
 
     private TextFieldWithBrowseButton createPathBrowseField() {
@@ -45,19 +50,15 @@ public class ValePluginSettingsComponent {
                         .withDescription("Locate your vale binary");
         TextFieldWithBrowseButton textField = new TextFieldWithBrowseButton();
         textField.addBrowseFolderListener(new TextBrowseFolderListener(fileChooserDescriptor));
+        textField.getTextField().getDocument().addDocumentListener(new DocumentAdapter() {
+            @Override
+            protected void textChanged(@NotNull DocumentEvent documentEvent) {
+                ApplicationManager.getApplication().executeOnPooledThread(() -> valeVersion.setText(OSUtils.valeVersion(textField.getText())));
+            }
+        });
         InsertPathAction.addTo(textField.getTextField(), fileChooserDescriptor);
-        return textField;
-    }
 
-    public ValePluginSettingsComponent() {
-        myMainPanel = FormBuilder.createFormBuilder()
-                .addLabeledComponent(new JBLabel("Enter vale executable location"), valePath, 1, false)
-                .addLabeledComponent(new JBLabel("Vale version"),valeVersion, 2, false)
-                .addLabeledComponent(new JBLabel("Enter .vale.ini full absolute path"), configurationFilePath, 3, false)
-                .addLabeledComponent(new JBLabel(
-                        "<html><body>File extensions to check.<br/>Default:adoc,md,rst <br/>Examples: adoc,md,rst,py,rs,java</body></html>"), extensionsTextField, 4, false)
-                .addComponentFillVertically(new JPanel(), 0)
-                .getPanel();
+        return textField;
     }
 
     public JComponent getPreferredFocusedComponent() {
@@ -86,16 +87,11 @@ public class ValePluginSettingsComponent {
         extensionsTextField.setText(newValue);
     }
 
-    public void setValeVersion(String newVersion){
+    public void setValeVersion(String newVersion) {
         valeVersion.setText(newVersion);
     }
 
-    @NotNull
-    public String getConfigurationFilePathText() {
-        return configurationFilePath.getText();
-    }
-
-    public void setConfigurationFilePathText(@NotNull String newText) {
-        configurationFilePath.setText(newText);
+    public String getValeVersionText() {
+        return valeVersion.getText();
     }
 }
