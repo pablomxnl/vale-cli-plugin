@@ -35,19 +35,14 @@ public class ValePluginSettingsConfigurable implements Configurable {
     @Override
     public boolean isModified() {
         boolean pathModified = !settingsComponent.getValePathText().equals(settings.valePath);
-        boolean settingsModified = !settingsComponent.getConfigurationFilePathText().equals(settings.valeSettingsPath);
         boolean extensionsModified = !settingsComponent.getExtensionsText().equals(settings.extensions);
-        return pathModified || settingsModified || extensionsModified;
+        return pathModified || extensionsModified;
     }
 
     @Override
     public void apply() {
-        if (!settingsComponent.getValePathText().equals(settings.valePath)){
-            settings.valeVersion = OSUtils.valeVersion(settingsComponent.getValePathText());
-            settingsComponent.setValeVersion(settings.valeVersion);
-        }
         settings.valePath = settingsComponent.getValePathText();
-        settings.valeSettingsPath = settingsComponent.getConfigurationFilePathText();
+        settings.valeVersion = settingsComponent.getValeVersionText();
         settings.extensions = settingsComponent.getExtensionsText();
     }
 
@@ -55,7 +50,6 @@ public class ValePluginSettingsConfigurable implements Configurable {
     @Override
     public void reset() {
         settingsComponent.setValePathText(settings.valePath);
-        settingsComponent.setConfigurationFilePathText(settings.valeSettingsPath);
         settingsComponent.setExtensionsText(settings.extensions);
         settingsComponent.setValeVersion(settings.valeVersion);
     }

@@ -29,6 +29,14 @@
                                  key="vale.cli.plugin.settings.title"
         />
 
+            <projectConfigurable
+                    parentId="tools"
+                    instance="org.ideplugins.vale_cli_plugin.settings.ValePluginProjectSettingsConfigurable"
+                    id="org.ideplugins.vale_cli_plugin.settings.ProjectSettings"
+                    bundle="ValePlugin"
+                    key="vale.cli.plugin.project.settings.title"
+                    nonDefaultProject="true"/>
+
         <!-- output window -->
         <toolWindow id="Vale CLI"
                     anchor="bottom"

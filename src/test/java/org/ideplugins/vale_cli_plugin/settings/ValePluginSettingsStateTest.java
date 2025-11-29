@@ -13,7 +13,6 @@ public class ValePluginSettingsStateTest extends BaseTest {
     @Test
     void allSettingsBlank() {
         settings.valePath = "";
-        settings.valeSettingsPath = "";
         settings.extensions = "";
         assertFalse(settings.areSettingsValid().getKey(), "Should return false");
     }
@@ -23,15 +22,11 @@ public class ValePluginSettingsStateTest extends BaseTest {
         assertTrue(settings.areSettingsValid().getKey(), "Should return false");
     }
 
-    @Test
-    void invalidSettingsFile() {
-        settings.valeSettingsPath = "/tmp/.valeddd.ini";
-        assertFalse(settings.areSettingsValid().getKey(), "Should return false");
-    }
+
 
     @Test
     void validSettingsFile() {
-        settings.valeSettingsPath = "/tmp/.vale.ini";
+//        settings.valeSettingsPath = "/tmp/.vale.ini";
         assertTrue(settings.areSettingsValid().getKey(), "Should return false");
     }
 }
