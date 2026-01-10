@@ -51,7 +51,7 @@ public class OSUtils {
         List<String> command = wrapCommandWithShellEnv(whichCommand);
         LOG.info("Executing whichWhere command: " + String.join(" ", command));
         try {
-            GeneralCommandLine cmd = new GeneralCommandLine(command.toArray(new String[0]));
+            GeneralCommandLine cmd = new GeneralCommandLine(command);
             CapturingProcessHandler handler = new CapturingProcessHandler(cmd);
             ProcessOutput output = handler.runProcess();
             if (output.getExitCode() == 0) {

@@ -31,7 +31,6 @@ public class BaseTest {
     public void setUp() {
         settings = ValePluginSettingsState.getInstance();
         settings.valePath = areTestRunningInCI()? "/usr/bin/vale" : findValeBinaryPath();
-        settings.extensions = "adoc,md";
     }
 
     private static Boolean areTestRunningInCI() {

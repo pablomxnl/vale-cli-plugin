@@ -8,7 +8,6 @@ import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.InsertPathAction;
 import com.intellij.ui.components.JBLabel;
-import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.FormBuilder;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,7 +17,6 @@ import javax.swing.event.DocumentEvent;
 public class ValePluginSettingsComponent {
 
     private final JPanel myMainPanel;
-    private final JBTextField extensionsTextField = new JBTextField();
     private final JBLabel valeVersion = new JBLabel();
     private final TextFieldWithBrowseButton valePath = createPathBrowseField();
 
@@ -28,8 +26,6 @@ public class ValePluginSettingsComponent {
                 .addLabeledComponent(new JBLabel("Enter vale executable location"), valePath, 1, false)
                 .addLabeledComponent(new JBLabel("Vale version"), valeVersion, 2, false)
                 .addLabeledComponent(new JBLabel("Auto detect"), locateValeButton, 3, false)
-                .addLabeledComponent(new JBLabel(
-                        "<html><body>File extensions to check.<br/>Default:adoc,md,rst <br/>Examples: adoc,md,rst,py,rs,java</body></html>"), extensionsTextField, 4, false)
                 .addComponentFillVertically(new JPanel(), 0)
                 .getPanel();
     }
@@ -76,15 +72,6 @@ public class ValePluginSettingsComponent {
 
     public void setValePathText(@NotNull String newText) {
         valePath.setText(newText);
-    }
-
-    @NotNull
-    public String getExtensionsText() {
-        return extensionsTextField.getText();
-    }
-
-    public void setExtensionsText(@NotNull String newValue) {
-        extensionsTextField.setText(newValue);
     }
 
     public void setValeVersion(String newVersion) {

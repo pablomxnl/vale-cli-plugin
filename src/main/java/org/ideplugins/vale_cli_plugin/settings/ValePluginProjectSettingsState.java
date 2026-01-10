@@ -11,6 +11,7 @@ public final class ValePluginProjectSettingsState implements PersistentStateComp
     public static class State {
         public String valeSettingsPath = "";
         public boolean runSyncOnStartup;
+        public String extensions = "md,adoc,rst";
     }
 
     private State state = new State();
@@ -39,8 +40,17 @@ public final class ValePluginProjectSettingsState implements PersistentStateComp
     public void setValeSettingsPath(String path){
         state.valeSettingsPath = path;
     }
+
     public String getValeSettingsPath(){
         return state.valeSettingsPath;
+    }
+
+    public void setExtensions(String extensions){
+        state.extensions = extensions;
+    }
+
+    public String getExtensions(){
+        return state.extensions;
     }
 
     public boolean getRunSyncOnStartup(){

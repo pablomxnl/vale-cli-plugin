@@ -18,8 +18,6 @@
     <depends>com.intellij.modules.lang</depends>
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
-        <!-- Use the `ANY` Language for the external annotator instead of having to put
-            each language with their dependencies -->
 
         <!-- plugin settings -->
         <applicationConfigurable parentId="tools"
@@ -29,13 +27,13 @@
                                  key="vale.cli.plugin.settings.title"
         />
 
-            <projectConfigurable
-                    parentId="tools"
-                    instance="org.ideplugins.vale_cli_plugin.settings.ValePluginProjectSettingsConfigurable"
-                    id="org.ideplugins.vale_cli_plugin.settings.ProjectSettings"
-                    bundle="ValePlugin"
-                    key="vale.cli.plugin.project.settings.title"
-                    nonDefaultProject="true"/>
+        <projectConfigurable
+                parentId="tools"
+                instance="org.ideplugins.vale_cli_plugin.settings.ValePluginProjectSettingsConfigurable"
+                id="org.ideplugins.vale_cli_plugin.settings.ProjectSettings"
+                bundle="ValePlugin"
+                key="vale.cli.plugin.project.settings.title"
+                nonDefaultProject="true"/>
 
         <!-- output window -->
         <toolWindow id="Vale CLI"
@@ -64,5 +62,19 @@
         <action id="org.ideplugins.vale_cli_plugin.actions.ValeBugReportAction"
                 class="org.ideplugins.vale_cli_plugin.actions.FeedbackToolwindowToolbarAction"
                 icon="/icons/bug-report.svg"  />
+
+        <action id="org.ideplugins.vale_cli_plugin.actions.ValeSettingsAction"
+                icon="AllIcons.General.Settings"
+                class="org.ideplugins.vale_cli_plugin.actions.SettingsToolbarAction" />
+
+        <action id="org.ideplugins.vale_cli_plugin.actions.ValeProjectSettingsAction"
+                icon="AllIcons.General.ProjectTab"
+                class="org.ideplugins.vale_cli_plugin.actions.ProjectSettingsToolbarAction" />
+
+        <action id="org.ideplugins.vale_cli_plugin.actions.ValeSyncAction"
+                icon="AllIcons.Actions.Refresh"
+                class="org.ideplugins.vale_cli_plugin.actions.SyncValeStylesToolbarAction" />
+
+
     </actions>
 </idea-plugin>
