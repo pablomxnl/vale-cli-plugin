@@ -50,6 +50,20 @@ public class ActionHelper {
         return ValePluginSettingsState.getInstance();
     }
 
+    public static Optional<ConsoleView> getConsoleView(@NotNull Project project, @NotNull ToolWindow toolWindow) {
+        ConsoleView consoleView = null;
+        ContentManager contentManager = toolWindow.getContentManager();
+        Optional<Content> content = Optional.ofNullable(contentManager.findContent("Vale Results"));
+        if (content.isEmpty()) {
+            ValeToolWindow vtw = new ValeToolWindow();
+            vtw.createToolWindowContent(project, toolWindow);
+            content = Optional.ofNullable(contentManager.findContent("Vale Results"));
+        }
+        if (content.isPresent()) {
+            consoleView = (ConsoleView) content.get().getComponent().getComponent(0);
+        }
+        return Optional.ofNullable(consoleView);
+    }
     public static void writeTextToConsole(@NotNull Project project, String text, ConsoleViewContentType level) {
         ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow("Vale CLI");
         if (toolWindow != null) {

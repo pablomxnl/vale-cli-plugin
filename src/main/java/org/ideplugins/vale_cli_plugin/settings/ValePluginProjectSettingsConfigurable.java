@@ -11,6 +11,7 @@ import com.intellij.openapi.util.NlsContexts;
 import com.intellij.ui.InsertPathAction;
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBLabel;
+import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.FormBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -21,13 +22,27 @@ import java.util.ResourceBundle;
 
 public final class ValePluginProjectSettingsConfigurable implements Configurable {
 
+    private static final ResourceBundle BUNDLE = ResourceBundle.getBundle("ValePlugin");
     private final Project myProject;
-
     private final JPanel myMainPanel;
-    private final JBCheckBox runSynOnStartup = new JBCheckBox();
+    private final JBCheckBox runSyncOnStartup = new JBCheckBox();
+    private final JBTextField extensionsTextField = new JBTextField();
     private final TextFieldWithBrowseButton configurationFilePath = createIniBrowseField();
     private ValePluginProjectSettingsState settings;
-    private static final ResourceBundle BUNDLE = ResourceBundle.getBundle("ValePlugin");
+
+    public ValePluginProjectSettingsConfigurable(Project project) {
+        myProject = project;
+        myMainPanel = FormBuilder.createFormBuilder()
+                .addLabeledComponent(new JBLabel(BUNDLE.getString("vale.cli.plugin.project.settings.filechooser.label")), configurationFilePath,
+                        1, false)
+                .addLabeledComponent(new JBLabel(BUNDLE.getString("vale.cli.plugin.project.settings.sync.label")), runSyncOnStartup,
+                        2, false)
+                .addLabeledComponent(new JBLabel(
+                        "<html><body>File extensions to check.<br/>Default:adoc,md,rst <br/>Examples: adoc,md,rst,py,rs,java</body></html>"), extensionsTextField, 3, false)
+                .addComponentFillVertically(new JPanel(), 0)
+                .getPanel();
+
+    }
 
     @NotNull
     private String getConfigurationFilePathText() {
@@ -39,7 +54,7 @@ public final class ValePluginProjectSettingsConfigurable implements Configurable
     }
 
     private void setRunSyncOnStartup(boolean b) {
-        runSynOnStartup.setSelected(b);
+        runSyncOnStartup.setSelected(b);
     }
 
     private TextFieldWithBrowseButton createIniBrowseField() {
@@ -57,18 +72,6 @@ public final class ValePluginProjectSettingsConfigurable implements Configurable
         return textField;
     }
 
-    public ValePluginProjectSettingsConfigurable(Project project) {
-        myProject = project;
-        myMainPanel = FormBuilder.createFormBuilder()
-                .addLabeledComponent(new JBLabel(BUNDLE.getString("vale.cli.plugin.project.settings.filechooser.label")), configurationFilePath,
-                        1, false)
-                .addLabeledComponent(new JBLabel(BUNDLE.getString("vale.cli.plugin.project.settings.sync.label")), runSynOnStartup,
-                        1, false)
-                .addComponentFillVertically(new JPanel(), 0)
-                .getPanel();
-
-    }
-
     @Override
     public @NlsContexts.ConfigurableName String getDisplayName() {
         return "Vale CLI Project Settings";
@@ -84,23 +87,52 @@ public final class ValePluginProjectSettingsConfigurable implements Configurable
     @Override
     public boolean isModified() {
         return !getConfigurationFilePathText().equals(settings.getValeSettingsPath()) ||
-                !runSynOnStartup.isSelected() == settings.getRunSyncOnStartup();
+                !runSyncOnStartup.isSelected() == settings.getRunSyncOnStartup() ||
+                !getExtensionsText().equals(settings.getExtensions());
     }
 
     @Override
     public void apply() throws ConfigurationException {
-        File f = new File(getConfigurationFilePathText());
-        if (!f.exists())
-            throw new ConfigurationException(
-                    BUNDLE.getString("vale.cli.plugin.project.settings.invalidfile.message"),
-                    BUNDLE.getString("vale.cli.plugin.project.invalid.settings.title"));
+        validateValues();
         settings.setValeSettingsPath(getConfigurationFilePathText());
-        settings.setRunSyncOnStartup(runSynOnStartup.isSelected());
+        settings.setExtensions(getExtensionsText());
+        settings.setRunSyncOnStartup(runSyncOnStartup.isSelected());
+    }
+
+    private void validateValues() throws ConfigurationException {
+        String configurationFile = getConfigurationFilePathText();
+        String extensions = getExtensionsText();
+        StringBuilder errors = new StringBuilder();
+        if (!configurationFile.isEmpty()) {
+            File f = new File(configurationFile);
+            if (!f.exists()) {
+                errors.append(BUNDLE.getString("vale.cli.plugin.project.settings.invalidfile.message")).append("\n");
+            }
+        }
+        if (extensions.isBlank()) {
+            errors.append(BUNDLE.getString("vale.cli.plugin.project.settings.invalid_extensions.message"));
+        }
+        if (!errors.isEmpty()) {
+            throw new ConfigurationException(
+                    errors.toString(),
+                    BUNDLE.getString("vale.cli.plugin.project.invalid.settings.title"));
+        }
     }
 
     @Override
     public void reset() {
         setConfigurationFilePathText(settings.getValeSettingsPath());
         setRunSyncOnStartup(settings.getRunSyncOnStartup());
+        setExtensionsText(settings.getExtensions());
     }
+
+    @NotNull
+    public String getExtensionsText() {
+        return extensionsTextField.getText();
+    }
+
+    public void setExtensionsText(@NotNull String newValue) {
+        extensionsTextField.setText(newValue);
+    }
+
 }

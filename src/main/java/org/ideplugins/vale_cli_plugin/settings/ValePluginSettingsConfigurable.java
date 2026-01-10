@@ -4,14 +4,19 @@ import com.intellij.openapi.options.Configurable;
 
 import javax.swing.JComponent;
 
+import com.intellij.openapi.options.ConfigurationException;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nls.Capitalization;
 import org.jetbrains.annotations.Nullable;
+
+import java.io.File;
+import java.util.ResourceBundle;
 
 public class ValePluginSettingsConfigurable implements Configurable {
 
     private ValePluginSettingsComponent settingsComponent;
     private ValePluginSettingsState settings;
+    private static final ResourceBundle BUNDLE = ResourceBundle.getBundle("ValePlugin");
 
     @Nls(capitalization = Capitalization.Title)
     @Override
@@ -34,23 +39,27 @@ public class ValePluginSettingsConfigurable implements Configurable {
 
     @Override
     public boolean isModified() {
-        boolean pathModified = !settingsComponent.getValePathText().equals(settings.valePath);
-        boolean extensionsModified = !settingsComponent.getExtensionsText().equals(settings.extensions);
-        return pathModified || extensionsModified;
+        return !settingsComponent.getValePathText().equals(settings.valePath);
     }
 
     @Override
-    public void apply() {
-        settings.valePath = settingsComponent.getValePathText();
+    public void apply() throws ConfigurationException {
+        String value = settingsComponent.getValePathText();
+        if (!value.isEmpty()){
+            File f = new File(value);
+            if (!f.exists())
+                throw new ConfigurationException(
+                        BUNDLE.getString("vale.cli.plugin.settings.invalidexe.message"),
+                        BUNDLE.getString("vale.cli.plugin.invalid.settings.title"));
+        }
+        settings.valePath = value;
         settings.valeVersion = settingsComponent.getValeVersionText();
-        settings.extensions = settingsComponent.getExtensionsText();
     }
 
 
     @Override
     public void reset() {
         settingsComponent.setValePathText(settings.valePath);
-        settingsComponent.setExtensionsText(settings.extensions);
         settingsComponent.setValeVersion(settings.valeVersion);
     }
 
