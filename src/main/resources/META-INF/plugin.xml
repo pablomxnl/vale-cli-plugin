@@ -35,6 +35,12 @@
                 key="vale.cli.plugin.project.settings.title"
                 nonDefaultProject="true"/>
 
+        <!-- Use the `ANY` Language (language = "" ) for the external annotator instead of having to put
+            each language with their dependencies -->
+        <externalAnnotator order="last"
+                           implementationClass="org.ideplugins.vale_cli_plugin.annotator.ValeExternalAnnotatorProcessor"
+                           language=""
+        />
         <!-- output window -->
         <toolWindow id="Vale CLI"
                     anchor="bottom"
@@ -43,8 +49,9 @@
                     factoryClass="org.ideplugins.vale_cli_plugin.toolwindow.ValeToolWindow"
                     icon="/icons/pluginIcon2.svg"/>
 
-        <notificationGroup displayType="STICKY_BALLOON" id="vale-cli-plugin-update" bundle="ValePlugin"
+        <notificationGroup displayType="BALLOON" id="vale-cli-plugin-update" bundle="ValePlugin"
                            key="notification.group.vale.cli.plugin.update"/>
+        <notificationGroup displayType="BALLOON" id="vale-cli-plugin-notifications"  hideFromSettings="true"/>
 
         <postStartupActivity implementation="org.ideplugins.vale_cli_plugin.activity.ValeStartupActivity"
                              id="valeStartupActivity"/>
@@ -54,7 +61,6 @@
     </extensions>
 
     <actions>
-
         <action id="org.ideplugins.vale_cli_plugin.actions.ValeFeedbackAction"
                 class="org.ideplugins.vale_cli_plugin.actions.FeedbackToolwindowToolbarAction"
                 icon="/icons/feature-request.svg"  />

@@ -13,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
+import static org.ideplugins.vale_cli_plugin.Constants.PLUGIN_BUNDLE;
 import static org.ideplugins.vale_cli_plugin.Constants.PLUGIN_ID;
 
 @Service(Service.Level.APP)
@@ -59,7 +60,7 @@ public final class ValeCliPluginConfigurationState
 
         static PluginSettings create(final String version){
             final PluginSettings instance = new PluginSettings();
-            ResourceBundle rb = ResourceBundle.getBundle("ValePlugin");
+            ResourceBundle rb = ResourceBundle.getBundle(PLUGIN_BUNDLE);
             String dsn = rb.getString("sentry.dsn");
             instance.configuration = new TreeMap<>(
                     Map.of(LAST_VERSION, version,

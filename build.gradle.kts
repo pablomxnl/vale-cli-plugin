@@ -71,8 +71,9 @@ val runIdeForManualTests by intellijPlatformTesting.runIde.registering {
 
 @Suppress("unused")
 val runIdeEAP by intellijPlatformTesting.runIde.registering {
-    type = IntelliJPlatformType.IntellijIdeaCommunity
-    version = "252-EAP-SNAPSHOT"
+    type = IntelliJPlatformType.IntellijIdea
+    version = "253-EAP-SNAPSHOT"
+    useInstaller = false
 }
 
 tasks.register("printCoverageForGitlab") {
@@ -94,8 +95,7 @@ dependencies {
         zipSigner()
         testFramework(TestFrameworkType.Platform)
     }
-
-    implementation(libs.gson)
+    implementation(libs.jackson)
     implementation(libs.sentrysdk){
         exclude(group = "org.slf4j")
     }
@@ -107,6 +107,7 @@ dependencies {
     testRuntimeOnly(libs.junitplatform)
     testRuntimeOnly(libs.junitengine)
     testImplementation(libs.junit4)
+    testRuntimeOnly("org.junit.vintage:junit-vintage-engine")
 
 }
 

@@ -1,0 +1,24 @@
+= Some title
+
+[source, java]
+.Code example
+----
+public static void main(String[] args){
+  System.out.println("Hello world");
+}
+----
+
+Kill it, kill it with fire !!
+
+This document is being written in passive voice
+
+There is a new file available.
+
+But no one knows where it
+
+== Hey
+When I ran
+
+Hello
+
+H

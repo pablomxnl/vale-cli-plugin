@@ -8,20 +8,27 @@ import org.jetbrains.annotations.NotNull;
 @State(name="org.ideplugins.vale_cli_plugin_project.settings", storages = {@Storage(StoragePathMacros.WORKSPACE_FILE)})
 public final class ValePluginProjectSettingsState implements PersistentStateComponent<ValePluginProjectSettingsState.State> {
 
+    private final @NotNull Project project;
+
     public static class State {
         public String valeSettingsPath = "";
         public boolean runSyncOnStartup;
         public String extensions = "md,adoc,rst";
+        public String guessedConfig = "";
+    }
+    
+    public ValePluginProjectSettingsState(@NotNull Project theProject){
+        project = theProject;
     }
 
     private State state = new State();
 
-    public static ValePluginProjectSettingsState getInstance(Project project){
+    public static ValePluginProjectSettingsState getInstance(@NotNull Project project){
        return project.getService(ValePluginProjectSettingsState.class);
     }
 
     @Override
-    public  State getState() {
+    public State getState() {
         return state;
     }
 
@@ -33,7 +40,7 @@ public final class ValePluginProjectSettingsState implements PersistentStateComp
     @Override
     public void initializeComponent() {
         if (state.valeSettingsPath.isEmpty()){
-            System.out.println("Find vale config file");
+            String temp = OSUtils.findValeBinaryPath();
         }
     }
 

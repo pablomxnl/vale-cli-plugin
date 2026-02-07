@@ -1,7 +1,6 @@
 package org.ideplugins.vale_cli_plugin.errorhandling;
 
 import com.intellij.ide.DataManager;
-import com.intellij.ide.IdeBundle;
 import com.intellij.ide.plugins.InstalledPluginsState;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
@@ -13,7 +12,6 @@ import com.intellij.openapi.diagnostic.IdeaLoggingEvent;
 import com.intellij.openapi.diagnostic.SubmittedReportInfo;
 import com.intellij.openapi.extensions.PluginDescriptor;
 import com.intellij.openapi.extensions.PluginId;
-import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
@@ -24,6 +22,7 @@ import com.intellij.util.Consumer;
 import com.intellij.util.system.OS;
 import io.sentry.Sentry;
 import io.sentry.SentryLevel;
+import org.ideplugins.vale_cli_plugin.utils.NotificationHelper;
 import org.ideplugins.vale_cli_plugin.settings.ValeCliPluginConfigurationState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -33,8 +32,6 @@ import java.io.File;
 
 import static com.intellij.ide.plugins.PluginManagerCore.getPlugin;
 import static org.ideplugins.vale_cli_plugin.Constants.PLUGIN_ID;
-import static org.ideplugins.vale_cli_plugin.actions.ActionHelper.displayNotificationWithAction;
-
 
 public class SentryErrorReporter extends ErrorReportSubmitter {
 
@@ -108,15 +105,12 @@ public class SentryErrorReporter extends ErrorReportSubmitter {
         return getPlugin(pluginId);
     }
 
-    private void showOutdatedPluginErrorNotification(PluginDescriptor descriptor) {
+    private void showOutdatedPluginErrorNotification(PluginDescriptor descriptor, NotificationHelper helper) {
         ApplicationManager.getApplication().invokeLater(() ->
-                displayNotificationWithAction(NotificationType.ERROR,
-                        "Error won't be submitted because there is a newer version available",
-                        "Update %s Plugin".formatted(descriptor.getName()),
-                        () ->
-                                ShowSettingsUtil.getInstance()
-                                        .showSettingsDialog(null, IdeBundle.message("title.plugins"))
-                )
+                  helper.showNotificationWithGoToPluginsAction(
+                          "Error won't be submitted because there is a newer version available",
+                          "Update %s Plugin".formatted(descriptor.getName()),
+                          NotificationType.ERROR)
         );
     }
 
@@ -148,7 +142,7 @@ public class SentryErrorReporter extends ErrorReportSubmitter {
         initSentry(pluginDescriptor);
         InstalledPluginsState pluginState = InstalledPluginsState.getInstance();
         if (pluginState.hasNewerVersion(pluginDescriptor.getPluginId())) {
-            showOutdatedPluginErrorNotification(pluginDescriptor);
+            showOutdatedPluginErrorNotification(pluginDescriptor, new NotificationHelper(project));
             consumer.consume(new SubmittedReportInfo(SubmittedReportInfo.SubmissionStatus.DUPLICATE));
             return true;
         }

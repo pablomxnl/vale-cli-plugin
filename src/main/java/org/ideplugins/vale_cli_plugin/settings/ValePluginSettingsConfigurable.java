@@ -12,11 +12,13 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.util.ResourceBundle;
 
+import static org.ideplugins.vale_cli_plugin.Constants.PLUGIN_BUNDLE;
+
 public class ValePluginSettingsConfigurable implements Configurable {
 
     private ValePluginSettingsComponent settingsComponent;
     private ValePluginSettingsState settings;
-    private static final ResourceBundle BUNDLE = ResourceBundle.getBundle("ValePlugin");
+    private static final ResourceBundle BUNDLE = ResourceBundle.getBundle(PLUGIN_BUNDLE);
 
     @Nls(capitalization = Capitalization.Title)
     @Override
