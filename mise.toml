@@ -5,10 +5,3 @@ node = "24.13.0"
 "github:errata-ai/vale" = "3.13.0"
 "github:asciidoctor/asciidoctor.js" = "latest"
 
-#dummy env variables for gradle, real thing comes from gitlab vars
-[env]
-JBM_CERTIFICATE_CHAIN= "a"
-JBM_PRIVATE_KEY="b"
-JBM_PRIVATE_KEY_PASSWORD=""
-JBM_PUBLISH_TOKEN=""
-JETBRAINS_PLUGIN_TOKEN=""
