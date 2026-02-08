@@ -2,16 +2,7 @@
 <buildprofiles xsi:noNamespaceSchemaLocation="https://helpserver.labs.jb.gg/help/schemas/mvp/build-profiles.xsd"
                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
-    <variables>
-        <web-root>https://www.jetbrains.com/help</web-root>
-        <download-page>https://www.jetbrains.com/writerside/download/</download-page>
-        <download-title>Get Writerside</download-title>
-        <showDownloadButton>true</showDownloadButton>
-        <primary-color>strawberry</primary-color>
-
-        <custom-favicons>https://www.jetbrains.com/icon-512.png</custom-favicons>
-    </variables>
-
+    <variables></variables>
     <build-profile instance="plugin-docs">
         <variables>
             <noindex-content>false</noindex-content>

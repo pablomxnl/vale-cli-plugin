@@ -39,7 +39,7 @@ public class SyncValeStylesToolbarAction extends AnAction {
                 return;
             }
             ProcessListener listener = new SyncProcessListener(project);
-            TasksKt.runWithModalProgressBlocking(project, "Syncing vale styles", (coroutineScope, continuation) -> {
+            TasksKt.runWithModalProgressBlocking(project, BUNDLE.getString("sync.modal.title"), (coroutineScope, continuation) -> {
                 try {
                     return cliExecutor.runSyncCommand(listener);
                 } catch (ExecutionException e) {
@@ -63,9 +63,9 @@ public class SyncValeStylesToolbarAction extends AnAction {
         public void processTerminated(@NotNull ProcessEvent event) {
             ApplicationManager.getApplication().invokeLater(()-> {
                 if (event.getExitCode() == 0) {
-                    writeTextToConsole(project, "✅ Vale sync completed successfully.\n", LOG_INFO_OUTPUT);
+                    writeTextToConsole(project, "✅ " + BUNDLE.getString("vale.cli.plugin.syncsuccess.notification"), LOG_INFO_OUTPUT);
                 } else {
-                    writeTextToConsole(project, "❌ Vale sync failed with exit code: "
+                    writeTextToConsole(project, "❌ " + BUNDLE.getString("vale.cli.plugin.syncfailed.consolemessage")
                                     + event.getExitCode() + "\n" + getOutput().getStderr(),
                             LOG_ERROR_OUTPUT);
                 }

@@ -46,8 +46,9 @@ class NotificationHelper(
             details ?: "",
             NotificationType.ERROR
         )
-            .addProjectSettingsAction()
             .addGlobalSettingsAction()
+            .addProjectSettingsAction()
+
 
         Notifications.Bus.notify(notification, project)
     }
@@ -68,14 +69,14 @@ class NotificationHelper(
 
     fun showNotificationWithConfigurationActions(content: String, type: NotificationType){
         val notification = create(valeGroup, "Vale CLI", content, type)
-            .addProjectSettingsAction()
             .addGlobalSettingsAction()
+            .addProjectSettingsAction()
         Notifications.Bus.notify(notification, project)
     }
 
     fun showNotificationWithGoToPluginsAction(title: String, content: String, type: NotificationType) {
-        val notification = create(valeGroup, title, content, type)
-            .addGoToPluginsAction()
+        val notification = create(valeGroup, title, "", type)
+            .addGoToPluginsAction(content)
         Notifications.Bus.notify(notification, project)
     }
 
@@ -90,7 +91,7 @@ class NotificationHelper(
 
     private fun Notification.addProjectSettingsAction(): Notification =
         addAction(
-            NotificationAction.createSimple("Check Vale project settings") {
+            NotificationAction.createSimple("Vale project settings") {
                 ShowSettingsUtil.getInstance()
                     .showSettingsDialog(project, ValePluginProjectSettingsConfigurable::class.java)
             }
@@ -98,15 +99,15 @@ class NotificationHelper(
 
     private fun Notification.addGlobalSettingsAction(): Notification =
         addAction(
-            NotificationAction.createSimple("Check Vale settings") {
+            NotificationAction.createSimple("Configure vale path") {
                 ShowSettingsUtil.getInstance()
                     .showSettingsDialog(project, ValePluginSettingsConfigurable::class.java)
             }
         )
 
-    private fun Notification.addGoToPluginsAction(): Notification =
+    private fun Notification.addGoToPluginsAction(text:String): Notification =
         addAction(
-            NotificationAction.createSimple("Check Vale project settings") {
+            NotificationAction.createSimple(text) {
                 ShowSettingsUtil.getInstance()
                     .showSettingsDialog(project, IdeBundle.message("title.plugins"))
             }

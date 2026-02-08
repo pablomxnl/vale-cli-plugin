@@ -101,7 +101,7 @@ ValeExternalAnnotatorProcessor.AnalysisResult> implements DumbAware {
 
     private void createAnnotation(@NotNull AnnotationHolder holder, @NotNull ValeProblem problem, TextRange range, PsiFile file) {
         AnnotationBuilder annotationBuilder = holder.newAnnotation(problem.getHighlightSeverity(),
-                problem.message());
+                problem.message()).highlightType(problem.getProblemHighlightType());
         if (problem.isValidRangeForAnnotation(range, file.getViewProvider().getDocument())) {
             annotationBuilder = annotationBuilder.range(range);
         }

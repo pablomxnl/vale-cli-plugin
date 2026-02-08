@@ -51,6 +51,7 @@
 
         <notificationGroup displayType="BALLOON" id="vale-cli-plugin-update" bundle="ValePlugin"
                            key="notification.group.vale.cli.plugin.update"/>
+
         <notificationGroup displayType="BALLOON" id="vale-cli-plugin-notifications"  hideFromSettings="true"/>
 
         <postStartupActivity implementation="org.ideplugins.vale_cli_plugin.activity.ValeStartupActivity"
