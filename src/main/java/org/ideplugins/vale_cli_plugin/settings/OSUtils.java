@@ -7,7 +7,6 @@ import com.intellij.execution.process.ProcessOutput;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.SystemInfo;
 
-import java.io.File;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,12 +24,12 @@ public class OSUtils {
         return Optional.ofNullable(System.getenv("CI_PROJECT_DIR")).isPresent();
     }
 
-    public static String valeVersion(String fullPath){
+    public static String valeVersion(String valeBinaryPath){
         String version = "";
-        List<String> versionCommand = wrapCommandWithShellEnv(fullPath + " --version");
+        List<String> versionCommand = wrapCommandWithShellEnv(valeBinaryPath + " --version");
         LOG.info("Executing version command: " + versionCommand);
         try {
-            GeneralCommandLine cmd = new GeneralCommandLine(versionCommand.toArray(new String[0]));
+            GeneralCommandLine cmd = new GeneralCommandLine(versionCommand);
             CapturingProcessHandler handler = new CapturingProcessHandler(cmd);
             ProcessOutput output = handler.runProcess();
             if (output.getExitCode() == 0) {
@@ -66,11 +65,4 @@ public class OSUtils {
         return path;
     }
 
-    public static String normalizeFilePath(String filePath) {
-        String tempPath = filePath;
-        if (SystemInfo.isWindows && !filePath.contains(File.separator)) {
-            tempPath = filePath.replace('/', File.separatorChar);
-        }
-        return tempPath;
-    }
 }

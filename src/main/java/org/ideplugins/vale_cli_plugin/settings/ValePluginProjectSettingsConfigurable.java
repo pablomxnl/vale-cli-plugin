@@ -20,9 +20,11 @@ import javax.swing.*;
 import java.io.File;
 import java.util.ResourceBundle;
 
+import static org.ideplugins.vale_cli_plugin.Constants.PLUGIN_BUNDLE;
+
 public final class ValePluginProjectSettingsConfigurable implements Configurable {
 
-    private static final ResourceBundle BUNDLE = ResourceBundle.getBundle("ValePlugin");
+    private static final ResourceBundle BUNDLE = ResourceBundle.getBundle(PLUGIN_BUNDLE);
     private final Project myProject;
     private final JPanel myMainPanel;
     private final JBCheckBox runSyncOnStartup = new JBCheckBox();

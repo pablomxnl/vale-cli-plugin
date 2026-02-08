@@ -1,9 +1,10 @@
 # Pre-requisites
 
-The plugin requires at least the Vale CLI tool installed. 
-For asciidoctor files support the [AsciiDoc plugin](https://plugins.jetbrains.com/plugin/7391-asciidoc) and asciidoctor are required. 
-For ReStructured text files support the [ReStructuredText plugin](https://plugins.jetbrains.com/plugin/7124-restructuredtext) and docutils are required . 
+The plugin requires:
 
+* Vale CLI tool installed and available in the system path.
+* To support _AsciiDoc_ files, the plugin requires asciidoctor available in the system path. (optional)
+* To support _reStructuredText_ files, the plugin requires docutils available in the system path. (optional)
 
 > **Make sure these dependencies are available on your system path**
 >
@@ -46,9 +47,9 @@ For ReStructured text files support the [ReStructuredText plugin](https://plugin
       </tab>
   </tabs>
 
-### Vale config file generation
+### Vale configuration file generation
 
-Once the Vale CLI binary has been installed, a configuration file has to be created.
+After installing the Vale CLI binary, create a configuration file.
 
 This is a minimal configuration to get started, place it on a file named either `.vale.ini` or `_vale.ini` at the root of the project, or on the user's home directory (for Linux/Mac usually contained in `$HOME`
 environment variable, for Windows usually contained in `%\USERPROFILE%` environment variable).
@@ -63,17 +64,22 @@ BasedOnStyles = Vale, write-good
 
 A more complete configuration file can be created using the [Vale CLI Config Generator](https://vale.sh/generator/).
 
-Once this file exists run the following command from the path where the file has been created:
+## Styles Sync
 
-```
+After creating a vale configuration file one needs to fetch those styles and rules, using the command
+
+<code-block>
 vale sync
-```
+</code-block>
 
-This command will download the style files according to the configuration.
+This command is also executed with the `Sync` button in plugin tool window toolbar, or on project loaded
+if this is enabled in the vale project settings.
+
+<img src="vale_sync_toolbar_action.webp" alt="Notification of error report ignored due to outdated plugin version" />
 
 ## Asciidoctor installation (optional)
 
-Asciidoctor is required only if planning to lint asciidoc files, the asciidoctor binary must be in the system PATH for the vale binary to execute it.
+Asciidoctor is required only if planning to lint `AsciiDoc` files, the asciidoctor binary must be in the system PATH for the vale binary to execute it.
 <tabs>
       <tab title="Linux"><p>Use one of the following methods to install asciidoctor</p>
       <list style="bullet">
@@ -104,7 +110,7 @@ Asciidoctor is required only if planning to lint asciidoc files, the asciidoctor
       </tab>
   </tabs>
 
-## Docutils installation (optional)
+## `Docutils` installation (optional)
 
 Docutils (rst2html in particular) is required only if planning to lint ReStructured text files (with extension rst)
 <tabs>

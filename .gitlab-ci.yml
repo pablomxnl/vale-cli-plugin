@@ -10,7 +10,7 @@ variables:
   ARTIFACT: webHelpPD2-all.zip
   WRS_VERSION: "2025.03.8312"
 
-image: registry.gitlab.com/pablomxnl/vale-cli-plugin/builder:0.0.27
+image: registry.gitlab.com/pablomxnl/vale-cli-plugin/builder:0.0.28
 default:
   tags:
     - saas-linux-medium-amd64
