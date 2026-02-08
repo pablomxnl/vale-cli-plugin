@@ -1,0 +1,12 @@
+[settings]
+yes = true
+not_found_auto_install = true
+
+[tools]
+gradle = "9.1.0"
+java = "temurin-21"
+node = "24.13.0"
+"github:errata-ai/vale" = "3.13.0"
+"github:asciidoctor/asciidoctor.js" = "latest"
+
+

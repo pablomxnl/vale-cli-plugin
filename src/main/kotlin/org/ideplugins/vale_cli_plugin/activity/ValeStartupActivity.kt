@@ -1,66 +1,82 @@
 package org.ideplugins.vale_cli_plugin.activity
 
-import com.intellij.ide.BrowserUtil
-import com.intellij.ide.plugins.IdeaPluginDescriptor
+import com.intellij.execution.ExecutionException
+import com.intellij.execution.process.CapturingProcessAdapter
+import com.intellij.execution.process.ProcessEvent
 import com.intellij.ide.plugins.PluginManagerCore.getPlugin
-import com.intellij.notification.*
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.invokeLater
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.extensions.PluginId
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.ProjectActivity
 import org.ideplugins.vale_cli_plugin.Constants
-import org.ideplugins.vale_cli_plugin.settings.OSUtils
-import org.ideplugins.vale_cli_plugin.settings.ValeCliPluginConfigurationState
-import org.ideplugins.vale_cli_plugin.settings.ValePluginProjectSettingsState
-import org.ideplugins.vale_cli_plugin.settings.ValePluginSettingsState
-import java.util.*
+import org.ideplugins.vale_cli_plugin.service.ValeCliExecutor
+import org.ideplugins.vale_cli_plugin.settings.*
+import org.ideplugins.vale_cli_plugin.utils.NotificationHelper
 
 class ValeStartupActivity : ProjectActivity {
 
-    private val logger: Logger = Logger.getInstance(ValeStartupActivity::class.java)
+    private val logger = Logger.getInstance(ValeStartupActivity::class.java)
 
     override suspend fun execute(project: Project) {
-        val id = PluginId.getId(Constants.PLUGIN_ID)
-        val pluginDescriptor = getPlugin(id)
-        if (pluginDescriptor != null) {
-            val pluginSettings = ApplicationManager.getApplication().getService(
-                ValeCliPluginConfigurationState::class.java
-            )
-            val lastKnownVersion = pluginSettings.lastVersion
+        val notificationHelper = NotificationHelper(project)
 
-            if (lastKnownVersion.isNotEmpty() && lastKnownVersion != pluginDescriptor.version) {
-                showUpdateNotification(project, pluginDescriptor, pluginSettings)
+        configureValePath()
+        checkIfPluginWasUpdated(notificationHelper)
+        runSyncIfNeeded(project, notificationHelper)
+    }
+
+    private fun checkIfPluginWasUpdated(notificationHelper: NotificationHelper) {
+        val id = PluginId.getId(Constants.PLUGIN_ID)
+        val pluginDescriptor = getPlugin(id) ?: return
+
+        val settings = ApplicationManager.getApplication()
+            .getService(ValeCliPluginConfigurationState::class.java)
+
+        if (
+            settings.lastVersion.isNotEmpty() &&
+            settings.lastVersion != pluginDescriptor.version
+        ) {
+            invokeLater {
+                notificationHelper.showPluginWasUpdatedNotification()
+                settings.lastVersion = pluginDescriptor.version
             }
         }
-        val projectSettings = ValePluginProjectSettingsState.getInstance(project)
+    }
+
+    private fun configureValePath() {
         val settings = ValePluginSettingsState.getInstance()
-        if (settings.valePath.isBlank()){
+        if (settings.valePath.isBlank()) {
             settings.valePath = OSUtils.findValeBinaryPath()
         }
-        if (projectSettings.runSyncOnStartup){
-            logger.info("Running vale sync")
-        } else {
-            logger.info("Not running vale sync")
-        }
     }
-}
 
-private fun showUpdateNotification(
-    project: Project, pluginDescriptor: IdeaPluginDescriptor, pluginSettings: ValeCliPluginConfigurationState
-) {
-    ApplicationManager.getApplication().invokeLater {
-        Optional.ofNullable(
-            NotificationGroupManager.getInstance().getNotificationGroup(Constants.NOTIFICATION_GROUP)
-        ).ifPresent { group: NotificationGroup ->
-            val action = NotificationAction.createSimple(
-                Constants.UPDATE_NOTIFICATION_BODY
-            ) { BrowserUtil.browse(Constants.JB_MARKETPLACE_URL) }
-            val notification = group.createNotification(
-                Constants.UPDATE_NOTIFICATION_TITLE, "", NotificationType.INFORMATION
-            ).addAction(action)
-            Notifications.Bus.notify(notification, project)
-            pluginSettings.lastVersion = pluginDescriptor.version
+    private fun runSyncIfNeeded(project: Project, notificationHelper: NotificationHelper) {
+        val projectSettings = ValePluginProjectSettingsState.getInstance(project)
+        val settings = ValePluginSettingsState.getInstance()
+
+        if (settings.valePath.isNullOrEmpty() || !projectSettings.runSyncOnStartup) {
+            return
+        }
+
+        val cliExecutor = ValeCliExecutor.getInstance(project)
+
+        try {
+            cliExecutor.runSyncCommand(object : CapturingProcessAdapter() {
+                override fun processTerminated(event: ProcessEvent) {
+                    if (event.exitCode == 0) {
+                        notificationHelper.notifySyncSuccess()
+                    } else {
+                        notificationHelper.notifySyncFailure(
+                            cliExecutor.parseErrorProcessOutput(output).text
+                        )
+                    }
+                }
+            })
+        } catch (e: ExecutionException) {
+            logger.debug(e)
+            notificationHelper.notifySyncFailure(e.message)
         }
     }
 }

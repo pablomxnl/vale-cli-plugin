@@ -23,9 +23,10 @@ public final class ValePluginSettingsState implements PersistentStateComponent<V
         if (valePath.isEmpty() || valePath.isBlank()) {
             ApplicationManager.getApplication().executeOnPooledThread(() -> {
                         valePath = OSUtils.findValeBinaryPath();
-                        valeVersion = OSUtils.valeVersion(valePath);
-                        LOG.info(String.format("Found vale version:%s  executable:%s", valeVersion, valePath));
-
+                        valeVersion = valePath.isEmpty()? OSUtils.valeVersion(valePath) : "";
+                        if (!valePath.isEmpty() && !valeVersion.isEmpty()){
+                            LOG.info(String.format("Found vale version:%s  executable:%s", valeVersion, valePath));
+                        }
                     }
             );
         }

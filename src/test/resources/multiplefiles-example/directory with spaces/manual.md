@@ -63,13 +63,16 @@ Listing block content is commonly used to preserve code input.
 
 [quote,firstname lastname,movie title]
 ____
+
 I am a block quote or a prose excerpt.
 I am subject to normal substitutions.
+
 ____
 
 [verse,firstname lastname,poem title and more]
 ____
-I am a verse block.
+
+  I am a verse block.
   Indents and endlines are preserved in verse blocks.
 ____
 
@@ -89,3 +92,6 @@ The text at the end of this sentence is cross referenced to <<_third_level_headi
 
 This is a link to the https://docs.asciidoctor.org/home/[Asciidoctor documentation].
 This is an attribute reference {url-quickref}[that links this text to the AsciiDoc Syntax Quick Reference].
+
+When do we start the fire? And then we can
+Try to do this again 

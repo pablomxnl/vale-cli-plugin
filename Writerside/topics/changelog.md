@@ -2,6 +2,22 @@ What's new
 =====
 This document provides an overview of the changes by release.
 
+0.0.28
+------
+
+- Implements https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/28[#28] Allow different vale config per project
+- Implements https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/50[#50] Add vale sync action
+- Implements https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/51[#51] Use stdin to lint files
+- Closes https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/49 Error when no vale configuration file is found
+
+---
+
+**Removed**
+
+- Tools menu action to lint all supported files in project
+- Project view and editor popup actions to lint current file or multiple selected files
+- Tool view popup action to lint all files in one project directory
+
 0.0.27
 ------
 
