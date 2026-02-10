@@ -1,91 +1,122 @@
-import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
+import org.jetbrains.changelog.Changelog
+import org.jetbrains.changelog.markdownToHTML
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
-import org.jsoup.Jsoup
 
 fun properties(key: String) = providers.gradleProperty(key)
 fun environment(key: String) = providers.environmentVariable(key)
 
+val lspLibraryVersion = rootProject.libs.versions.lsp.library.get()
+val testingLsp = 243
+
 group = properties("pluginGroup").get()
+version = properties("pluginVersion").get()
 
 plugins {
-    id("java")
-    id("jacoco")
-    alias(libs.plugins.asciidoc)
-    alias(libs.plugins.gradleIntelliJPlugin) // Gradle IntelliJ Plugin
-    alias(libs.plugins.semver)
-    alias(libs.plugins.jacocolog)
-    alias(libs.plugins.kotlin)
+    id("java") // Java support
+    alias(libs.plugins.kotlin) // Kotlin support
+    alias(libs.plugins.intelliJPlatform) // IntelliJ Platform Gradle Plugin
+    alias(libs.plugins.changelog) // Gradle Changelog Plugin
+    alias(libs.plugins.qodana) // Gradle Qodana Plugin
+    alias(libs.plugins.kover) // Gradle Kover Plugin
+    alias(libs.plugins.devjaidelsp)
 }
 
+shadowLSP {
+    // Package to contain the relocated LSP library packages.
+    // This must be unique to your plugin.
+    packagePrefix = "org.ideplugins.vale_cli_plugin.lsp_support"
+
+    // LSP features, which need a configured language ID,
+    // are enabled for languages specified here
+    enabledLanguageIds = setOf("adoc", "rst", "md")
+}
+
+configurations.all {
+    resolutionStrategy.eachDependency {
+        if (requested.group == "dev.j-a.ide" && requested.version == "default") {
+            useVersion("$lspLibraryVersion.$testingLsp")
+            because("LSP platform version")
+        }
+    }
+}
+
+// Set the JVM language level used to build the project.
 kotlin {
     jvmToolchain(21)
 }
 
+// Configure project's dependencies
 repositories {
     mavenCentral()
+
+    // IntelliJ Platform Gradle Plugin Repositories Extension - read more: https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-repositories-extension.html
     intellijPlatform {
         defaultRepositories()
     }
 }
 
+// Dependencies are managed with Gradle version catalog - read more: https://docs.gradle.org/current/userguide/platforms.html#sub:version-catalog
 dependencies {
+    // IntelliJ Platform Gradle Plugin Dependencies Extension - read more: https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-dependencies-extension.html
     intellijPlatform {
-        create(properties("platformType"), properties("platformVersion"), useInstaller = false)
+        create(properties("platformType"), properties("platformVersion"))
+
+        // Plugin Dependencies. Uses `platformBundledPlugins` property from the gradle.properties file for bundled IntelliJ Platform plugins.
         bundledPlugins(properties("platformBundledPlugins").map { it.split(',') })
+
+        // Plugin Dependencies. Uses `platformPlugins` property from the gradle.properties file for plugin from JetBrains Marketplace.
         plugins(properties("platformPlugins").map { it.split(',') })
+
         pluginVerifier()
         zipSigner()
-        testFramework(TestFrameworkType.Starter)
         testFramework(TestFrameworkType.Platform)
         testFramework(TestFrameworkType.Plugin.Java)
     }
-
-    /*
-    sourceSets {
-        create("integrationTest") {
-            compileClasspath += sourceSets.main.get().output
-            runtimeClasspath += sourceSets.main.get().output
-        }
-    }
-
-    val integrationTestImplementation by configurations.getting {
-        extendsFrom(configurations.testImplementation.get())
-    }
-
-    dependencies {
-        integrationTestImplementation(libs.junit)
-        integrationTestImplementation(libs.kodeinDi)
-        integrationTestImplementation(libs.kotlinxCoroutines)
-    }
-    */
-
-    implementation(libs.gson)
-    implementation(libs.ztexec) {
-        exclude(group = "org.slf4j", module = "slf4j-api")
-    }
+    implementation(rootProject.libs.lsp.client)
+    implementation(libs.okhttp)
     implementation(libs.sentrysdk){
         exclude(group = "org.slf4j")
     }
     implementation(libs.annotations)
+    testImplementation(kotlin("test"))
     testImplementation(libs.junit)
-    testImplementation(libs.assertj)
-    testImplementation(libs.mockito)
-
     testRuntimeOnly(libs.junitplatform)
     testRuntimeOnly(libs.junitengine)
     testImplementation(libs.junit4)
-
 }
 
-// Configure Gradle IntelliJ Platform Plugin
+// Configure IntelliJ Platform Gradle Plugin - read more: https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-extension.html
 intellijPlatform {
     pluginConfiguration {
         name = properties("pluginName")
-        changeNotes = provider {
-            Jsoup.parse(file("build/docs/CHANGELOG.html"))
-                    .select("#releasenotes")[0].nextElementSibling()?.children()
-                    ?.toString()
+        version = properties("pluginVersion")
+
+        // Extract the <!-- Plugin description --> section from README.md and provide for the plugin's manifest
+        description = providers.fileContents(layout.projectDirectory.file("README.md")).asText.map {
+            val start = "<!-- Plugin description -->"
+            val end = "<!-- Plugin description end -->"
+
+            with(it.lines()) {
+                if (!containsAll(listOf(start, end))) {
+                    throw GradleException("Plugin description section not found in README.md:\n$start ... $end")
+                }
+                subList(indexOf(start) + 1, indexOf(end)).joinToString("\n").let(::markdownToHTML)
+            }
         }
+
+        val changelog = project.changelog // local variable for configuration cache compatibility
+        // Get the latest available change notes from the changelog file
+        changeNotes = properties("pluginVersion").map { pluginVersion ->
+            with(changelog) {
+                renderItem(
+                    (getOrNull(pluginVersion) ?: getUnreleased())
+                        .withHeader(false)
+                        .withEmptySections(false),
+                    Changelog.OutputType.HTML,
+                )
+            }
+        }
+
         ideaVersion {
             sinceBuild = properties("pluginSinceBuild")
             untilBuild = properties("pluginUntilBuild")
@@ -100,9 +131,10 @@ intellijPlatform {
 
     publishing {
         token = environment("JBM_PUBLISH_TOKEN")
-        channels.set(
-                listOf(if ("true" == environment("PUSH_EAP").getOrElse("false")) "eap" else "default")
-        )
+        // The pluginVersion is based on the SemVer (https://semver.org) and supports pre-release labels, like 2.1.7-alpha.3
+        // Specify pre-release label to publish the plugin in a custom Release Channel automatically. Read more:
+        // https://plugins.jetbrains.com/docs/intellij/deployment.html#specifying-a-release-channel
+        channels = providers.gradleProperty("pluginVersion").map { listOf(it.substringAfter('-', "").substringBefore('.').ifEmpty { "default" }) }
     }
 
     pluginVerification {
@@ -110,83 +142,62 @@ intellijPlatform {
             recommended()
         }
     }
-
 }
 
-//val integrationTest = task<Test>("integrationTest") {
-//    val integrationTestSourceSet = sourceSets.getByName("integrationTest")
-//    testClassesDirs = integrationTestSourceSet.output.classesDirs
-//    classpath = integrationTestSourceSet.runtimeClasspath
-//    systemProperty("path.to.build.plugin", tasks.prepareSandbox.get().pluginDirectory.get().asFile)
-//    useJUnitPlatform()
-//    dependsOn(tasks.prepareSandbox)
-//}
+// Configure Gradle Changelog Plugin - read more: https://github.com/JetBrains/gradle-changelog-plugin
+changelog {
+    groups.empty()
+    repositoryUrl = providers.gradleProperty("pluginRepositoryUrl")
+}
 
-val runIdeForManualTests by intellijPlatformTesting.runIde.registering {
-    prepareSandboxTask {
-        sandboxDirectory = project.layout.buildDirectory.dir("custom-sandbox")
-        sandboxSuffix = ""
-    }
-    task {
-        doFirst {
-            copy {
-                from("${projectDir}/src/test/resources/ide/options/")
-                into(project.layout.buildDirectory.dir("custom-sandbox/config/options"))
-                include("*.xml")
+// Configure Gradle Kover Plugin - read more: https://github.com/Kotlin/kotlinx-kover#configuration
+kover {
+    reports {
+        total {
+            xml {
+                onCheck = true
+            }
+            html {
+                onCheck = true
             }
         }
-        systemProperty("idea.auto.reload.plugins", "false")
-        systemProperty("idea.trust.all.projects", "true")
-        systemProperty("ide.show.tips.on.startup.default.value", "false")
-        systemProperty("nosplash", "true")
-        args = listOf("${projectDir}/src/test/resources/multiplefiles-example/")
     }
-}
-
-val runIdeEAP by intellijPlatformTesting.runIde.registering {
-    type = IntelliJPlatformType.IntellijIdeaCommunity
-    version = "251-EAP-SNAPSHOT"
 }
 
 tasks {
-    // Set the JVM compatibility versions
-    withType<JavaCompile> {
-        sourceCompatibility = "21"
-        targetCompatibility = "21"
-        options.compilerArgs = listOf("-Xlint:deprecation","-Xlint:unchecked")
+    wrapper {
+        gradleVersion = providers.gradleProperty("gradleVersion").get()
+    }
+
+    publishPlugin {
+        dependsOn(patchChangelog)
     }
 
     withType<Test>{
         useJUnitPlatform()
-        configure<JacocoTaskExtension> {
-            isIncludeNoLocationClasses = true
-            excludes = listOf("jdk.internal.*")
+    }
+
+}
+
+
+
+intellijPlatformTesting {
+    runIde {
+        register("runIdeForUiTests") {
+            task {
+                jvmArgumentProviders += CommandLineArgumentProvider {
+                    listOf(
+                        "-Drobot-server.port=8082",
+                        "-Dide.mac.message.dialogs.as.sheets=false",
+                        "-Djb.privacy.policy.text=<!--999.999-->",
+                        "-Djb.consents.confirmation.enabled=false",
+                    )
+                }
+            }
+
+            plugins {
+                robotServerPlugin()
+            }
         }
-        finalizedBy(jacocoTestReport)
     }
-
-    init {
-        version = semver.version
-    }
-
-    asciidoctor {
-        setSourceDir(baseDir)
-        sources {
-            include("CHANGELOG.adoc")
-        }
-        setOutputDir(file("build/docs"))
-    }
-
-    jacocoTestReport {
-        classDirectories.setFrom(instrumentCode)
-        reports {
-            xml.required = true
-        }
-    }
-
-    patchPluginXml {
-        dependsOn("asciidoctor")
-    }
-
-
 }

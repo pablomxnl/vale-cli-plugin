@@ -5,5 +5,5 @@ public interface Constants {
     String UPDATE_NOTIFICATION_TITLE = "Vale CLI Plugin has been updated!!";
     String JB_MARKETPLACE_URL = "https://plugins.jetbrains.com/plugin/19613-vale-cli/reviews";
     String UPDATE_NOTIFICATION_BODY = "Useful? Please rate / review";
-    String NOTIFICATION_GROUP = "vale-cli-plugin-update";
+    String NOTIFICATION_GROUP = "Vale CLI Plugin Update";
 }

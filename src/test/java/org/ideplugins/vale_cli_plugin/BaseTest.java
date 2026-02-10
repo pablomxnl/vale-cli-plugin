@@ -12,7 +12,6 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
-import static org.ideplugins.vale_cli_plugin.settings.OSUtils.findValeBinaryPath;
 
 public class BaseTest {
 
@@ -30,7 +29,6 @@ public class BaseTest {
     @BeforeEach
     public void setUp() {
         settings = ValePluginSettingsState.getInstance();
-        settings.valePath = areTestRunningInCI()? "/usr/bin/vale" : findValeBinaryPath();
         settings.valeSettingsPath = "";
         settings.extensions = "adoc,md";
     }

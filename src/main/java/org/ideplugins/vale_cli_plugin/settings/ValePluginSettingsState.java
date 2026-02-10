@@ -6,7 +6,6 @@ import com.intellij.openapi.components.Service;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.util.SystemInfo;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -15,8 +14,8 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import static  java.util.AbstractMap.SimpleEntry;
-import static  java.util.Map.Entry;
+import static java.util.AbstractMap.SimpleEntry;
+import static java.util.Map.Entry;
 
 
 @State(
@@ -27,21 +26,9 @@ import static  java.util.Map.Entry;
 final public class ValePluginSettingsState implements PersistentStateComponent<ValePluginSettingsState> {
 
     private static final Logger LOG = Logger.getInstance(ValePluginSettingsState.class);
-    @Override
-    public void initializeComponent() {
-        String path = OSUtils.findValeBinaryPath();
-        String valeVersion = OSUtils.valeVersion();
-        if (path.isEmpty() && !valeVersion.isEmpty()){
-            valePath = SystemInfo.isWindows? "vale.exe" : "vale";
-            LOG.info( String.format("Guessing vale version:%s  executable:%s" ,  valeVersion, valePath));
-        } else {
-            valePath = path;
-            LOG.info( String.format("Found vale version:%s at %s" ,  valeVersion, valePath));
-        }
-    }
 
-    public String valePath = "";
-
+    public boolean installVale = true;
+    public boolean syncVale = true;
     public String valeSettingsPath = "";
     public String extensions = "md,adoc,rst";
 
@@ -66,10 +53,6 @@ final public class ValePluginSettingsState implements PersistentStateComponent<V
                 Error list:\s
                 """);
         boolean validationResult = true;
-        if (StringUtils.isBlank(valePath)) {
-            errors.append("\n* Vale path couldn't be detected automatically, please set it up");
-            validationResult = false;
-        }
         if (StringUtils.isNotBlank(valeSettingsPath)) {
             File file = new File(valeSettingsPath);
             if (!file.exists()) {

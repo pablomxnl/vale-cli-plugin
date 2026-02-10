@@ -5,20 +5,15 @@ import com.intellij.ide.plugins.IdeaPluginDescriptor
 import com.intellij.ide.plugins.PluginManagerCore.getPlugin
 import com.intellij.notification.*
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.extensions.PluginId
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.ProjectActivity
 import org.ideplugins.vale_cli_plugin.Constants
-import org.ideplugins.vale_cli_plugin.listener.FileSavedListener
 import org.ideplugins.vale_cli_plugin.settings.ValeCliPluginConfigurationState
 import java.util.*
 
 class ValeStartupActivity : ProjectActivity {
     override suspend fun execute(project: Project) {
-        val listener = FileSavedListener.getInstance(project)
-        EditorFactory.getInstance().eventMulticaster.addDocumentListener(listener, listener)
-        listener.activate()
         val id = PluginId.getId(Constants.PLUGIN_ID)
         val pluginDescriptor = getPlugin(id)
         if (pluginDescriptor != null) {

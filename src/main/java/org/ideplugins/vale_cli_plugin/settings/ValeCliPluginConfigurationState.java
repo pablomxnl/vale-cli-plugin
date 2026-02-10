@@ -11,8 +11,10 @@ import com.intellij.util.xmlb.annotations.MapAnnotation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
-import java.util.*;
+import java.util.Map;
+import java.util.Optional;
+import java.util.ResourceBundle;
+import java.util.TreeMap;
 
 import static org.ideplugins.vale_cli_plugin.Constants.PLUGIN_ID;
 
@@ -23,6 +25,7 @@ public final class ValeCliPluginConfigurationState
 
     private static final String LAST_VERSION = "lastVersion";
     private static final String SENTRY_DSN = "sentryDsn";
+    private static final String VALE_LS_INSTALLED = "valeLsPath";
 
     private PluginSettings settings = createInitialSettings();
 
@@ -46,6 +49,14 @@ public final class ValeCliPluginConfigurationState
         return settings.configuration.get(LAST_VERSION);
     }
 
+    public String getValeLsPath(){
+        return settings.configuration.get(VALE_LS_INSTALLED);
+    }
+
+    public void setValeLsPath(String path){
+        settings.configuration.put(VALE_LS_INSTALLED, path);
+    }
+
     public void setLastVersion(String version ){
         settings.configuration.put(LAST_VERSION, version);
     }
@@ -54,7 +65,7 @@ public final class ValeCliPluginConfigurationState
         return settings.configuration.get(SENTRY_DSN);
     }
 
-    static class PluginSettings {
+    public static class PluginSettings {
         @MapAnnotation
         private Map<String,String> configuration;
 
@@ -62,9 +73,12 @@ public final class ValeCliPluginConfigurationState
             final PluginSettings instance = new PluginSettings();
             ResourceBundle rb = ResourceBundle.getBundle("ValePlugin");
             String dsn = rb.getString("sentry.dsn");
+            String valeLsPath = "";
             instance.configuration = new TreeMap<>(
                     Map.of(LAST_VERSION, version,
-                            SENTRY_DSN , dsn)
+                           SENTRY_DSN , dsn,
+                           VALE_LS_INSTALLED, valeLsPath
+                    )
             );
             return  instance;
         }

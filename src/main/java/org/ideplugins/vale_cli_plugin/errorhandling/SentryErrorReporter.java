@@ -3,7 +3,11 @@ package org.ideplugins.vale_cli_plugin.errorhandling;
 import com.intellij.ide.DataManager;
 import com.intellij.ide.IdeBundle;
 import com.intellij.ide.plugins.InstalledPluginsState;
+import com.intellij.notification.Notification;
+import com.intellij.notification.NotificationAction;
 import com.intellij.notification.NotificationType;
+import com.intellij.notification.Notifications;
+import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.application.ApplicationInfo;
@@ -26,9 +30,9 @@ import org.ideplugins.vale_cli_plugin.settings.ValeCliPluginConfigurationState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.awt.Component;
+import java.awt.*;
 
-import static org.ideplugins.vale_cli_plugin.actions.ActionHelper.displayNotificationWithAction;
+import static org.ideplugins.vale_cli_plugin.Constants.NOTIFICATION_GROUP;
 
 
 public class SentryErrorReporter extends ErrorReportSubmitter {
@@ -87,8 +91,7 @@ public class SentryErrorReporter extends ErrorReportSubmitter {
 
     private void showOutdatedPluginErrorNotification(PluginDescriptor descriptor) {
         ApplicationManager.getApplication().invokeLater(() ->
-                displayNotificationWithAction(NotificationType.ERROR,
-                        "Error won't be submitted because there is a newer version available",
+                displayNotificationWithAction(
                         "Update %s Plugin".formatted(descriptor.getName()),
                         () ->
                                 ShowSettingsUtil.getInstance()
@@ -139,4 +142,18 @@ public class SentryErrorReporter extends ErrorReportSubmitter {
         }.queue();
         return true;
     }
+
+    static void displayNotificationWithAction(final String actionTitle, Runnable r) {
+        Notification notification = new Notification(NOTIFICATION_GROUP, "Vale CLI",
+                "Error won't be submitted because there is a newer version available",
+                NotificationType.ERROR);
+        notification.addAction(new NotificationAction(actionTitle) {
+            @Override
+            public void actionPerformed(@NotNull AnActionEvent anActionEvent, @NotNull Notification notification) {
+                r.run();
+            }
+        });
+        Notifications.Bus.notify(notification);
+    }
+
 }
