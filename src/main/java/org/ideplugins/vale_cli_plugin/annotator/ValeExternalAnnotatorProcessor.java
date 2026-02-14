@@ -17,6 +17,7 @@ import org.ideplugins.vale_cli_plugin.service.ValeCliExecutor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
 import java.util.*;
 
 import static com.intellij.execution.ui.ConsoleViewContentType.LOG_ERROR_OUTPUT;
@@ -61,8 +62,15 @@ ValeExternalAnnotatorProcessor.AnalysisResult> implements DumbAware {
         if (!cliExecutor.extensionsAsList().contains(virtualFile.getExtension())) {
             return null;
         }
-
-        return new AnalysisResult(getValeProblems(collectedInfo, virtualFile, cliExecutor, project), collectedInfo.document);
+        List<ValeProblem> results = new ArrayList<>();
+        try {
+            results.addAll(getValeProblems(collectedInfo, virtualFile, cliExecutor, project));
+        } catch (Exception e){
+            LOGGER.debug("Vale lint failed" + e);
+            String errorMessage = "❌ Vale lint failed:\n" + e.getMessage();
+            writeTextToConsole(project, errorMessage, LOG_ERROR_OUTPUT);
+        }
+        return new AnalysisResult(results, collectedInfo.document);
     }
 
     @Override
@@ -141,15 +149,16 @@ ValeExternalAnnotatorProcessor.AnalysisResult> implements DumbAware {
 
 
     private static List<ValeProblem> getValeProblems(InitialInfo collectedInfo, VirtualFile virtualFile,
-                                              ValeCliExecutor cliExecutor,  Project project) {
+                                              ValeCliExecutor cliExecutor,  Project project) throws IOException, ExecutionException {
         List<ValeProblem> result = new ArrayList<>();
         try {
             LOGGER.debug("Getting alerts via stdin for file" + virtualFile.getPath());
             ProcessOutput output = cliExecutor.runLintStdinCommand(
                     collectedInfo.document.getImmutableCharSequence(), virtualFile.getExtension());
-            result = parseProcessOutput(output, project, cliExecutor);
-        } catch (ExecutionException e) {
+            result.addAll(parseProcessOutput(output, project, cliExecutor));
+        } catch (ExecutionException | IOException e) {
             LOGGER.debug("Vale execution exception: " + e.getMessage());
+            throw e;
         }
         return result;
     }

@@ -97,25 +97,20 @@ public final class ValeCliExecutor {
         return handler.runProcess();
     }
 
-    public ProcessOutput runLintStdinCommand(CharSequence stdin, String extension) throws ExecutionException {
+    public ProcessOutput runLintStdinCommand(CharSequence stdin, String extension) throws ExecutionException, IOException {
         GeneralCommandLine lint = buildLintStdInCommand(extension);
         LOGGER.debug("PATH: " + System.getenv("PATH"));
         LOGGER.info("Running vale lint stdin command: " + lint.getCommandLineString());
-        CapturingProcessHandler handler = new CapturingProcessHandler(lint);
-        handler.addProcessListener(new ProcessAdapter() {
-            @Override
-            public void startNotified(@NotNull ProcessEvent event) {
-                try (Writer writer = new OutputStreamWriter(handler.getProcessInput(), lint.getCharset())) {
-                    writer.append(stdin);
-                    writer.flush();
-                } catch (IOException e) {
-                    LOGGER.debug(e);
-                    throw new RuntimeException(e);
-                }
-            }
-        });
+
+        Process process = lint.createProcess();
+        try (Writer writer = new OutputStreamWriter(process.getOutputStream(), lint.getCharset())) {
+            writer.append(stdin);
+            writer.flush();
+        }
+        CapturingProcessHandler handler = new CapturingProcessHandler(process, lint.getCharset(), lint.getCommandLineString());
         return handler.runProcess();
     }
+
 
     public @NotNull String checkConfiguration() {
         StringBuilder errors = new StringBuilder();
