@@ -1,6 +1,6 @@
 [versions]
 # libraries
-sentrysdk = "8.26.0"
+sentrysdk = "8.32.0"
 annotations = "26.0.1"
 jackson = "3.0.3"
 
@@ -12,7 +12,7 @@ assertj = "3.27.6"
 mockito = "5.11.0"
 
 # plugins
-gradleIntelliJPlugin = "2.10.4"
+gradleIntelliJPlugin = "2.11.0"
 semver = "1.0.4"
 asciidoc = "5.0.0-alpha.1"
 kotlin = "2.1.20"

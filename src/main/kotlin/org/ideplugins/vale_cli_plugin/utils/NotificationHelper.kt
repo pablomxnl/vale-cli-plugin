@@ -17,7 +17,7 @@ import org.ideplugins.vale_cli_plugin.settings.ValePluginSettingsConfigurable
 import java.util.ResourceBundle
 
 class NotificationHelper(
-    private val project: Project
+    private val project: Project?
 ) {
 
     private val bundle: ResourceBundle = ResourceBundle.getBundle(PLUGIN_BUNDLE)

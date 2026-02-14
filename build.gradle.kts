@@ -119,8 +119,8 @@ intellijPlatform {
         if (changelog.exists()){
             changeNotes = provider {
                 Jsoup.parse(changelog)
-                    .select("#releasenotes")[0].nextElementSibling()?.children()
-                    ?.toString()
+                    .select("#releasenotes")[0].nextElementSibling()!!.children().subList(0, 10)
+                    .joinToString("\n")
             }
         }        
     }

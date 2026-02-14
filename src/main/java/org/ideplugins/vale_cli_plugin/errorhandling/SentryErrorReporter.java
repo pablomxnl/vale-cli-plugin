@@ -20,6 +20,7 @@ import com.intellij.openapi.util.NlsActions;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.util.Consumer;
 import com.intellij.util.system.OS;
+
 import io.sentry.Sentry;
 import io.sentry.SentryLevel;
 import org.ideplugins.vale_cli_plugin.utils.NotificationHelper;
@@ -29,6 +30,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.awt.Component;
 import java.io.File;
+import java.util.List;
 
 import static com.intellij.ide.plugins.PluginManagerCore.getPlugin;
 import static org.ideplugins.vale_cli_plugin.Constants.PLUGIN_ID;
@@ -92,9 +94,12 @@ public class SentryErrorReporter extends ErrorReportSubmitter {
 
     private static void submitErrors(IdeaLoggingEvent @NotNull [] events, String additionalInfo) {
         for (IdeaLoggingEvent ideaEvent : events) {
-            Sentry.captureMessage(ideaEvent.getThrowableText(),
+            String message  = ideaEvent.getThrowableText();
+            Sentry.captureMessage(message,
                     SentryLevel.ERROR, cb -> {
                         cb.setExtra("userMessage", additionalInfo);
+                        if (message.contains("\n") && message.length()>1)
+                            cb.setFingerprint(List.of(message.substring(0, message.indexOf("\n"))));
                         cb.setUser(null);
                     });
         }
