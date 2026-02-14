@@ -2,6 +2,12 @@ What's new
 =====
 This document provides an overview of the changes by release.
 
+0.0.29
+------
+
+- Fixes [\#52](https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/52) java.io.IOException: The pipe has been ended.
+- Fixes [\#53](https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/53) IllegalStateException: This method is forbidden on EDT
+
 0.0.28
 ------
 
