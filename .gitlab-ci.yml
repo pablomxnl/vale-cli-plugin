@@ -32,6 +32,7 @@ cache:
     when: always
     paths:
       - build/distributions/*.zip
+      - build/docs
       - build/reports/tests
       - build/reports/jacoco/test
     reports:
@@ -47,6 +48,7 @@ cache:
     when: always
     paths:
       - build/distributions/*.zip
+      - build/docs
       - build/reports/tests
       - build/reports/jacoco/test
     reports:

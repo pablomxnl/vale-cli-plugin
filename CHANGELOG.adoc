@@ -7,6 +7,12 @@ This document provides an overview of the changes by release.
 [[releasenotes]]
 == Release notes
 
+=== 0.0.29
+
+- Fixes https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/52[#52] java.io.IOException: The pipe has been ended.
+- Fixes https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/53[#53] IllegalStateException: This method is forbidden on EDT
+
+
 === 0.0.28
 
 - Implements https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/28[#28] Allow different vale config per project
