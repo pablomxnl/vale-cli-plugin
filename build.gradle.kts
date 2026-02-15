@@ -126,9 +126,15 @@ intellijPlatform {
     }
 
     signing {
-        certificateChainFile = file(environment("JBM_CERTIFICATE_CHAIN"))
-        privateKeyFile = file(environment("JBM_PRIVATE_KEY"))
-        password = environment("JBM_PRIVATE_KEY_PASSWORD")
+        val certChain = environment("JBM_CERTIFICATE_CHAIN").orNull
+        val privateKey = environment("JBM_PRIVATE_KEY").orNull
+        val password = environment("JBM_PRIVATE_KEY_PASSWORD").orNull
+
+        if (certChain != null && privateKey != null && password != null) {
+            certificateChainFile = file(certChain)
+            privateKeyFile = file(privateKey)
+            this.password = password
+        }
     }
 
     publishing {

@@ -7,6 +7,7 @@ import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.util.xmlb.XmlSerializerUtil;
+import com.intellij.util.xmlb.annotations.OptionTag;
 import org.jetbrains.annotations.NotNull;
 
 @State(
@@ -20,20 +21,24 @@ public final class ValePluginSettingsState implements PersistentStateComponent<V
 
     @Override
     public void initializeComponent() {
-        if (valePath.isEmpty() || valePath.isBlank()) {
             ApplicationManager.getApplication().executeOnPooledThread(() -> {
+                    if (valePath.isBlank()) {
                         valePath = OSUtils.findValeBinaryPath();
-                        valeVersion = valePath.isEmpty()? OSUtils.valeVersion(valePath) : "";
-                        if (!valePath.isEmpty() && !valeVersion.isEmpty()){
-                            LOG.info(String.format("Found vale version:%s  executable:%s", valeVersion, valePath));
-                        }
                     }
-            );
-        }
+                    String rawVersion = valePath.isBlank() ? "" : OSUtils.valeVersion(valePath);
+                    valeVersion = ValeVersion.parse(rawVersion);
+                    ValeVersion.setCurrent(valeVersion);
+                    if (!valePath.isBlank() && valeVersion.isKnown()){
+                        LOG.info(String.format("Found vale version:%s  executable:%s", valeVersion, valePath));
+                    }
+                }
+        );
     }
 
     public String valePath = "";
-    public String valeVersion = "";
+
+    @OptionTag(converter = ValeVersionConverter.class)
+    public ValeVersion valeVersion = ValeVersion.parse(null);
 
     @Override
     public ValePluginSettingsState getState() {
@@ -43,6 +48,10 @@ public final class ValePluginSettingsState implements PersistentStateComponent<V
     @Override
     public void loadState(@NotNull ValePluginSettingsState state) {
         XmlSerializerUtil.copyBean(state, this);
+        if (valeVersion == null) {
+            valeVersion = ValeVersion.parse(null);
+        }
+        ValeVersion.setCurrent(valeVersion);
     }
 
     public static ValePluginSettingsState getInstance() {
