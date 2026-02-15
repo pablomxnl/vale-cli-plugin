@@ -1,0 +1,140 @@
+= Contributing to Vale CLI Plugin
+:icons: font
+
+
+Thank you for your interest in contributing to the Vale CLI Plugin
+This document provides guidelines and instructions for contributing to this project.
+
+== Getting Started
+
+Before starting any work on this project, please follow these important guidelines:
+
+=== Create an Issue or Discussion First
+
+*Always ask questions or create an issue before starting work.* This ensures visibility and prevents duplicate effort.
+
+- Check existing https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues[GitLab issues^] to see if your feature or bug fix is already being worked on
+- If you have a question, open an issue with label `question` to clarify requirements
+- If fixing a bug, create an issue describing the problem
+- If adding a feature, create an issue describing the feature request and discuss the implementation approach
+- Wait for feedback from the maintainers before starting development
+
+This process helps to:
+- Avoid duplicate work
+- Discuss design decisions early
+- Ensure alignment with project goals
+- Coordinate efforts across contributors
+
+== Development Workflow
+
+=== Prerequisites
+
+To build and test the plugin locally, you'll need:
+
+- Gitlab account
+- Java 21 (see `mise.toml` for exact version)
+- Gradle (included via wrapper)
+- Docker (for running tests in a containerized environment)
+
+
+Besides these requisites, you must fork this repository to your Gitlab account by clicking the Gitlab UI `Fork` button,
+or click https://gitlab.com/pablomxnl/vale-cli-plugin/-/forks/new[here^].
+
+=== Building the Plugin
+
+[source,bash]
+----
+./gradlew buildPlugin
+----
+
+=== Running the Plugin Locally
+
+To test the plugin in an IntelliJ sandbox:
+
+[source,bash]
+----
+./gradlew runForManualTests --no-configuration-cache
+----
+
+This task configures the sandbox to not confirm exit or show tips at startup, and opens a sample project with markdown files for testing.
+
+Can also use the standard `runIde` task:
+
+[source,bash]
+----
+./gradlew runIde
+----
+
+This task starts the IDE with the plugin installed but with no project opened.
+
+=== Running Tests
+
+==== Local Test Execution
+
+[source,bash]
+----
+./gradlew test
+----
+
+==== Container-Based Testing (Simulating CI/CD Pipeline)
+
+To run tests in a Docker container that simulates the actual pipeline environment:
+
+[source,bash]
+----
+docker run --rm -u gradle -v "$PWD":/home/gradle/project -w /home/gradle/project registry.gitlab.com/pablomxnl/vale-cli-plugin/builder:0.0.28 gradle test
+----
+
+After running tests, view the results at `build/reports/tests/test/index.html`.
+
+== Contribution Requirements
+
+=== GitLab Pipeline Requirements
+
+*Your fork must run all pipelines, and they must pass before submitting a merge request.*
+
+- All GitLab CI/CD pipelines must pass
+- Check your pipeline status in the GitLab CI/CD interface before opening a merge request
+- Apparently, to allow to run CI jobs
+https://forum.gitlab.com/t/identity-verification-is-required-in-order-to-run-ci-jobs/126689[Gitlab requires email/phone verificaton^],
+so make sure to verify your account so the CI/CD pipeline can run on your fork.
+
+
+=== Unit Tests
+
+*All changes must include unit tests unless the change involves Swing/AWT/UI interactions.*
+
+- Write unit tests for new features and bug fixes
+- For UI-related changes (Swing/AWT interactions), manual testing in the IDE sandbox is acceptable instead of unit tests
+- Run tests locally before pushing: `./gradlew test`
+
+=== Documentation
+
+The project uses https://plugins.jetbrains.com/plugin/20158-writerside[Writerside plugin^] to write final user documentation.
+Unfortunately Writerside doesn't support AsciiDoc, so write docs in Markdown under folder `Writerside/topics`
+
+== Submitting Your Contribution
+
+=== Before Opening a Merge Request
+
+1. Ensure your GitLab fork passes all CI/CD pipelines
+
+=== Merge Request Process
+
+1. Create a merge request against the `main` branch
+2. Give a clear description of what the MR addresses
+3. Reference the related issue in the MR description
+4. Ensure CI/CD pipelines pass in your fork before requesting review
+5. Be responsive to feedback during code review
+6. Make requested changes and push them to your branch
+
+== Questions?
+
+If you have questions about the contribution process:
+
+- Open a GitLab issue with the `question` label
+- Check existing documentation at https://plugins.jetbrains.com/plugin/19613-vale-cli/docs[Plugin Documentation^]
+
+
+
+

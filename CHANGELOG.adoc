@@ -11,6 +11,7 @@ This document provides an overview of the changes by release.
 
 - Fixes https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/52[#52] java.io.IOException: The pipe has been ended.
 - Fixes https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/53[#53] IllegalStateException: This method is forbidden on EDT
+- Implements https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/54[#54] Use path for stdin vale processing
 
 
 === 0.0.28

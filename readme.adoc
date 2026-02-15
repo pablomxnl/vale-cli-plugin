@@ -43,7 +43,7 @@ The standard gradle intellij plugin task that runs the IDE with the developed pl
 +
 [source]
 ----
-docker run --rm --env-file .env.empty -u gradle -v "$PWD":/home/gradle/project -w /home/gradle/project registry.gitlab.com/pablomxnl/vale-cli-plugin/builder:0.0.27 gradle test
+docker run --rm -u gradle -v "$PWD":/home/gradle/project -w /home/gradle/project registry.gitlab.com/pablomxnl/vale-cli-plugin/builder:0.0.28 gradle test
 ----
 . Open the test results
 +
