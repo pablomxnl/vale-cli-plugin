@@ -154,7 +154,9 @@ ValeExternalAnnotatorProcessor.AnalysisResult> implements DumbAware {
         try {
             LOGGER.debug("Getting alerts via stdin for file" + virtualFile.getPath());
             ProcessOutput output = cliExecutor.runLintStdinCommand(
-                    collectedInfo.document.getImmutableCharSequence(), virtualFile.getExtension());
+                    collectedInfo.document.getImmutableCharSequence(),
+                    virtualFile.getExtension(),
+                    virtualFile.getPath());
             result.addAll(parseProcessOutput(output, project, cliExecutor));
         } catch (ExecutionException | IOException e) {
             LOGGER.debug("Vale execution exception: " + e.getMessage());

@@ -98,7 +98,7 @@ to find out the directory where to look for the log file according to your opera
         pluginVersion = pluginSettings.getLastVersion();
         description = "Bug Report".equals(actionEvent.getPresentation().getText())? BUG_TEMPLATE +
                 SYSTEM_INFO_TEMPLATE.formatted(operatingSystem, ideVersion, jdkVersion, pluginVersion,
-                        ValePluginSettingsState.getInstance().valeVersion) :
+                        ValePluginSettingsState.getInstance().valeVersion.toString()) :
                 FEATURE_REQUEST_TEMPLATE;
     }
 

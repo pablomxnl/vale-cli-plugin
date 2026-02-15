@@ -55,14 +55,15 @@ public class ValePluginSettingsConfigurable implements Configurable {
                         BUNDLE.getString("vale.cli.plugin.invalid.settings.title"));
         }
         settings.valePath = value;
-        settings.valeVersion = settingsComponent.getValeVersionText();
+        settings.valeVersion = settingsComponent.getValeVersion();
+        ValeVersion.setCurrent(settings.valeVersion);
     }
 
 
     @Override
     public void reset() {
         settingsComponent.setValePathText(settings.valePath);
-        settingsComponent.setValeVersion(settings.valeVersion);
+        settingsComponent.setValeVersion(settings.valeVersion.toString());
     }
 
     @Override

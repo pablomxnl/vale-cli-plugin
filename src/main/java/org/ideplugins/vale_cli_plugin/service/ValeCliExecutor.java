@@ -7,10 +7,12 @@ import com.intellij.openapi.components.Service;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectUtil;
+import com.intellij.openapi.util.io.FileUtil;
 import org.ideplugins.vale_cli_plugin.annotator.ValeProblem;
 import org.ideplugins.vale_cli_plugin.annotator.ValeRuntimeError;
 import org.ideplugins.vale_cli_plugin.settings.ValePluginProjectSettingsState;
 import org.ideplugins.vale_cli_plugin.settings.ValePluginSettingsState;
+import org.ideplugins.vale_cli_plugin.settings.ValeVersion;
 import org.jetbrains.annotations.NotNull;
 import tools.jackson.core.StreamReadFeature;
 import tools.jackson.core.json.JsonReadFeature;
@@ -35,6 +37,7 @@ import java.nio.file.Path;
 public final class ValeCliExecutor {
 
     private static final ResourceBundle BUNDLE = ResourceBundle.getBundle(PLUGIN_BUNDLE);
+    private static final ValeVersion PATH_ARG_MIN_VERSION = ValeVersion.parse("3.13.2");
     private final Logger LOGGER = Logger.getInstance(ValeCliExecutor.class);
     private final Project project;
     private final ValePluginSettingsState settings;
@@ -63,7 +66,7 @@ public final class ValeCliExecutor {
         return theProject.getService(ValeCliExecutor.class);
     }
 
-    private @NotNull GeneralCommandLine buildLintStdInCommand(String extension) {
+    private @NotNull GeneralCommandLine buildLintStdInCommand(String extension, String path) {
         String configFilePath = projectSettings.getValeSettingsPath();
         Path baseDir = Objects.requireNonNull(ProjectUtil.guessProjectDir(project)).toNioPath();
         GeneralCommandLine command = new GeneralCommandLine().withExePath(settings.valePath)
@@ -71,7 +74,16 @@ public final class ValeCliExecutor {
         if (!configFilePath.isBlank()) {
             command = command.withParameters("--config=" + configFilePath);
         }
-        command = command.withParameters("--no-exit", "--output=JSON", "--ext=." + extension);
+        Path inputPath = Path.of(Objects.requireNonNull(path, "path"));
+        Path relativePath = (inputPath.isAbsolute() && inputPath.startsWith(baseDir))
+                ? baseDir.relativize(inputPath)
+                : inputPath;
+        String posixPath = FileUtil.toSystemIndependentName(relativePath.toString());
+        if (settings.valeVersion.isAtLeast(PATH_ARG_MIN_VERSION)) {
+            command = command.withParameters("--no-exit", "--output=JSON", "--path=" + posixPath);
+        } else {
+            command = command.withParameters("--no-exit", "--output=JSON", "--ext=." + extension);
+        }
         return command;
     }
 
@@ -97,8 +109,8 @@ public final class ValeCliExecutor {
         return handler.runProcess();
     }
 
-    public ProcessOutput runLintStdinCommand(CharSequence stdin, String extension) throws ExecutionException, IOException {
-        GeneralCommandLine lint = buildLintStdInCommand(extension);
+    public ProcessOutput runLintStdinCommand(CharSequence stdin, String extension, String path) throws ExecutionException, IOException {
+        GeneralCommandLine lint = buildLintStdInCommand(extension, path);
         LOGGER.debug("PATH: " + System.getenv("PATH"));
         LOGGER.info("Running vale lint stdin command: " + lint.getCommandLineString());
 

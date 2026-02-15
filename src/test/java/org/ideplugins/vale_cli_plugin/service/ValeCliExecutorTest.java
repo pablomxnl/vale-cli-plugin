@@ -73,7 +73,7 @@ public class ValeCliExecutorTest extends BaseTest {
         ## This is a test
         This text is being written in passive voice.
         """;
-        ProcessOutput output = executor.runLintStdinCommand(markDownContent, "md");
+        ProcessOutput output = executor.runLintStdinCommand(markDownContent, "md", "dummy.md");
         assertEquals(0, output.getExitCode(), "lint stdin command should exit 0");
     }
 
@@ -83,7 +83,7 @@ public class ValeCliExecutorTest extends BaseTest {
         ValeCliExecutor executor = ValeCliExecutor.getInstance(codeInsightTestFixture.getProject());
 
         assertThrows(ExecutionException.class, () -> {
-            ProcessOutput output = executor.runLintStdinCommand(markDownContent, "md");
+            ProcessOutput output = executor.runLintStdinCommand(markDownContent, "md", "dummy.md");
             assertNotEquals(0, output.getExitCode(), "lint stdin command should exit 0");
         });
 
@@ -95,7 +95,7 @@ public class ValeCliExecutorTest extends BaseTest {
         ValePluginProjectSettingsState pluginProjectSettingsState = codeInsightTestFixture.getProject().getService(ValePluginProjectSettingsState.class);
         pluginProjectSettingsState.getState().valeSettingsPath = BaseTest.testProjectPath + "/.vale.ini";
         ValeCliExecutor executor = new ValeCliExecutor(codeInsightTestFixture.getProject(), this.settings, pluginProjectSettingsState);
-        ProcessOutput output = executor.runLintStdinCommand(markDownContent, "md");
+        ProcessOutput output = executor.runLintStdinCommand(markDownContent, "md", "dummy.md");
         assertEquals(0, output.getExitCode(), "lint file command should exit 0");
     }
 
@@ -104,7 +104,7 @@ public class ValeCliExecutorTest extends BaseTest {
         settings.valePath = BaseTest.testProjectPath + "/.vale.ini";
         ValeCliExecutor executor = ValeCliExecutor.getInstance(codeInsightTestFixture.getProject());
         assertThrows(ExecutionException.class, ()-> {
-            ProcessOutput output = executor.runLintStdinCommand(markDownContent, "md");
+            ProcessOutput output = executor.runLintStdinCommand(markDownContent, "md", "dummy.md");
             assertNotEquals(0, output.getExitCode(), "lint file command should exit 0");
         });
     }
@@ -114,7 +114,7 @@ public class ValeCliExecutorTest extends BaseTest {
         ValePluginProjectSettingsState pluginProjectSettingsState = codeInsightTestFixture.getProject().getService(ValePluginProjectSettingsState.class);
         pluginProjectSettingsState.setValeSettingsPath(BaseTest.testProjectPath + "/.valetest.ini");
         ValeCliExecutor executor = new ValeCliExecutor(codeInsightTestFixture.getProject(), this.settings, pluginProjectSettingsState);
-        ProcessOutput output = executor.runLintStdinCommand(markDownContent, "md");
+        ProcessOutput output = executor.runLintStdinCommand(markDownContent, "md", "dummy.md");
         assertNotEquals(0, output.getExitCode(), "lint file command should exit non 0");
     }
 
