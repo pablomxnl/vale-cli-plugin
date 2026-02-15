@@ -92,7 +92,7 @@ build-documentation:
   variables:
     GIT_DEPTH: 0
   rules:
-    - if: '$CI_MERGE_REQUEST_SOURCE_PROJECT_ID != $CI_PROJECT_ID'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_SOURCE_PROJECT_ID != $CI_PROJECT_ID'
       when: never
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
