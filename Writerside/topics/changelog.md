@@ -2,6 +2,11 @@ What's new
 =====
 This document provides an overview of the changes by release.
 
+### 0.0.30
+
+* Fixes [\#56](https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/56) PluginException: Access is allowed from Event Dispatch Thread (EDT)
+* Implements [\#59](https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/59) Improve quick fixes
+
 0.0.29
 ------
 

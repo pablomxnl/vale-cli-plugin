@@ -6,6 +6,7 @@ import com.intellij.lang.annotation.AnnotationBuilder;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.ExternalAnnotator;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.project.DumbAware;
@@ -41,8 +42,10 @@ ValeExternalAnnotatorProcessor.AnalysisResult> implements DumbAware {
         Project project = file.getProject();
         ValeCliExecutor cliExecutor = ValeCliExecutor.getInstance(project);
         VirtualFile virtualFile = file.getViewProvider().getVirtualFile();
-        if (cliExecutor.extensionsAsList().contains(virtualFile.getExtension())) {
-            return new InitialInfo(file, file.getViewProvider().getDocument());
+        Document document = file.getViewProvider().getDocument();
+        if (cliExecutor.extensionsAsList().contains(virtualFile.getExtension()) &&
+                virtualFile.isInLocalFileSystem() && document !=null) {
+            return new InitialInfo(file, document);
         }
         return null;
     }
@@ -68,7 +71,9 @@ ValeExternalAnnotatorProcessor.AnalysisResult> implements DumbAware {
         } catch (Exception e){
             LOGGER.debug("Vale lint failed" + e);
             String errorMessage = "❌ Vale lint failed:\n" + e.getMessage();
-            writeTextToConsole(project, errorMessage, LOG_ERROR_OUTPUT);
+            ApplicationManager.getApplication()
+                    .invokeLater(() -> writeTextToConsole(project, errorMessage, LOG_ERROR_OUTPUT)
+                    );
         }
         return new AnalysisResult(results, collectedInfo.document);
     }
@@ -104,7 +109,12 @@ ValeExternalAnnotatorProcessor.AnalysisResult> implements DumbAware {
     private static void showErrors(ValeRuntimeError valeRuntimeError, Project project) {
         String errorMessage = "❌ Vale lint failed\n Code: " + valeRuntimeError.code() +
                 "\n Message: " + valeRuntimeError.text();
-        ApplicationManager.getApplication().invokeLater(() -> writeTextToConsole(project,errorMessage,LOG_ERROR_OUTPUT ));
+        ApplicationManager.getApplication().invokeLater(
+                () -> writeTextToConsole(project, errorMessage, LOG_ERROR_OUTPUT),
+                ModalityState.defaultModalityState(),
+                project.getDisposed()
+        );
+
     }
 
     private void createAnnotation(@NotNull AnnotationHolder holder, @NotNull ValeProblem problem, TextRange range, PsiFile file) {
