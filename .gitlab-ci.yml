@@ -62,6 +62,7 @@ build_artifact:
     - gradle buildPlugin
   after_script:
     - gradle printCoverageForGitlab
+
 publish_eap:
   stage: deploy
   variables:
@@ -76,6 +77,7 @@ publish_eap:
       when: never
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_PROJECT_ID == "38399489"'
       when: manual
+      allow_failure: true
 
 
 build_release_artifact:
