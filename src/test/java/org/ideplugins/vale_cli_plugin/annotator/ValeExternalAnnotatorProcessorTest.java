@@ -37,6 +37,7 @@ public class ValeExternalAnnotatorProcessorTest extends BaseTest {
         AnnotationHolder holder = mock(AnnotationHolder.class);
         AnnotationBuilder builder = mock(AnnotationBuilder.class);
         when(builder.range(any(TextRange.class))).thenReturn(builder);
+        when(builder.tooltip(anyString())).thenReturn(builder);
         when(builder.withFix(any())).thenReturn(builder);
         when(holder.newAnnotation(any(HighlightSeverity.class), anyString()))
                 .thenReturn(builder);
@@ -56,6 +57,8 @@ public class ValeExternalAnnotatorProcessorTest extends BaseTest {
         AnnotationHolder holder = mock(AnnotationHolder.class);
         AnnotationBuilder builder = mock(AnnotationBuilder.class);
         when(builder.range(any(TextRange.class))).thenReturn(builder);
+        when(builder.tooltip(anyString())).thenReturn(builder);
+        when(builder.withFix(any())).thenReturn(builder);
         when(holder.newAnnotation(any(HighlightSeverity.class), anyString()))
                 .thenReturn(builder);
 
@@ -74,6 +77,8 @@ public class ValeExternalAnnotatorProcessorTest extends BaseTest {
         AnnotationHolder holder = mock(AnnotationHolder.class);
         AnnotationBuilder builder = mock(AnnotationBuilder.class);
         when(builder.range(any(TextRange.class))).thenReturn(builder);
+        when(builder.tooltip(anyString())).thenReturn(builder);
+        when(builder.withFix(any())).thenReturn(builder);
         when(holder.newAnnotation(any(HighlightSeverity.class), anyString()))
                 .thenReturn(builder);
 
@@ -97,6 +102,8 @@ public class ValeExternalAnnotatorProcessorTest extends BaseTest {
         AnnotationHolder holder = mock(AnnotationHolder.class);
         AnnotationBuilder builder = mock(AnnotationBuilder.class);
         when(builder.range(any(TextRange.class))).thenReturn(builder);
+        when(builder.tooltip(anyString())).thenReturn(builder);
+        when(builder.withFix(any())).thenReturn(builder);
         when(holder.newAnnotation(any(HighlightSeverity.class), anyString()))
                 .thenReturn(builder);
 
@@ -135,6 +142,8 @@ public class ValeExternalAnnotatorProcessorTest extends BaseTest {
         AnnotationHolder holder = mock(AnnotationHolder.class);
         AnnotationBuilder builder = mock(AnnotationBuilder.class);
         when(builder.range(any(TextRange.class))).thenReturn(builder);
+        when(builder.tooltip(anyString())).thenReturn(builder);
+        when(builder.withFix(any())).thenReturn(builder);
         when(holder.newAnnotation(any(HighlightSeverity.class), anyString()))
                 .thenReturn(builder);
 
@@ -170,6 +179,7 @@ public class ValeExternalAnnotatorProcessorTest extends BaseTest {
         AnnotationHolder holder = mock(AnnotationHolder.class);
         AnnotationBuilder builder = mock(AnnotationBuilder.class);
         when(builder.range(any(TextRange.class))).thenReturn(builder);
+        when(builder.tooltip(anyString())).thenReturn(builder);
         when(builder.withFix(any())).thenReturn(builder);
         when(holder.newAnnotation(any(HighlightSeverity.class), anyString()))
                 .thenReturn(builder);
