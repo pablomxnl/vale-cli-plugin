@@ -1,5 +1,6 @@
 package org.ideplugins.vale_cli_plugin.service;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.execution.process.*;
@@ -8,12 +9,15 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectUtil;
 import com.intellij.openapi.util.io.FileUtil;
+import org.ideplugins.vale_cli_plugin.annotator.ValeAction;
+import org.ideplugins.vale_cli_plugin.annotator.ValeFixOutputParser;
 import org.ideplugins.vale_cli_plugin.annotator.ValeProblem;
 import org.ideplugins.vale_cli_plugin.annotator.ValeRuntimeError;
 import org.ideplugins.vale_cli_plugin.settings.ValePluginProjectSettingsState;
 import org.ideplugins.vale_cli_plugin.settings.ValePluginSettingsState;
 import org.ideplugins.vale_cli_plugin.settings.ValeVersion;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import tools.jackson.core.StreamReadFeature;
 import tools.jackson.core.json.JsonReadFeature;
 import tools.jackson.core.type.TypeReference;
@@ -25,7 +29,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.ResourceBundle;
 
 import static com.intellij.execution.configurations.GeneralCommandLine.ParentEnvironmentType.CONSOLE;
 import static org.ideplugins.vale_cli_plugin.Constants.PLUGIN_BUNDLE;
@@ -100,12 +110,45 @@ public final class ValeCliExecutor {
         return command;
     }
 
+    private GeneralCommandLine buildFixCommand(String alertJson) {
+        String configFilePath = projectSettings.getValeSettingsPath();
+        Path baseDir = Objects.requireNonNull(ProjectUtil.guessProjectDir(project)).toNioPath();
+        GeneralCommandLine command = new GeneralCommandLine().withExePath(settings.valePath)
+                .withWorkingDirectory(baseDir);
+        command = command.withParameters("fix");
+        if (!configFilePath.isBlank()) {
+            command = command.withParameters("--config=" + configFilePath);
+        }
+        command = command.withParameters(alertJson);
+        return command;
+    }
+
+    private GeneralCommandLine buildLsConfigCommand(@Nullable Path configPath) {
+        String configFilePath = configPath != null ? configPath.toString() : projectSettings.getValeSettingsPath();
+        Path baseDir = Path.of(Objects.requireNonNull(project.getBasePath()));
+        GeneralCommandLine command = new GeneralCommandLine().withExePath(settings.valePath)
+                .withWorkingDirectory(baseDir)
+                .withParentEnvironmentType(CONSOLE);
+        command = command.withParameters("ls-config");
+        if (configFilePath != null && !configFilePath.isBlank()) {
+            command = command.withParameters("--config=" + configFilePath);
+        }
+        return command;
+    }
+
 
     public ProcessOutput runSyncCommand(ProcessListener listener) throws ExecutionException {
         GeneralCommandLine sync = buildSyncCommand();
         LOGGER.info("Running vale sync command: " + sync.getCommandLineString());
         CapturingProcessHandler handler = new CapturingProcessHandler(sync);
         handler.addProcessListener(listener);
+        return handler.runProcess();
+    }
+
+    public ProcessOutput runLsConfigCommand(@Nullable Path configPath) throws ExecutionException {
+        GeneralCommandLine lsConfig = buildLsConfigCommand(configPath);
+        LOGGER.info("Running vale ls-config command: " + lsConfig.getCommandLineString());
+        CapturingProcessHandler handler = new CapturingProcessHandler(lsConfig);
         return handler.runProcess();
     }
 
@@ -123,6 +166,65 @@ public final class ValeCliExecutor {
         return handler.runProcess();
     }
 
+    public @NotNull List<String> runFix(@NotNull ValeProblem problem) {
+        ValeAction action = problem.action();
+        String actionName = action == null || action.name() == null ? "" : action.name();
+        if (actionName.isBlank()) {
+            return List.of();
+        }
+        return runFixOnProblem(problem);
+    }
+
+    private @NotNull List<String> runFixOnProblem(@NotNull ValeProblem problem) {
+        String alertJson = buildFixAlertPayload(problem);
+        if (alertJson.isBlank()) {
+            return List.of();
+        }
+        GeneralCommandLine fix = buildFixCommand(alertJson);
+        LOGGER.info("Running vale fix command: " + fix.getCommandLineString());
+        try {
+            CapturingProcessHandler handler = new CapturingProcessHandler(fix);
+            ProcessOutput output = handler.runProcess();
+            String stdout = output.getStdout();
+            ValeFixOutputParser.FixResult result = ValeFixOutputParser.parse(stdout);
+            if (!result.error().isBlank()) {
+                LOGGER.warn("Vale fix returned error: " + result.error());
+            }
+            if (!output.getStderr().isBlank()) {
+                LOGGER.warn("Vale fix diagnostics: " + output.getStderr());
+            }
+            return result.suggestions();
+        } catch (Exception e) {
+            LOGGER.warn("Failed to run vale fix", e);
+            return List.of();
+        }
+    }
+
+    private @NotNull String buildFixAlertPayload(@NotNull ValeProblem problem) {
+        ValeAction action = problem.action();
+        String actionName = action == null || action.name() == null ? "" : action.name();
+        if (actionName.isBlank()) {
+            return "";
+        }
+        Optional<List<String>> paramsOptional = action.parameters().isEmpty() ? Optional.empty() : action.parameters();
+        List<String> params = paramsOptional.orElseGet(List::of);
+        String match = problem.match();
+        if (match != null && match.isBlank()) {
+            match = null;
+        }
+        String check = problem.check();
+        if (check != null && check.isBlank()) {
+            check = null;
+        }
+        FixAction fixAction = new FixAction(actionName, List.copyOf(params));
+        FixAlertPayload alert = new FixAlertPayload(fixAction, match, check);
+        try {
+            return mapper.writeValueAsString(alert);
+        } catch (Exception e) {
+            LOGGER.warn("Failed to build vale fix payload", e);
+            return "";
+        }
+    }
 
     public @NotNull String checkConfiguration() {
         StringBuilder errors = new StringBuilder();
@@ -166,4 +268,16 @@ public final class ValeCliExecutor {
         return mapper.readValue(processOutput.getStderr(), new TypeReference<>() {
         });
     }
+
+    private record FixAlertPayload(
+            @JsonProperty("Action") FixAction action,
+            @JsonProperty("Match") String match,
+            @JsonProperty("Check") String check) {
+    }
+
+    private record FixAction(
+            @JsonProperty("Name") String name,
+            @JsonProperty("Params") List<String> params) {
+    }
+
 }

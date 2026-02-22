@@ -1,6 +1,5 @@
 package org.ideplugins.vale_cli_plugin.annotator;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.lang.annotation.HighlightSeverity;
 import com.intellij.openapi.editor.Document;
@@ -9,7 +8,6 @@ import com.intellij.util.DocumentUtil;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Optional;
 
 public record ValeProblem(
     String description,
@@ -25,18 +23,10 @@ public record ValeProblem(
 ) {
         public HighlightSeverity getHighlightSeverity(){
                 return switch (severity) {
-                        case "warning","suggestion" -> HighlightSeverity.WARNING;
+                        case "warning" -> HighlightSeverity.WARNING;
                         case "error" -> HighlightSeverity.ERROR;
+                        case "suggestion" -> HighlightSeverity.INFORMATION;
                         default -> HighlightSeverity.WEAK_WARNING;
-                };
-        }
-
-        public ProblemHighlightType getProblemHighlightType(){
-                return switch (severity) {
-                        case "warning" -> ProblemHighlightType.WARNING;
-                        case "error" -> ProblemHighlightType.ERROR;
-                        case "suggestion" -> ProblemHighlightType.INFORMATION;
-                        default -> ProblemHighlightType.WEAK_WARNING;
                 };
         }
 
@@ -53,14 +43,5 @@ public record ValeProblem(
                 return range != null && DocumentUtil.isValidOffset(range.getStartOffset(), document) &&
                         DocumentUtil.isValidOffset(range.getEndOffset(), document);
         }
-
-
-}
-
-record ValeAction(
-        String name,
-        @JsonProperty(value = "Params")
-        Optional<List<String>> parameters
-){
 
 }

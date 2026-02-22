@@ -17,9 +17,8 @@
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.lang</depends>
     <extensions defaultExtensionNs="com.intellij">
-        <!-- Add your extensions here -->
 
-        <!-- plugin settings -->
+        <!-- Global plugin settings shown under Tools. -->
         <applicationConfigurable parentId="tools"
                                  instance="org.ideplugins.vale_cli_plugin.settings.ValePluginSettingsConfigurable"
                                  id="org.ideplugins.vale_cli_plugin.settings.ValePluginSettingsConfigurable"
@@ -27,6 +26,7 @@
                                  key="vale.cli.plugin.settings.title"
         />
 
+        <!-- Per-project Vale CLI settings shown under Tools. -->
         <projectConfigurable
                 parentId="tools"
                 instance="org.ideplugins.vale_cli_plugin.settings.ValePluginProjectSettingsConfigurable"
@@ -41,7 +41,10 @@
                            implementationClass="org.ideplugins.vale_cli_plugin.annotator.ValeExternalAnnotatorProcessor"
                            language=""
         />
-        <!-- output window -->
+        <!-- Enables clickable rule links in annotation tooltips for local Vale rules. -->
+        <codeInsight.linkHandler prefix="#vale-rule/"
+                                 handlerClass="org.ideplugins.vale_cli_plugin.annotator.ValeRuleLinkHandler" />
+        <!-- Tool window that displays Vale output. -->
         <toolWindow id="Vale CLI"
                     anchor="bottom"
                     canCloseContents="false"
@@ -49,39 +52,47 @@
                     factoryClass="org.ideplugins.vale_cli_plugin.toolwindow.ValeToolWindow"
                     icon="/icons/pluginIcon2.svg"/>
 
+        <!-- Notification group for update announcements. -->
         <notificationGroup displayType="BALLOON" id="vale-cli-plugin-update" bundle="ValePlugin"
                            key="notification.group.vale.cli.plugin.update"/>
 
+        <!-- Notification group for runtime plugin messages. -->
         <notificationGroup displayType="BALLOON" id="vale-cli-plugin-notifications"  hideFromSettings="true"/>
 
+        <!-- Startup notifications after project open. -->
         <postStartupActivity implementation="org.ideplugins.vale_cli_plugin.activity.ValeStartupActivity"
                              id="valeStartupActivity"/>
+        <!-- Report IDE errors via Sentry. -->
         <errorHandler implementation="org.ideplugins.vale_cli_plugin.errorhandling.SentryErrorReporter"/>
 
 
     </extensions>
 
     <actions>
+        <!-- Open feedback issue template in browser. -->
         <action id="org.ideplugins.vale_cli_plugin.actions.ValeFeedbackAction"
                 class="org.ideplugins.vale_cli_plugin.actions.FeedbackToolwindowToolbarAction"
                 icon="/icons/feature-request.svg"  />
 
+        <!-- Open bug report template in browser. -->
         <action id="org.ideplugins.vale_cli_plugin.actions.ValeBugReportAction"
                 class="org.ideplugins.vale_cli_plugin.actions.FeedbackToolwindowToolbarAction"
                 icon="/icons/bug-report.svg"  />
 
+        <!-- Open global Vale CLI plugin settings. -->
         <action id="org.ideplugins.vale_cli_plugin.actions.ValeSettingsAction"
                 icon="AllIcons.General.Settings"
                 class="org.ideplugins.vale_cli_plugin.actions.SettingsToolbarAction" />
 
+        <!-- Open per-project Vale CLI settings. -->
         <action id="org.ideplugins.vale_cli_plugin.actions.ValeProjectSettingsAction"
                 icon="AllIcons.General.ProjectTab"
                 class="org.ideplugins.vale_cli_plugin.actions.ProjectSettingsToolbarAction" />
 
+        <!-- Run `vale sync` to update project styles. -->
         <action id="org.ideplugins.vale_cli_plugin.actions.ValeSyncAction"
                 icon="AllIcons.Actions.Refresh"
                 class="org.ideplugins.vale_cli_plugin.actions.SyncValeStylesToolbarAction" />
-
 
     </actions>
 </idea-plugin>

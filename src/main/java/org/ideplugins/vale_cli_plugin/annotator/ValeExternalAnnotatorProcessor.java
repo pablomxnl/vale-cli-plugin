@@ -18,8 +18,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.List;
 import static com.intellij.execution.ui.ConsoleViewContentType.LOG_ERROR_OUTPUT;
 import static org.ideplugins.vale_cli_plugin.utils.ConsoleHelper.clearConsole;
 import static org.ideplugins.vale_cli_plugin.utils.ConsoleHelper.writeTextToConsole;
@@ -109,9 +109,13 @@ ValeExternalAnnotatorProcessor.AnalysisResult> implements DumbAware {
 
     private void createAnnotation(@NotNull AnnotationHolder holder, @NotNull ValeProblem problem, TextRange range, PsiFile file) {
         AnnotationBuilder annotationBuilder = holder.newAnnotation(problem.getHighlightSeverity(),
-                problem.message());
+                formatMessage(problem));
         if (problem.isValidRangeForAnnotation(range, file.getViewProvider().getDocument())) {
             annotationBuilder = annotationBuilder.range(range);
+        }
+        String tooltip = ValeTooltipHelper.buildTooltip(problem);
+        if (tooltip != null && !tooltip.isBlank()) {
+            annotationBuilder = annotationBuilder.tooltip(tooltip);
         }
         annotationBuilder = addQuickFix(problem, range, annotationBuilder);
         if ("md".equalsIgnoreCase(file.getViewProvider().getVirtualFile().getExtension())) {
@@ -126,27 +130,36 @@ ValeExternalAnnotatorProcessor.AnalysisResult> implements DumbAware {
     }
 
     private static AnnotationBuilder addQuickFix(@NotNull ValeProblem problem, TextRange range, AnnotationBuilder annotationBuilder) {
-        String term = problem.match();
-        switch (problem.action().name()) {
-            case "replace":
-                if (problem.action().parameters().isPresent()) {
-                    String replacement = problem.action().parameters().get().getFirst();
-                    annotationBuilder = annotationBuilder.withFix(new ValeReplaceQuickFix(term, replacement, range));
-                }
-                break;
-            case "remove":
-                annotationBuilder = annotationBuilder.withFix(new ValeRemoveQuickFix(term, range));
-                break;
-            case "ignore":
-                LOGGER.info("Not implemented yet");
-                break;
-            case null:
-            default:
-                break;
+        if (problem.action() == null || problem.action().name() == null || problem.action().name().isBlank()) {
+            return annotationBuilder;
         }
+        String actionName = problem.action().name();
+
+        // We do not want to show the chooser for "replace" and "remove" if the result is unique anyway.
+        // In those cases, it is enough to just apply the change without a second confirmation from the user.
+        // For other actions like "suggest" and "edit", the replacement gets computed dynamically and is not readily
+        // presented to the user beforehand. Therefore, we want a second confirmation.
+        boolean alwaysShowChooser = !"replace".equalsIgnoreCase(actionName)
+                && !"remove".equalsIgnoreCase(actionName);
+
+        annotationBuilder = annotationBuilder.withFix(new ValeLazyFixQuickFix(problem, range, alwaysShowChooser));
         return annotationBuilder;
     }
 
+    /**
+     * Formats the annotation text shown in the editor by combining the problem message and rule name.
+     */
+    private static @NotNull String formatMessage(@NotNull ValeProblem problem) {
+        String message = problem.message() == null ? "" : problem.message();
+        String check = problem.check() == null ? "" : problem.check();
+        if (message.isBlank()) {
+            return check.isBlank() ? "Vale issue" : check;
+        }
+        if (check.isBlank()) {
+            return message;
+        }
+        return message + " (" + check + ")";
+    }
 
     private static List<ValeProblem> getValeProblems(InitialInfo collectedInfo, VirtualFile virtualFile,
                                               ValeCliExecutor cliExecutor,  Project project) throws IOException, ExecutionException {
@@ -159,7 +172,7 @@ ValeExternalAnnotatorProcessor.AnalysisResult> implements DumbAware {
                     virtualFile.getPath());
             result.addAll(parseProcessOutput(output, project, cliExecutor));
         } catch (ExecutionException | IOException e) {
-            LOGGER.debug("Vale execution exception: " + e.getMessage());
+            LOGGER.debug("Vale execution exception", e);
             throw e;
         }
         return result;

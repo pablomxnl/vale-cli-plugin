@@ -11,10 +11,13 @@ public class ProjectSettingsToolbarAction extends AnAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        ApplicationManager.getApplication().invokeLater(() ->
+        var application = ApplicationManager.getApplication();
+        if (application.isHeadlessEnvironment()) {
+            return;
+        }
+        application.invokeLater(() ->
                 ShowSettingsUtil.getInstance()
                         .showSettingsDialog(e.getProject(), ValePluginProjectSettingsConfigurable.class));
     }
 
 }
-
