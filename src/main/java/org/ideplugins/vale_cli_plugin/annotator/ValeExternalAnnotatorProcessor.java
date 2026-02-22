@@ -71,9 +71,10 @@ ValeExternalAnnotatorProcessor.AnalysisResult> implements DumbAware {
         } catch (Exception e){
             LOGGER.debug("Vale lint failed" + e);
             String errorMessage = "❌ Vale lint failed:\n" + e.getMessage();
-            ApplicationManager.getApplication()
-                    .invokeLater(() -> writeTextToConsole(project, errorMessage, LOG_ERROR_OUTPUT)
-                    );
+            ApplicationManager.getApplication().invokeLater(
+                    () -> writeTextToConsole(project, errorMessage, LOG_ERROR_OUTPUT),
+                    ModalityState.defaultModalityState(),
+                    project.getDisposed());
         }
         return new AnalysisResult(results, collectedInfo.document);
     }
