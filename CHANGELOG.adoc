@@ -7,6 +7,11 @@ This document provides an overview of the changes by release.
 [[releasenotes]]
 == Release notes
 
+=== 0.0.30
+- Fixes https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/56[#56] PluginException: Access is allowed from Event Dispatch Thread (EDT)
+- Implements https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/59[#59] Improve quick fixes
+
+
 === 0.0.29
 
 - Fixes https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/52[#52] java.io.IOException: The pipe has been ended.
@@ -19,7 +24,7 @@ This document provides an overview of the changes by release.
 - Implements https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/28[#28] Allow different vale config per project
 - Implements https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/50[#50] Add vale sync action
 - Implements https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/51[#51] Use stdin to lint files
-- Fixes https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/49 Error when no vale configuration file is found
+- Fixes https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/49[#49] Error when no vale configuration file is found
 
 ==== Removed
 
