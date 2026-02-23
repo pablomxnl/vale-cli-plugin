@@ -58,7 +58,7 @@ environment variable, for Windows usually contained in `%\USERPROFILE%` environm
 StylesPath = styles
 MinAlertLevel = suggestion
 Packages = write-good
-[*]
+[*.{adoc,md,rst}]
 BasedOnStyles = Vale, write-good
 ```
 
