@@ -34,7 +34,7 @@ public class BaseTest {
     @BeforeEach
     public void setUp() {
         settings = ValePluginSettingsState.getInstance();
-        settings.valePath = areTestRunningInCI()? "/usr/bin/vale" : findValeBinaryPath();
+        settings.setValePath(areTestRunningInCI()? "/usr/bin/vale" : findValeBinaryPath());
         projectSettings = new ValePluginProjectSettingsState.State();
     }
 
