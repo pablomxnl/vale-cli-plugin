@@ -4,10 +4,10 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public record ValeConfigurationPaths(@NotNull List<String> configFiles,
+public record ValeConfigurationPaths(String rootIni, @NotNull List<String> configFiles,
                                      @NotNull List<String> paths) {
 
     public static @NotNull ValeConfigurationPaths empty() {
-        return new ValeConfigurationPaths(List.of(), List.of());
+        return new ValeConfigurationPaths("", List.of(),  List.of());
     }
 }

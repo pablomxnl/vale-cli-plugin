@@ -41,7 +41,7 @@ public class ValePluginSettingsConfigurable implements Configurable {
 
     @Override
     public boolean isModified() {
-        return !settingsComponent.getValePathText().equals(settings.valePath);
+        return !settingsComponent.getValePathText().equals(settings.getValePath());
     }
 
     @Override
@@ -54,16 +54,16 @@ public class ValePluginSettingsConfigurable implements Configurable {
                         BUNDLE.getString("vale.cli.plugin.settings.invalidexe.message"),
                         BUNDLE.getString("vale.cli.plugin.invalid.settings.title"));
         }
-        settings.valePath = value;
-        settings.valeVersion = settingsComponent.getValeVersion();
-        ValeVersion.setCurrent(settings.valeVersion);
+        settings.setValePath(value);
+        settings.setValeVersion(settingsComponent.getValeVersion());
+        ValeVersion.setCurrent(settings.getValeVersion());
     }
 
 
     @Override
     public void reset() {
-        settingsComponent.setValePathText(settings.valePath);
-        settingsComponent.setValeVersion(settings.valeVersion.toString());
+        settingsComponent.setValePathText(settings.getValePath());
+        settingsComponent.setValeVersion(settings.getValeVersion().toString());
     }
 
     @Override

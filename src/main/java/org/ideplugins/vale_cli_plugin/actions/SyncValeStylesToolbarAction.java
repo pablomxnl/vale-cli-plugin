@@ -5,6 +5,7 @@ import com.intellij.execution.process.CapturingProcessAdapter;
 import com.intellij.execution.process.ProcessEvent;
 import com.intellij.execution.process.ProcessListener;
 import com.intellij.notification.NotificationType;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
@@ -25,6 +26,12 @@ import static org.ideplugins.vale_cli_plugin.utils.ConsoleHelper.writeTextToCons
 public class SyncValeStylesToolbarAction extends AnAction {
 
     private static final ResourceBundle BUNDLE = ResourceBundle.getBundle(Constants.PLUGIN_BUNDLE);
+
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
+    }
+
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent event) {

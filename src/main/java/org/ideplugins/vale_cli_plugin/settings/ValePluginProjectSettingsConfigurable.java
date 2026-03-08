@@ -29,6 +29,7 @@ public final class ValePluginProjectSettingsConfigurable implements Configurable
     private final JPanel myMainPanel;
     private final JBCheckBox runSyncOnStartup = new JBCheckBox();
     private final JBTextField extensionsTextField = new JBTextField();
+    private final JBLabel guessedConfig = new JBLabel();
     private final TextFieldWithBrowseButton configurationFilePath = createIniBrowseField();
     private ValePluginProjectSettingsState settings;
 
@@ -37,8 +38,10 @@ public final class ValePluginProjectSettingsConfigurable implements Configurable
         myMainPanel = FormBuilder.createFormBuilder()
                 .addLabeledComponent(new JBLabel(BUNDLE.getString("vale.cli.plugin.project.settings.filechooser.label")), configurationFilePath,
                         1, false)
-                .addLabeledComponent(new JBLabel(BUNDLE.getString("vale.cli.plugin.project.settings.sync.label")), runSyncOnStartup,
+                .addLabeledComponent(new JBLabel("Guessed config file"), guessedConfig,
                         2, false)
+                .addLabeledComponent(new JBLabel(BUNDLE.getString("vale.cli.plugin.project.settings.sync.label")), runSyncOnStartup,
+                        3, false)
                 .addLabeledComponent(new JBLabel(
                         "<html><body>File extensions to check.<br/>Default:adoc,md,rst <br/>Examples: adoc,md,rst,py,rs,java</body></html>"), extensionsTextField, 3, false)
                 .addComponentFillVertically(new JPanel(), 0)
@@ -60,7 +63,7 @@ public final class ValePluginProjectSettingsConfigurable implements Configurable
     }
 
     private TextFieldWithBrowseButton createIniBrowseField() {
-        final FileChooserDescriptor fileChooserDescriptor = FileChooserDescriptorFactory.createSingleFileDescriptor()
+        final FileChooserDescriptor fileChooserDescriptor = FileChooserDescriptorFactory.singleFile()
                 .withTitle(BUNDLE.getString("vale.cli.plugin.project.settings.filechooser.title"))
                 .withDescription(BUNDLE.getString("vale.cli.plugin.project.settings.filechooser.description"))
                 .withShowHiddenFiles(true)
@@ -83,6 +86,7 @@ public final class ValePluginProjectSettingsConfigurable implements Configurable
     @Override
     public @Nullable JComponent createComponent() {
         settings = ValePluginProjectSettingsState.getInstance(myProject);
+        guessedConfig.setText(settings.getRootIni());
         return myMainPanel;
     }
 

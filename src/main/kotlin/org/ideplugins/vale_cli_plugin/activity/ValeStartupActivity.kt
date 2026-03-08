@@ -12,6 +12,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.ProjectActivity
 import org.ideplugins.vale_cli_plugin.Constants
 import org.ideplugins.vale_cli_plugin.service.ValeCliExecutor
+import org.ideplugins.vale_cli_plugin.service.ValeLsConfigService
 import org.ideplugins.vale_cli_plugin.settings.*
 import org.ideplugins.vale_cli_plugin.utils.NotificationHelper
 
@@ -23,8 +24,29 @@ class ValeStartupActivity : ProjectActivity {
         val notificationHelper = NotificationHelper(project)
 
         configureValePath()
-        checkIfPluginWasUpdated(notificationHelper)
+        checkValeConfig(project)
         runSyncIfNeeded(project, notificationHelper)
+        checkIfPluginWasUpdated(notificationHelper)
+    }
+
+    private fun checkValeConfig(project: Project) {
+        val settings = ValePluginSettingsState.getInstance()
+        if (settings.valePath.isNullOrEmpty() ) {
+            return
+        }
+        val projectSettings = ValePluginProjectSettingsState.getInstance(project)
+        if (!ApplicationManager.getApplication().isUnitTestMode) {
+            if (projectSettings.rootIni.isEmpty()){
+                logger.info("Running vale-ls config")
+                val lsConfigService = ValeLsConfigService.getInstance(project)
+                val configuration = lsConfigService.loadConfigurationPaths()
+                projectSettings.rootIni = configuration.rootIni()
+            } else {
+                logger.info("Not running vale-ls config again")
+            }
+        } else {
+            projectSettings.rootIni = ".vale.ini"
+        }
     }
 
     private fun checkIfPluginWasUpdated(notificationHelper: NotificationHelper) {
@@ -48,6 +70,7 @@ class ValeStartupActivity : ProjectActivity {
     private fun configureValePath() {
         val settings = ValePluginSettingsState.getInstance()
         if (settings.valePath.isBlank()) {
+            logger.info("Finding vale path")
             settings.valePath = OSUtils.findValeBinaryPath()
         }
     }
@@ -56,7 +79,7 @@ class ValeStartupActivity : ProjectActivity {
         val projectSettings = ValePluginProjectSettingsState.getInstance(project)
         val settings = ValePluginSettingsState.getInstance()
 
-        if (settings.valePath.isNullOrEmpty() || !projectSettings.runSyncOnStartup) {
+        if (settings.valePath.isNullOrEmpty() || !projectSettings.runSyncOnStartup || projectSettings.rootIni.isEmpty()) {
             return
         }
 
