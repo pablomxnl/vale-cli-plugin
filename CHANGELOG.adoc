@@ -7,6 +7,9 @@ This document provides an overview of the changes by release.
 [[releasenotes]]
 == Release notes
 
+=== 0.0.31
+- Fixes https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/61[#61] Do not run vale if there is no vale config available
+
 === 0.0.30
 - Fixes https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/56[#56] PluginException: Access is allowed from Event Dispatch Thread (EDT)
 - Implements https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/59[#59] Improve quick fixes

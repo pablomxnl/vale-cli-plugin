@@ -20,7 +20,7 @@ public class SyncValeStylesToolbarActionTest extends BaseTest{
 
     @Test
     public void testActionWithInvalidSettings(CodeInsightTestFixture codeInsightTestFixture){
-        settings.valePath = "";
+        settings.setValePath("");
         codeInsightTestFixture.testAction(new SyncValeStylesToolbarAction());
     }
 }

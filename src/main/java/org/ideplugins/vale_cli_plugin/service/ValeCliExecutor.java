@@ -79,7 +79,7 @@ public final class ValeCliExecutor {
     private @NotNull GeneralCommandLine buildLintStdInCommand(String extension, String path) {
         String configFilePath = projectSettings.getValeSettingsPath();
         Path baseDir = Objects.requireNonNull(ProjectUtil.guessProjectDir(project)).toNioPath();
-        GeneralCommandLine command = new GeneralCommandLine().withExePath(settings.valePath)
+        GeneralCommandLine command = new GeneralCommandLine().withExePath(settings.getValePath())
                 .withWorkingDirectory(baseDir);
         if (!configFilePath.isBlank()) {
             command = command.withParameters("--config=" + configFilePath);
@@ -89,7 +89,7 @@ public final class ValeCliExecutor {
                 ? baseDir.relativize(inputPath)
                 : inputPath;
         String posixPath = FileUtil.toSystemIndependentName(relativePath.toString());
-        if (settings.valeVersion.isAtLeast(PATH_ARG_MIN_VERSION)) {
+        if (settings.getValeVersion().isAtLeast(PATH_ARG_MIN_VERSION)) {
             command = command.withParameters("--no-exit", "--output=JSON", "--path=" + posixPath);
         } else {
             command = command.withParameters("--no-exit", "--output=JSON", "--ext=." + extension);
@@ -100,7 +100,7 @@ public final class ValeCliExecutor {
     private GeneralCommandLine buildSyncCommand() {
         String configFilePath = projectSettings.getValeSettingsPath();
         Path baseDir = Path.of(Objects.requireNonNull(project.getBasePath()));
-        GeneralCommandLine command = new GeneralCommandLine().withExePath(settings.valePath)
+        GeneralCommandLine command = new GeneralCommandLine().withExePath(settings.getValePath())
                 .withWorkingDirectory(baseDir)
                 .withParentEnvironmentType(CONSOLE);
         command = command.withParameters("sync", "--output=JSON");
@@ -113,7 +113,7 @@ public final class ValeCliExecutor {
     private GeneralCommandLine buildFixCommand(String alertJson) {
         String configFilePath = projectSettings.getValeSettingsPath();
         Path baseDir = Objects.requireNonNull(ProjectUtil.guessProjectDir(project)).toNioPath();
-        GeneralCommandLine command = new GeneralCommandLine().withExePath(settings.valePath)
+        GeneralCommandLine command = new GeneralCommandLine().withExePath(settings.getValePath())
                 .withWorkingDirectory(baseDir);
         command = command.withParameters("fix");
         if (!configFilePath.isBlank()) {
@@ -126,7 +126,7 @@ public final class ValeCliExecutor {
     private GeneralCommandLine buildLsConfigCommand(@Nullable Path configPath) {
         String configFilePath = configPath != null ? configPath.toString() : projectSettings.getValeSettingsPath();
         Path baseDir = Path.of(Objects.requireNonNull(project.getBasePath()));
-        GeneralCommandLine command = new GeneralCommandLine().withExePath(settings.valePath)
+        GeneralCommandLine command = new GeneralCommandLine().withExePath(settings.getValePath())
                 .withWorkingDirectory(baseDir)
                 .withParentEnvironmentType(CONSOLE);
         command = command.withParameters("ls-config");
@@ -228,10 +228,10 @@ public final class ValeCliExecutor {
 
     public @NotNull String checkConfiguration() {
         StringBuilder errors = new StringBuilder();
-        File valeBinary = new File(settings.valePath);
-        if (settings.valePath.isEmpty() || !valeBinary.exists() || !valeBinary.canExecute()) {
+        File valeBinary = new File(settings.getValePath());
+        if (settings.getValePath().isEmpty() || !valeBinary.exists() || !valeBinary.canExecute()) {
             errors.append(BUNDLE.getString("vale.cli.plugin.settings.invalidexe.message"));
-            errors.append(":\t\t").append(settings.valePath);
+            errors.append(":\t\t").append(settings.getValePath());
             errors.append("\n");
         }
         if (projectSettings.getExtensions().isBlank()) {

@@ -34,15 +34,17 @@ public class ValePluginSettingsComponent {
         JButton result = new JButton("Auto Detect");
         result.addActionListener(e -> ApplicationManager.getApplication().executeOnPooledThread(() -> {
             valePath.setText(OSUtils.findValeBinaryPath());
-            String rawVersion = OSUtils.valeVersion(valePath.getText());
-            valeVersion.setText(ValeVersion.parse(rawVersion).toString());
+            if (!valePath.getText().isEmpty()){
+                String rawVersion = OSUtils.valeVersion(valePath.getText());
+                valeVersion.setText(ValeVersion.parse(rawVersion).toString());
+            }
         }));
         return result;
     }
 
     private TextFieldWithBrowseButton createPathBrowseField() {
         FileChooserDescriptor fileChooserDescriptor =
-                FileChooserDescriptorFactory.createSingleFileDescriptor()
+                FileChooserDescriptorFactory.singleFile()
                         .withTitle("Provide Vale Binary Location")
                         .withDescription("Locate your vale binary");
         TextFieldWithBrowseButton textField = new TextFieldWithBrowseButton();
@@ -50,10 +52,12 @@ public class ValePluginSettingsComponent {
         textField.getTextField().getDocument().addDocumentListener(new DocumentAdapter() {
             @Override
             protected void textChanged(@NotNull DocumentEvent documentEvent) {
-                ApplicationManager.getApplication().executeOnPooledThread(() -> {
-                    String rawVersion = OSUtils.valeVersion(textField.getText());
-                    valeVersion.setText(ValeVersion.parse(rawVersion).toString());
-                });
+                if (!textField.getText().isEmpty()){
+                    ApplicationManager.getApplication().executeOnPooledThread(() -> {
+                        String rawVersion = OSUtils.valeVersion(textField.getText());
+                        valeVersion.setText(ValeVersion.parse(rawVersion).toString());
+                    });
+                }
             }
         });
         InsertPathAction.addTo(textField.getTextField(), fileChooserDescriptor);

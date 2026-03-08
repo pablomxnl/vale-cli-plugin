@@ -26,10 +26,9 @@ public class OSUtils {
 
     public static String valeVersion(String valeBinaryPath){
         String version = "";
-        List<String> versionCommand = wrapCommandWithShellEnv(valeBinaryPath + " --version");
-        LOG.info("Executing version command: " + versionCommand);
         try {
-            GeneralCommandLine cmd = new GeneralCommandLine(versionCommand);
+            GeneralCommandLine cmd = new GeneralCommandLine(valeBinaryPath).withParameters("--version");
+            LOG.info("Executing version command: " + cmd.getCommandLineString());
             CapturingProcessHandler handler = new CapturingProcessHandler(cmd);
             ProcessOutput output = handler.runProcess();
             if (output.getExitCode() == 0) {

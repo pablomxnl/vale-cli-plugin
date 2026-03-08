@@ -79,7 +79,7 @@ public class ValeCliExecutorTest extends BaseTest {
 
     @Test
     public void testRunLintStdinCommandInvalidExePath(CodeInsightTestFixture codeInsightTestFixture){
-        this.settings.valePath = "/tmp/path/doesnot/exist";
+        this.settings.setValePath("/tmp/path/doesnot/exist");
         ValeCliExecutor executor = ValeCliExecutor.getInstance(codeInsightTestFixture.getProject());
 
         assertThrows(ExecutionException.class, () -> {
@@ -101,7 +101,7 @@ public class ValeCliExecutorTest extends BaseTest {
 
     @Test
     public void testRunLintCommandOnFileAndNonExecutableFile(CodeInsightTestFixture codeInsightTestFixture) {
-        settings.valePath = BaseTest.testProjectPath + "/.vale.ini";
+        settings.setValePath(BaseTest.testProjectPath + "/.vale.ini");
         ValeCliExecutor executor = ValeCliExecutor.getInstance(codeInsightTestFixture.getProject());
         assertThrows(ExecutionException.class, ()-> {
             ProcessOutput output = executor.runLintStdinCommand(markDownContent, "md", "dummy.md");
@@ -123,7 +123,7 @@ public class ValeCliExecutorTest extends BaseTest {
         ValePluginProjectSettingsState pluginProjectSettingsState = codeInsightTestFixture.getProject()
                 .getService(ValePluginProjectSettingsState.class);
         pluginProjectSettingsState.getState().valeSettingsPath = BaseTest.testProjectPath + "/.does.not.exist.vale.ini";
-        settings.valePath = BaseTest.testProjectPath + "/.vale.ini";
+        settings.setValePath(BaseTest.testProjectPath + "/.vale.ini");
         ValeCliExecutor executor = new ValeCliExecutor(codeInsightTestFixture.getProject(), this.settings, pluginProjectSettingsState);
         executor.checkConfiguration();
     }
@@ -133,7 +133,7 @@ public class ValeCliExecutorTest extends BaseTest {
         ValePluginProjectSettingsState pluginProjectSettingsState = codeInsightTestFixture.getProject()
                 .getService(ValePluginProjectSettingsState.class);
         pluginProjectSettingsState.getState().valeSettingsPath = BaseTest.testProjectPath + "/.does.not.exist.vale.ini";
-        settings.valePath = "";
+        settings.setValePath("");
         ValeCliExecutor executor = new ValeCliExecutor(codeInsightTestFixture.getProject(), this.settings, pluginProjectSettingsState);
         executor.checkConfiguration();
     }
@@ -142,7 +142,7 @@ public class ValeCliExecutorTest extends BaseTest {
         ValePluginProjectSettingsState pluginProjectSettingsState = codeInsightTestFixture.getProject()
                 .getService(ValePluginProjectSettingsState.class);
         pluginProjectSettingsState.getState().valeSettingsPath = BaseTest.testProjectPath + "/.does.not.exist.vale.ini";
-        settings.valePath = BaseTest.testProjectPath + "/.does.not.exist.vale.ini";
+        settings.setValePath(BaseTest.testProjectPath + "/.does.not.exist.vale.ini");
         ValeCliExecutor executor = new ValeCliExecutor(codeInsightTestFixture.getProject(), this.settings, pluginProjectSettingsState);
         executor.checkConfiguration();
     }
