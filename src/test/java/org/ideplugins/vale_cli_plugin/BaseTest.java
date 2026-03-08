@@ -1,6 +1,9 @@
 package org.ideplugins.vale_cli_plugin;
 
+import com.intellij.openapi.application.Application;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.util.io.IoTestUtil;
+import com.intellij.testFramework.common.ThreadLeakTracker;
 import org.apache.commons.io.FileUtils;
 import org.ideplugins.vale_cli_plugin.settings.ValePluginProjectSettingsState;
 import org.ideplugins.vale_cli_plugin.settings.ValePluginSettingsState;
@@ -33,6 +36,8 @@ public class BaseTest {
 
     @BeforeEach
     public void setUp() {
+        Application app = ApplicationManager.getApplication();
+        ThreadLeakTracker.longRunningThreadCreated(app, "SystemPropertyWatcher");
         settings = ValePluginSettingsState.getInstance();
         settings.setValePath(areTestRunningInCI()? "/usr/bin/vale" : findValeBinaryPath());
         projectSettings = new ValePluginProjectSettingsState.State();
