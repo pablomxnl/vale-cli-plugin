@@ -45,8 +45,9 @@ ValeExternalAnnotatorProcessor.AnalysisResult> implements DumbAware {
         ValeCliExecutor cliExecutor = ValeCliExecutor.getInstance(project);
         VirtualFile virtualFile = file.getViewProvider().getVirtualFile();
         Document document = file.getViewProvider().getDocument();
-        boolean foundConfig = projectSettings.getRootIni() != null && !projectSettings.getRootIni().isEmpty();
-        if  (   foundConfig &&
+        boolean valeConfigurationFound = !projectSettings.getValeSettingsPath().isEmpty() ||
+                !projectSettings.getRootIni().isEmpty();
+        if  (   valeConfigurationFound &&
                 cliExecutor.extensionsAsList().contains(virtualFile.getExtension()) &&
                 virtualFile.isInLocalFileSystem() && document !=null) {
             return new InitialInfo(file, document);

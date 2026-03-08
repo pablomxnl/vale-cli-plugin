@@ -36,7 +36,7 @@ class ValeStartupActivity : ProjectActivity {
         }
         val projectSettings = ValePluginProjectSettingsState.getInstance(project)
         if (!ApplicationManager.getApplication().isUnitTestMode) {
-            if (projectSettings.rootIni.isEmpty()){
+            if (projectSettings.valeSettingsPath.isEmpty() && projectSettings.rootIni.isEmpty()){
                 logger.info("Running vale-ls config")
                 val lsConfigService = ValeLsConfigService.getInstance(project)
                 val configuration = lsConfigService.loadConfigurationPaths()
