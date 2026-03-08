@@ -35,7 +35,7 @@ These versions are available either
 To enable the EAP channel for this plugin copy the following URL
 
 ```
-http://plugins.jetbrains.com/plugin/19613-vale-cli/versions/eap
+https://plugins.jetbrains.com/plugin/19613-vale-cli/versions/eap
 ``` 
 
 and paste it on the IDE plugin repositories via <kbd>Plugins</kbd> -> <kbd>⚙</kbd> -> <kbd>Manage Plugin Repositories ...</kbd>
@@ -69,7 +69,12 @@ Use the Auto Detect button if the field is empty or browse to locate the vale ex
 2. Synchronize vale styles on startup: If checked the plugin will execute `vale sync` when a project is opened. 
 3. File extensions to lint, by default set to `adoc,md,rst` ; requires at least one extension. 
 
-
+> **NOTE:**
+>
+> If the plugin doesn't find a vale configuration file the first time it opens a project, the plugin won't run vale against the configured extensions
+> until a configuration file is provided via project settings.
+>
+{style="note"}
 
 ## Plugin tool window
 

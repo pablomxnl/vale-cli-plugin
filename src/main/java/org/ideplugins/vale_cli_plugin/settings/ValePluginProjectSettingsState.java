@@ -14,7 +14,7 @@ public final class ValePluginProjectSettingsState implements PersistentStateComp
         public String valeSettingsPath = "";
         public boolean runSyncOnStartup;
         public String extensions = "md,adoc,rst";
-        public String guessedConfig = "";
+        public String rootIni = "";
     }
     
     public ValePluginProjectSettingsState(@NotNull Project theProject){
@@ -37,12 +37,6 @@ public final class ValePluginProjectSettingsState implements PersistentStateComp
         this.state = state;
     }
 
-    @Override
-    public void initializeComponent() {
-        if (state.valeSettingsPath.isEmpty()){
-            String temp = OSUtils.findValeBinaryPath();
-        }
-    }
 
     public void setValeSettingsPath(String path){
         state.valeSettingsPath = path;
@@ -68,4 +62,11 @@ public final class ValePluginProjectSettingsState implements PersistentStateComp
         state.runSyncOnStartup = b;
     }
 
+    public String getRootIni(){
+        return state.rootIni;
+    }
+
+    public void setRootIni(String rootIni){
+        state.rootIni = rootIni;
+    }
 }

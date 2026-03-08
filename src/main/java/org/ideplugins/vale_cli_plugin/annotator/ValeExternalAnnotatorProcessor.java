@@ -15,6 +15,7 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import org.ideplugins.vale_cli_plugin.service.ValeCliExecutor;
+import org.ideplugins.vale_cli_plugin.settings.ValePluginProjectSettingsState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -40,10 +41,13 @@ ValeExternalAnnotatorProcessor.AnalysisResult> implements DumbAware {
     @Override
     public @Nullable ValeExternalAnnotatorProcessor.InitialInfo collectInformation(@NotNull PsiFile file) {
         Project project = file.getProject();
+        ValePluginProjectSettingsState projectSettings = ValePluginProjectSettingsState.getInstance(project);
         ValeCliExecutor cliExecutor = ValeCliExecutor.getInstance(project);
         VirtualFile virtualFile = file.getViewProvider().getVirtualFile();
         Document document = file.getViewProvider().getDocument();
-        if (cliExecutor.extensionsAsList().contains(virtualFile.getExtension()) &&
+        boolean foundConfig = projectSettings.getRootIni() != null && !projectSettings.getRootIni().isEmpty();
+        if  (   foundConfig &&
+                cliExecutor.extensionsAsList().contains(virtualFile.getExtension()) &&
                 virtualFile.isInLocalFileSystem() && document !=null) {
             return new InitialInfo(file, document);
         }

@@ -88,9 +88,7 @@ tasks.register("printCoverageForGitlab") {
 
 dependencies {
     intellijPlatform {
-        create(properties("platformType"), properties("platformVersion"))
-        bundledPlugins(properties("platformBundledPlugins").map { it.split(',') })
-        plugins(properties("platformPlugins").map { it.split(',') })
+        intellijIdeaCommunity("2025.2")
         pluginVerifier()
         zipSigner()
         testFramework(TestFrameworkType.Platform)
