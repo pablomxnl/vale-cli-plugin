@@ -28,6 +28,7 @@ public final class ValePluginProjectSettingsConfigurable implements Configurable
     private final Project myProject;
     private final JPanel myMainPanel;
     private final JBCheckBox runSyncOnStartup = new JBCheckBox();
+    private final JBCheckBox restrictChecksToConfiguredExtensions = new JBCheckBox();
     private final JBTextField extensionsTextField = new JBTextField();
     private final JBLabel guessedConfig = new JBLabel();
     private final TextFieldWithBrowseButton configurationFilePath = createIniBrowseField();
@@ -35,6 +36,7 @@ public final class ValePluginProjectSettingsConfigurable implements Configurable
 
     public ValePluginProjectSettingsConfigurable(Project project) {
         myProject = project;
+        restrictChecksToConfiguredExtensions.addItemListener(e -> updateExtensionsFieldEnabled());
         myMainPanel = FormBuilder.createFormBuilder()
                 .addLabeledComponent(new JBLabel(BUNDLE.getString("vale.cli.plugin.project.settings.filechooser.label")), configurationFilePath,
                         1, false)
@@ -43,7 +45,10 @@ public final class ValePluginProjectSettingsConfigurable implements Configurable
                 .addLabeledComponent(new JBLabel(BUNDLE.getString("vale.cli.plugin.project.settings.sync.label")), runSyncOnStartup,
                         3, false)
                 .addLabeledComponent(new JBLabel(
-                        "<html><body>File extensions to check.<br/>Default:adoc,md,rst <br/>Examples: adoc,md,rst,py,rs,java</body></html>"), extensionsTextField, 3, false)
+                        BUNDLE.getString("vale.cli.plugin.project.settings.restrict_extensions.label")), restrictChecksToConfiguredExtensions,
+                        3, false)
+                .addLabeledComponent(new JBLabel(
+                        BUNDLE.getString("vale.cli.plugin.project.settings.extensions.label")), extensionsTextField, 3, false)
                 .addComponentFillVertically(new JPanel(), 0)
                 .getPanel();
 
@@ -93,7 +98,8 @@ public final class ValePluginProjectSettingsConfigurable implements Configurable
     @Override
     public boolean isModified() {
         return !getConfigurationFilePathText().equals(settings.getValeSettingsPath()) ||
-                !runSyncOnStartup.isSelected() == settings.getRunSyncOnStartup() ||
+                runSyncOnStartup.isSelected() != settings.getRunSyncOnStartup() ||
+                restrictChecksToConfiguredExtensions.isSelected() != settings.getRestrictChecksToConfiguredExtensions() ||
                 !getExtensionsText().equals(settings.getExtensions());
     }
 
@@ -103,6 +109,7 @@ public final class ValePluginProjectSettingsConfigurable implements Configurable
         settings.setValeSettingsPath(getConfigurationFilePathText());
         settings.setExtensions(getExtensionsText());
         settings.setRunSyncOnStartup(runSyncOnStartup.isSelected());
+        settings.setRestrictChecksToConfiguredExtensions(restrictChecksToConfiguredExtensions.isSelected());
     }
 
     private void validateValues() throws ConfigurationException {
@@ -115,7 +122,7 @@ public final class ValePluginProjectSettingsConfigurable implements Configurable
                 errors.append(BUNDLE.getString("vale.cli.plugin.project.settings.invalidfile.message")).append("\n");
             }
         }
-        if (extensions.isBlank()) {
+        if (restrictChecksToConfiguredExtensions.isSelected() && extensions.isBlank()) {
             errors.append(BUNDLE.getString("vale.cli.plugin.project.settings.invalid_extensions.message"));
         }
         if (!errors.isEmpty()) {
@@ -129,7 +136,9 @@ public final class ValePluginProjectSettingsConfigurable implements Configurable
     public void reset() {
         setConfigurationFilePathText(settings.getValeSettingsPath());
         setRunSyncOnStartup(settings.getRunSyncOnStartup());
+        setRestrictChecksToConfiguredExtensions(settings.getRestrictChecksToConfiguredExtensions());
         setExtensionsText(settings.getExtensions());
+        updateExtensionsFieldEnabled();
     }
 
     @NotNull
@@ -139,6 +148,14 @@ public final class ValePluginProjectSettingsConfigurable implements Configurable
 
     public void setExtensionsText(@NotNull String newValue) {
         extensionsTextField.setText(newValue);
+    }
+
+    public void setRestrictChecksToConfiguredExtensions(boolean value) {
+        restrictChecksToConfiguredExtensions.setSelected(value);
+    }
+
+    private void updateExtensionsFieldEnabled() {
+        extensionsTextField.setEnabled(restrictChecksToConfiguredExtensions.isSelected());
     }
 
 }

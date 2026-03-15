@@ -13,6 +13,7 @@ public final class ValePluginProjectSettingsState implements PersistentStateComp
     public static class State {
         public String valeSettingsPath = "";
         public boolean runSyncOnStartup;
+        public boolean restrictChecksToConfiguredExtensions = true;
         public String extensions = "md,adoc,rst";
         public String rootIni = "";
     }
@@ -60,6 +61,14 @@ public final class ValePluginProjectSettingsState implements PersistentStateComp
 
     public void setRunSyncOnStartup(boolean b){
         state.runSyncOnStartup = b;
+    }
+
+    public boolean getRestrictChecksToConfiguredExtensions() {
+        return state.restrictChecksToConfiguredExtensions;
+    }
+
+    public void setRestrictChecksToConfiguredExtensions(boolean value) {
+        state.restrictChecksToConfiguredExtensions = value;
     }
 
     public String getRootIni(){

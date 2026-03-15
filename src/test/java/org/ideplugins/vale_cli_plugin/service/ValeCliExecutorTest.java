@@ -137,6 +137,19 @@ public class ValeCliExecutorTest extends BaseTest {
         ValeCliExecutor executor = new ValeCliExecutor(codeInsightTestFixture.getProject(), this.settings, pluginProjectSettingsState);
         executor.checkConfiguration();
     }
+
+    @Test
+    public void testEmptyExtensionsAllowedWhenRestrictionDisabled(@NotNull CodeInsightTestFixture codeInsightTestFixture) {
+        ValePluginProjectSettingsState pluginProjectSettingsState = codeInsightTestFixture.getProject()
+                .getService(ValePluginProjectSettingsState.class);
+        pluginProjectSettingsState.setRestrictChecksToConfiguredExtensions(false);
+        pluginProjectSettingsState.setExtensions("");
+        ValeCliExecutor executor = new ValeCliExecutor(codeInsightTestFixture.getProject(), this.settings, pluginProjectSettingsState);
+        String errors = executor.checkConfiguration();
+        assertFalse(errors.contains("Invalid vale extensions list"),
+                "Extensions should not be validated when extension restriction is disabled");
+    }
+
     @Test
     public void testInvalidSettingsNotExecutableBinary(@NotNull CodeInsightTestFixture codeInsightTestFixture) throws Exception {
         ValePluginProjectSettingsState pluginProjectSettingsState = codeInsightTestFixture.getProject()
