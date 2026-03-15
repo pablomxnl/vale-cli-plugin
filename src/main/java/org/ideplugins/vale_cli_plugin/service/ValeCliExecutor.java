@@ -29,13 +29,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.util.*;
 
 import static com.intellij.execution.configurations.GeneralCommandLine.ParentEnvironmentType.CONSOLE;
 import static org.ideplugins.vale_cli_plugin.Constants.PLUGIN_BUNDLE;
@@ -47,7 +41,7 @@ import java.nio.file.Path;
 public final class ValeCliExecutor {
 
     private static final ResourceBundle BUNDLE = ResourceBundle.getBundle(PLUGIN_BUNDLE);
-    private static final ValeVersion PATH_ARG_MIN_VERSION = ValeVersion.parse("3.13.2");
+    private static final ValeVersion PATH_ARG_MIN_VERSION = ValeVersion.parse("3.14.0");
     private final Logger LOGGER = Logger.getInstance(ValeCliExecutor.class);
     private final Project project;
     private final ValePluginSettingsState settings;
@@ -76,7 +70,7 @@ public final class ValeCliExecutor {
         return theProject.getService(ValeCliExecutor.class);
     }
 
-    private @NotNull GeneralCommandLine buildLintStdInCommand(String extension, String path) {
+    private @NotNull GeneralCommandLine buildLintStdInCommand(@Nullable String extension, String path) {
         String configFilePath = projectSettings.getValeSettingsPath();
         Path baseDir = Objects.requireNonNull(ProjectUtil.guessProjectDir(project)).toNioPath();
         GeneralCommandLine command = new GeneralCommandLine().withExePath(settings.getValePath())
@@ -91,8 +85,13 @@ public final class ValeCliExecutor {
         String posixPath = FileUtil.toSystemIndependentName(relativePath.toString());
         if (settings.getValeVersion().isAtLeast(PATH_ARG_MIN_VERSION)) {
             command = command.withParameters("--no-exit", "--output=JSON", "--path=" + posixPath);
-        } else {
+        } else if (extension != null && !extension.isBlank()) {
             command = command.withParameters("--no-exit", "--output=JSON", "--ext=." + extension);
+        } else {
+            throw new RuntimeException("""
+                Checking files that do not have a file extension is only possible with vale version %s or above. \
+                Update vale and try again.
+                """.formatted(PATH_ARG_MIN_VERSION));
         }
         return command;
     }
@@ -152,7 +151,7 @@ public final class ValeCliExecutor {
         return handler.runProcess();
     }
 
-    public ProcessOutput runLintStdinCommand(CharSequence stdin, String extension, String path) throws ExecutionException, IOException {
+    public ProcessOutput runLintStdinCommand(CharSequence stdin, @Nullable String extension, String path) throws ExecutionException, IOException {
         GeneralCommandLine lint = buildLintStdInCommand(extension, path);
         LOGGER.debug("PATH: " + System.getenv("PATH"));
         LOGGER.info("Running vale lint stdin command: " + lint.getCommandLineString());
@@ -234,7 +233,7 @@ public final class ValeCliExecutor {
             errors.append(":\t\t").append(settings.getValePath());
             errors.append("\n");
         }
-        if (projectSettings.getExtensions().isBlank()) {
+        if (projectSettings.getRestrictChecksToConfiguredExtensions() && projectSettings.getExtensions().isBlank()) {
             errors.append(BUNDLE.getString("vale.cli.plugin.project.settings.invalid_extensions.message"));
             errors.append("\n");
         }
@@ -251,8 +250,18 @@ public final class ValeCliExecutor {
         return errors.toString();
     }
 
-    public @NotNull List<String> extensionsAsList() {
-        return Arrays.asList(projectSettings.getExtensions().split(","));
+    public boolean isAllowedByConfiguredExtensions(@Nullable String extension) {
+        if (!projectSettings.getRestrictChecksToConfiguredExtensions()) {
+            return true;
+        }
+        if (extension == null || extension.isBlank()) {
+            return false;
+        }
+        String normalizedExtension = extension.trim();
+        return Arrays.stream(projectSettings.getExtensions().split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .anyMatch(configuredExtension -> configuredExtension.equalsIgnoreCase(normalizedExtension));
     }
 
 

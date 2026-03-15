@@ -127,6 +127,20 @@ public class ValeExternalAnnotatorProcessorTest extends BaseTest {
     }
 
     @Test
+    public void testCollectReturnsInfoWhenRestrictionDisabled(CodeInsightTestFixture fixture) {
+        fixture.copyDirectoryToProject("multiplefiles-example", "src");
+        PsiFile file = fixture.configureFromTempProjectFile("src/adoc.adoc");
+        ValePluginProjectSettingsState pluginProjectSettingsState = fixture.getProject()
+                .getService(ValePluginProjectSettingsState.class);
+        pluginProjectSettingsState.setExtensions("md,xml,rst");
+        pluginProjectSettingsState.setRestrictChecksToConfiguredExtensions(false);
+
+        ValeExternalAnnotatorProcessor annotatorProcessor = new ValeExternalAnnotatorProcessor();
+        ValeExternalAnnotatorProcessor.InitialInfo info = annotatorProcessor.collectInformation(file);
+        assertNotNull(info, "Should ignore extension filtering when restriction is disabled");
+    }
+
+    @Test
     public void testDoAnnotateReturnsNull(CodeInsightTestFixture fixture) {
         fixture.copyDirectoryToProject("multiplefiles-example", "src");
         PsiFile file = fixture.configureFromTempProjectFile("src/adoc.adoc");

@@ -48,7 +48,7 @@ ValeExternalAnnotatorProcessor.AnalysisResult> implements DumbAware {
         boolean valeConfigurationFound = !projectSettings.getValeSettingsPath().isEmpty() ||
                 !projectSettings.getRootIni().isEmpty();
         if  (   valeConfigurationFound &&
-                cliExecutor.extensionsAsList().contains(virtualFile.getExtension()) &&
+                cliExecutor.isAllowedByConfiguredExtensions(virtualFile.getExtension()) &&
                 virtualFile.isInLocalFileSystem() && document !=null) {
             return new InitialInfo(file, document);
         }
@@ -67,7 +67,7 @@ ValeExternalAnnotatorProcessor.AnalysisResult> implements DumbAware {
             ApplicationManager.getApplication().invokeLater(() -> writeTextToConsole(project, errors, LOG_ERROR_OUTPUT));
             return null;
         }
-        if (!cliExecutor.extensionsAsList().contains(virtualFile.getExtension())) {
+        if (!cliExecutor.isAllowedByConfiguredExtensions(virtualFile.getExtension())) {
             return null;
         }
         List<ValeProblem> results = new ArrayList<>();
