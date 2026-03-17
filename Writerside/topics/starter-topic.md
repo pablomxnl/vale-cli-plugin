@@ -1,4 +1,4 @@
-# Vale CLI Plugin Documentation v %plugin_version%
+# Vale CLI Plugin Documentation v%plugin_version%
 
 Plugin for JetBrains IDE's that uses [Vale CLI](https://vale.sh) to lint markdown,asciidoc and other documentation formats
 
@@ -67,7 +67,8 @@ Use the Auto Detect button if the field is empty or browse to locate the vale ex
  
 1. Vale settings file location (`.vale.ini` or `_vale.ini`): required when want to use a configuration file located in a path different from [where the binary looks for it in it's search process](https://vale.sh/docs/topics/config/#search-process).  
 2. Synchronize vale styles on startup: If checked the plugin will execute `vale sync` when a project is opened. 
-3. File extensions to lint, by default set to `adoc,md,rst` ; requires at least one extension. 
+3. Restrict check to files by file extension: If unchecked, the plugin will check all file types.
+4. File extensions to lint, by default set to `adoc,md,rst` ; requires at least one extension. 
 
 > **NOTE:**
 >

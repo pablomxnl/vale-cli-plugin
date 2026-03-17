@@ -7,6 +7,11 @@ This document provides an overview of the changes by release.
 [[releasenotes]]
 == Release notes
 
+=== 0.0.32
+- Implements https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/62[#62] Store project-specific vale settings in sharable .idea folder
+- Implements https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/60[#60] Option to disable restriction to file extensions
+- Fixes https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/55[#55] Issue detecting vale in pyenv shims
+
 === 0.0.31
 - Fixes https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/61[#61] Do not run vale if there is no vale config available
 
