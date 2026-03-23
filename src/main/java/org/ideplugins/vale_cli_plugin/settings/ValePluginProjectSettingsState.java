@@ -6,7 +6,7 @@ import com.intellij.openapi.util.io.FileUtil;
 import org.jetbrains.annotations.NotNull;
 
 @Service(Service.Level.PROJECT)
-@State(name="org.ideplugins.vale_cli_plugin_project.settings", storages = {@Storage(value = "vale-cli.xml", roamingType = RoamingType.DEFAULT)})
+@State(name="org.ideplugins.vale_cli_plugin_project.settings", storages = {@Storage(value = "vale-cli.xml")})
 public final class ValePluginProjectSettingsState implements PersistentStateComponent<ValePluginProjectSettingsState.State> {
 
     private final @NotNull Project project;
