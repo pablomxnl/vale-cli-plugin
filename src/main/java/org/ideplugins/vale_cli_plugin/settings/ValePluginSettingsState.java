@@ -32,16 +32,36 @@ public final class ValePluginSettingsState implements PersistentStateComponent<V
                         LOG.info("ValePluginSettingsState.initializeComponent: ValePath is empty");
                         setValePath(OSUtils.findValeBinaryPath());
                     }
-                    if (!state.valeVersion.isKnown()){
-                        String rawVersion = state.valePath.isBlank() ? "" : OSUtils.valeVersion(state.valePath);
-                        state.valeVersion = ValeVersion.parse(rawVersion);
-                        ValeVersion.setCurrent(state.valeVersion);
-                    }
+                    refreshValeVersionFromBinary();
                     if (!state.valePath.isBlank() && state.valeVersion.isKnown()) {
                         LOG.info(String.format("Found vale version:%s  executable:%s", state.valeVersion, state.valePath));
                     }
                 }
         );
+    }
+
+    private void refreshValeVersionFromBinary() {
+        ValeVersion previousVersion = state.valeVersion == null ? ValeVersion.parse(null) : state.valeVersion;
+        ValeVersion detectedVersion = state.valePath.isBlank()
+                ? ValeVersion.parse(null)
+                : ValeVersion.parse(OSUtils.valeVersion(state.valePath));
+        if (!detectedVersion.equals(previousVersion)) {
+            LOG.info(String.format("Vale version updated from %s to %s for executable:%s",
+                    previousVersion, detectedVersion, state.valePath));
+            flushSettingsToDisk();
+        }
+        state.valeVersion = detectedVersion;
+        ValeVersion.setCurrent(state.valeVersion);
+    }
+
+    private void flushSettingsToDisk() {
+        ApplicationManager.getApplication().invokeLater(() -> {
+            try {
+                ApplicationManager.getApplication().saveSettings();
+            } catch (Exception e) {
+                LOG.warn("Failed to persist vale plugin settings", e);
+            }
+        });
     }
 
 

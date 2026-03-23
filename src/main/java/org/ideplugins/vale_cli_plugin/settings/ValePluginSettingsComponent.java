@@ -1,6 +1,7 @@
 package org.ideplugins.vale_cli_plugin.settings;
 
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.ui.TextBrowseFolderListener;
@@ -13,12 +14,15 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
+import java.io.File;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class ValePluginSettingsComponent {
 
     private final JPanel myMainPanel;
-    private final JBLabel valeVersion = new JBLabel();
+    private final JBLabel valeVersion = new JBLabel(ValeVersion.UNKNOWN_VERSION_NAME);
     private final TextFieldWithBrowseButton valePath = createPathBrowseField();
+    private final AtomicLong versionLookupCounter = new AtomicLong();
 
     public ValePluginSettingsComponent() {
         JButton locateValeButton = createButton();
@@ -32,13 +36,24 @@ public class ValePluginSettingsComponent {
 
     private JButton createButton() {
         JButton result = new JButton("Auto Detect");
-        result.addActionListener(e -> ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            valePath.setText(OSUtils.findValeBinaryPath());
-            if (!valePath.getText().isEmpty()){
-                String rawVersion = OSUtils.valeVersion(valePath.getText());
-                valeVersion.setText(ValeVersion.parse(rawVersion).toString());
-            }
-        }));
+        result.addActionListener(e -> {
+            result.setEnabled(false);
+            ApplicationManager.getApplication().executeOnPooledThread(() -> {
+                String detectedPath = "";
+                try {
+                    detectedPath = OSUtils.findValeBinaryPath();
+                } finally {
+                    String finalDetectedPath = detectedPath;
+                    ApplicationManager.getApplication().invokeLater(
+                            () -> {
+                                valePath.setText(finalDetectedPath);
+                                result.setEnabled(true);
+                            },
+                            ModalityState.any()
+                    );
+                }
+            });
+        });
         return result;
     }
 
@@ -52,17 +67,42 @@ public class ValePluginSettingsComponent {
         textField.getTextField().getDocument().addDocumentListener(new DocumentAdapter() {
             @Override
             protected void textChanged(@NotNull DocumentEvent documentEvent) {
-                if (!textField.getText().isEmpty()){
-                    ApplicationManager.getApplication().executeOnPooledThread(() -> {
-                        String rawVersion = OSUtils.valeVersion(textField.getText());
-                        valeVersion.setText(ValeVersion.parse(rawVersion).toString());
-                    });
-                }
+                requestValeVersionUpdate(textField.getTextField(), textField.getText());
             }
         });
         InsertPathAction.addTo(textField.getTextField(), fileChooserDescriptor);
 
         return textField;
+    }
+
+    private void requestValeVersionUpdate(@NotNull JTextField pathField, @NotNull String candidatePath) {
+        long lookupId = versionLookupCounter.incrementAndGet();
+        String normalizedPath = candidatePath.trim();
+        if (normalizedPath.isBlank()) {
+            setValeVersion(ValeVersion.UNKNOWN_VERSION_NAME);
+            return;
+        }
+        ApplicationManager.getApplication().executeOnPooledThread(() -> {
+
+             File executablePath = new File(normalizedPath);
+             if (!executablePath.exists() || !executablePath.canExecute()) {
+                 setValeVersion(ValeVersion.UNKNOWN_VERSION_NAME);
+                 return;
+             }
+
+            String rawVersion = OSUtils.valeVersion(normalizedPath);
+            String parsedVersion = ValeVersion.parse(rawVersion).toString();
+            ApplicationManager.getApplication().invokeLater(
+                    () -> {
+                        String currentPath = pathField.getText().trim();
+                        boolean isLatestLookup = lookupId == versionLookupCounter.get();
+                        if (isLatestLookup && normalizedPath.equals(currentPath)) {
+                            setValeVersion(parsedVersion);
+                        }
+                    },
+                    ModalityState.any()
+            );
+        });
     }
 
     public JComponent getPreferredFocusedComponent() {
@@ -83,7 +123,12 @@ public class ValePluginSettingsComponent {
     }
 
     public void setValeVersion(String newVersion) {
-        valeVersion.setText(newVersion);
+        var app = ApplicationManager.getApplication();
+        if (app.isDispatchThread()) {
+            valeVersion.setText(newVersion);
+            return;
+        }
+        app.invokeLater(() -> valeVersion.setText(newVersion), ModalityState.any());
     }
 
     @NotNull

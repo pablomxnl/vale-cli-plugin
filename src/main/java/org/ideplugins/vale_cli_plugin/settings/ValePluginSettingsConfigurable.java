@@ -41,7 +41,8 @@ public class ValePluginSettingsConfigurable implements Configurable {
 
     @Override
     public boolean isModified() {
-        return !settingsComponent.getValePathText().equals(settings.getValePath());
+        return !settingsComponent.getValePathText().equals(settings.getValePath()) ||
+                !settingsComponent.getValeVersion().equals(settings.getValeVersion());
     }
 
     @Override
