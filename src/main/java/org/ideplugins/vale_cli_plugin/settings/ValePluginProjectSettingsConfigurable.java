@@ -76,6 +76,7 @@ public final class ValePluginProjectSettingsConfigurable implements Configurable
                     String fileName = file.getName();
                     return fileName.equals(".vale.ini") || fileName.equals("vale.ini") || fileName.endsWith(".ini");
                 });
+        fileChooserDescriptor.setForcedToUseIdeaFileChooser(true);
         TextFieldWithBrowseButton textField = new TextFieldWithBrowseButton();
         textField.addBrowseFolderListener(new TextBrowseFolderListener(fileChooserDescriptor));
         InsertPathAction.addTo(textField.getTextField(), fileChooserDescriptor);

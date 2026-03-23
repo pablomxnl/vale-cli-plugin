@@ -2,6 +2,7 @@ package org.ideplugins.vale_cli_plugin.settings;
 
 import com.intellij.openapi.components.*;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.io.FileUtil;
 import org.jetbrains.annotations.NotNull;
 
 @Service(Service.Level.PROJECT)
@@ -40,7 +41,7 @@ public final class ValePluginProjectSettingsState implements PersistentStateComp
 
 
     public void setValeSettingsPath(String path){
-        state.valeSettingsPath = path;
+        state.valeSettingsPath = FileUtil.toSystemIndependentName(path);
     }
 
     public String getValeSettingsPath(){
@@ -76,6 +77,6 @@ public final class ValePluginProjectSettingsState implements PersistentStateComp
     }
 
     public void setRootIni(String rootIni){
-        state.rootIni = rootIni;
+        state.rootIni = FileUtil.toSystemIndependentName(rootIni);
     }
 }
