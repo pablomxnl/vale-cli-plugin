@@ -111,3 +111,9 @@ When the Vale CLI suggests a fix,  the plugin will offer a Quick Fix action on t
 <img src="quick_fix_replace.png" alt="Quick fixes replace " border-effect="line" />
 
 <img src="quick_fix_remove.webp" alt="Quick fixes remove" border-effect="line" />
+
+## Vale rules documentation
+
+From version 0.0.33, when opening vale rules YAML files, the plugin shows documentation about the rules:
+
+<img src="vale_rules_documentation.webp" alt="Vale Rules Documentation" border-effect="line" /> 

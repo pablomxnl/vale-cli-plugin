@@ -6,6 +6,9 @@ This document provides an overview of the changes by release.
 
 [[releasenotes]]
 == Release notes
+=== 0.0.33
+- Implements https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/57[#57] Integration of documentation for vale configuration and rules
+
 
 === 0.0.32
 - Implements https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/62[#62] Store project-specific vale settings in sharable .idea folder

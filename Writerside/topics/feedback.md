@@ -5,8 +5,8 @@ This project track issues in [Gitlab Issues](https://gitlab.com/pablomxnl/vale-c
 
 There are several ways to give feedback.
 
-Bug reports submitted through the plugin toolwindow toolbar bug, 
-given it gathers versioning information needed for troubleshooting.
+Bug reports submitted through the plugin toolwindow toolbar bug button are preferred, 
+given it gathers all the versioning information needed for troubleshooting.
 
 ## Feature request and Bug report plugin toolwindow toolbar actions
 
