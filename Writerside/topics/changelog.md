@@ -4,6 +4,9 @@ This document provides an overview of the changes by release.
 
 ## Release notes
 
+### 0.0.33
+* Implements [#57](https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/57) Integration of documentation for vale configuration and rules
+
 ### 0.0.32
 * Implements [#62](https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/62) Store project-specific vale settings in sharable .idea folder
 * Implements [#60](https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/60) Option to disable restriction to file extensions
