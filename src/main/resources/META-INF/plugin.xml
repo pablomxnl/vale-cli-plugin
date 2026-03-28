@@ -16,6 +16,7 @@
     <resource-bundle>ValePlugin</resource-bundle>
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.lang</depends>
+    <depends>org.jetbrains.plugins.yaml</depends>
     <extensions defaultExtensionNs="com.intellij">
 
         <!-- Global plugin settings shown under Tools. -->
@@ -66,6 +67,10 @@
         <errorHandler implementation="org.ideplugins.vale_cli_plugin.errorhandling.SentryErrorReporter"/>
 
 
+    </extensions>
+    <extensions defaultExtensionNs="com.intellij.platform.backend">
+        <documentation.targetProvider
+                implementation="org.ideplugins.vale_cli_plugin.documentation.ValeDocumentationTargetProvider"/>
     </extensions>
 
     <actions>
