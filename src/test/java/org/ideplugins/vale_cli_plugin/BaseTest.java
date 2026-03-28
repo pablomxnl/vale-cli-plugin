@@ -2,6 +2,8 @@ package org.ideplugins.vale_cli_plugin;
 
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.notification.NotificationDisplayType;
+import com.intellij.notification.NotificationsConfiguration;
 import com.intellij.openapi.util.io.IoTestUtil;
 import com.intellij.testFramework.common.ThreadLeakTracker;
 import org.apache.commons.io.FileUtils;
@@ -38,6 +40,9 @@ public class BaseTest {
     public void setUp() {
         Application app = ApplicationManager.getApplication();
         ThreadLeakTracker.longRunningThreadCreated(app, "SystemPropertyWatcher");
+        NotificationsConfiguration notificationsConfiguration = NotificationsConfiguration.getNotificationsConfiguration();
+        notificationsConfiguration.register(Constants.VALE_NOTIFICATION_GROUP, NotificationDisplayType.BALLOON, false, false);
+        notificationsConfiguration.register(Constants.UPDATE_NOTIFICATION_GROUP, NotificationDisplayType.BALLOON, false, false);
         settings = ValePluginSettingsState.getInstance();
         settings.setValePath(areTestRunningInCI()? "/usr/bin/vale" : findValeBinaryPath());
         projectSettings = new ValePluginProjectSettingsState.State();

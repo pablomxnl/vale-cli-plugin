@@ -117,6 +117,7 @@ public class ValeExternalAnnotatorProcessorTest extends BaseTest {
         PsiFile file = fixture.configureFromTempProjectFile("src/adoc.adoc");
         ValePluginProjectSettingsState pluginProjectSettingsState = fixture.getProject()
                 .getService(ValePluginProjectSettingsState.class);
+        pluginProjectSettingsState.setRootIni(".vale.ini");
         pluginProjectSettingsState.setExtensions("md,xml,rst");
 
         ValeExternalAnnotatorProcessor annotatorProcessor = new ValeExternalAnnotatorProcessor();
@@ -132,6 +133,7 @@ public class ValeExternalAnnotatorProcessorTest extends BaseTest {
         PsiFile file = fixture.configureFromTempProjectFile("src/adoc.adoc");
         ValePluginProjectSettingsState pluginProjectSettingsState = fixture.getProject()
                 .getService(ValePluginProjectSettingsState.class);
+        pluginProjectSettingsState.setRootIni(".vale.ini");
         pluginProjectSettingsState.setExtensions("md,xml,rst");
         pluginProjectSettingsState.setRestrictChecksToConfiguredExtensions(false);
 
@@ -146,6 +148,7 @@ public class ValeExternalAnnotatorProcessorTest extends BaseTest {
         PsiFile file = fixture.configureFromTempProjectFile("src/adoc.adoc");
         ValePluginProjectSettingsState pluginProjectSettingsState = fixture.getProject()
                 .getService(ValePluginProjectSettingsState.class);
+        pluginProjectSettingsState.setRootIni(".vale.ini");
         pluginProjectSettingsState.setExtensions("md,xml,adoc");
         ValeExternalAnnotatorProcessor annotatorProcessor = new ValeExternalAnnotatorProcessor();
         ValeExternalAnnotatorProcessor.InitialInfo info = annotatorProcessor.collectInformation(file);
@@ -170,12 +173,28 @@ public class ValeExternalAnnotatorProcessorTest extends BaseTest {
         PsiFile file = fixture.configureFromTempProjectFile("src/readme.md");
         ValePluginProjectSettingsState pluginProjectSettingsState = fixture.getProject()
                 .getService(ValePluginProjectSettingsState.class);
+        pluginProjectSettingsState.setRootIni(".vale.ini");
         ValeExternalAnnotatorProcessor annotatorProcessor = new ValeExternalAnnotatorProcessor();
         ValeExternalAnnotatorProcessor.InitialInfo info = annotatorProcessor.collectInformation(file);
         assertNotNull(info, "Should not return null for configured extension");
         pluginProjectSettingsState.setExtensions("");
         ValeExternalAnnotatorProcessor.AnalysisResult result = annotatorProcessor.doAnnotate(info);
         assertNull(result, "Should return null for not configured extension");
+    }
+
+    @Test
+    public void testCollectReturnsNullWhenNoValeConfig(CodeInsightTestFixture fixture) {
+        fixture.copyDirectoryToProject("multiplefiles-example", "src");
+        PsiFile file = fixture.configureFromTempProjectFile("src/readme.md");
+        ValePluginProjectSettingsState pluginProjectSettingsState = fixture.getProject()
+                .getService(ValePluginProjectSettingsState.class);
+        pluginProjectSettingsState.setValeSettingsPath("");
+        pluginProjectSettingsState.setRootIni("");
+
+        ValeExternalAnnotatorProcessor annotatorProcessor = new ValeExternalAnnotatorProcessor();
+        ValeExternalAnnotatorProcessor.InitialInfo info = annotatorProcessor.collectInformation(file);
+
+        assertNull(info, "Should return null when there is no Vale configuration");
     }
 
     @Test

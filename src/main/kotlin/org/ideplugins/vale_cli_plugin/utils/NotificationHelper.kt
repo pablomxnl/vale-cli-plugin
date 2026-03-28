@@ -5,7 +5,6 @@ import com.intellij.ide.IdeBundle
 import com.intellij.notification.Notification
 import com.intellij.notification.NotificationAction
 import com.intellij.notification.NotificationGroup
-import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
 import com.intellij.notification.Notifications
 import com.intellij.openapi.options.ShowSettingsUtil
@@ -22,12 +21,10 @@ class NotificationHelper(
 
     private val bundle: ResourceBundle = ResourceBundle.getBundle(PLUGIN_BUNDLE)
     private val valeGroup =
-        NotificationGroupManager.getInstance()
-            .getNotificationGroup(Constants.VALE_NOTIFICATION_GROUP)
+        NotificationGroup.findRegisteredGroup(Constants.VALE_NOTIFICATION_GROUP)
 
     private val pluginUpdatedNotificationGroup =
-        NotificationGroupManager.getInstance()
-            .getNotificationGroup(Constants.UPDATE_NOTIFICATION_GROUP)
+        NotificationGroup.findRegisteredGroup(Constants.UPDATE_NOTIFICATION_GROUP)
 
     fun notifySyncSuccess() {
         valeGroup?.let {
