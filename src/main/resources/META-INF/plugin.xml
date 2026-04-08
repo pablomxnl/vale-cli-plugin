@@ -51,7 +51,7 @@
                     canCloseContents="false"
                     doNotActivateOnStart="true"
                     factoryClass="org.ideplugins.vale_cli_plugin.toolwindow.ValeToolWindow"
-                    icon="/icons/pluginIcon2.svg"/>
+                    icon="/icons/toolWindowVale.svg"/>
 
         <!-- Notification group for update announcements. -->
         <notificationGroup displayType="BALLOON" id="vale-cli-plugin-update" bundle="ValePlugin"
