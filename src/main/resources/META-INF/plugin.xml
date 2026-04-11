@@ -99,5 +99,10 @@
                 icon="AllIcons.Actions.Refresh"
                 class="org.ideplugins.vale_cli_plugin.actions.SyncValeStylesToolbarAction" />
 
+        <!-- Navigate to vale config file if found . -->
+        <action id="org.ideplugins.vale_cli_plugin.actions.NavigateToValeConfigurationAction"
+                icon="AllIcons.FileTypes.Text"
+                class="org.ideplugins.vale_cli_plugin.actions.NavigateToValeConfigurationToolbarAction" />
+
     </actions>
 </idea-plugin>
