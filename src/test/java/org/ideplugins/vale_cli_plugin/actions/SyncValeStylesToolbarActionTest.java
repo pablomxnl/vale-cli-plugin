@@ -1,8 +1,7 @@
-package org.ideplugins.vale_cli_plugin.action;
+package org.ideplugins.vale_cli_plugin.actions;
 
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture;
 import org.ideplugins.vale_cli_plugin.BaseTest;
-import org.ideplugins.vale_cli_plugin.actions.SyncValeStylesToolbarAction;
 import org.ideplugins.vale_cli_plugin.testing.PluginTest;
 import org.ideplugins.vale_cli_plugin.testing.RunInEdtExtension;
 import org.junit.jupiter.api.Test;

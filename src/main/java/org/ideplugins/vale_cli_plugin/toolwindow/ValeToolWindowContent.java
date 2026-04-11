@@ -40,6 +40,9 @@ public class ValeToolWindowContent extends SimpleToolWindowPanel implements Disp
         Icon icon = IconUtil.colorize(Objects.requireNonNull(settings.getTemplatePresentation().getIcon()), color);
         settings.getTemplatePresentation().setIcon(icon);
         vale.add(settings);
+        AnAction navigateAction = instance.getAction("org.ideplugins.vale_cli_plugin.actions.NavigateToValeConfigurationAction");
+        navigateAction.getTemplatePresentation().setIcon(IconUtil.colorize(Objects.requireNonNull(navigateAction.getTemplatePresentation().getIcon()), color));
+        vale.add(navigateAction);
         AnAction syncAction = instance.getAction("org.ideplugins.vale_cli_plugin.actions.ValeSyncAction");
         syncAction.getTemplatePresentation().setIcon(IconUtil.colorize(Objects.requireNonNull(syncAction.getTemplatePresentation().getIcon()), color));
         vale.add(syncAction);

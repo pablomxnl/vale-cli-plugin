@@ -4,6 +4,10 @@ This document provides an overview of the changes by release.
 
 ## Release notes
 
+### 0.0.34
+* Adjust dark mode plugin tool window icon
+* Implements [#64](https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/64) Navigate to vale configuration file
+
 ### 0.0.33
 * Implements [#57](https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/57) Integration of documentation for vale configuration and rules
 

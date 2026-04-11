@@ -47,7 +47,7 @@ public class ValeCliExecutorTest extends BaseTest {
         try (HttpClient client = HttpClient.newHttpClient()){
 
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(new URI("https://github.com/errata-ai/Google/releases.atom"))
+                    .uri(new URI("https://github.com/vale-cli/Google/releases.atom"))
                     .HEAD()
                     .build();
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
