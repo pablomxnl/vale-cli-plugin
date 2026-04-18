@@ -81,7 +81,7 @@ Use the Auto Detect button if the field is empty or browse to locate the vale ex
 
 The plugin tool window has a toolbar with the following buttons
 
-<video src="../images/plugin-toolwindow-toolbar.webp" preview-src="vale_sync_toolbar_action.webp" />
+<video src="../images/plugin-toolwindow-toolbar.mp4" preview-src="vale_sync_toolbar_action.webp" />
 
 * Feature request
 * Bug report
@@ -127,4 +127,4 @@ From version 0.0.35 there is autocomplete in `.vale.ini` and navigate to rules, 
 
 <img src="vale_ini_documentation.webp" alt="Vale .init Documentation" border-effect="line" /> 
 
-<video src="../images/autocomplete_vale_ini.webp" preview-src="vale_ini_documentation.webp" /> /> 
+<video src="../images/autocomplete_vale_ini.mp4" preview-src="vale_ini_documentation.webp" />  
