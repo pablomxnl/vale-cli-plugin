@@ -27,7 +27,7 @@ Then select the zip file just downloaded from gitlab releases.
 
 ### EAP versions
 
-These versions are available either 
+These versions are available either
 
 * when a new EAP is available (around 3 per year)
 * or before releasing a new version of the plugin, a snapshot EAP version is available on the EAP channel.
@@ -77,21 +77,24 @@ Use the Auto Detect button if the field is empty or browse to locate the vale ex
 >
 {style="note"}
 
-## Plugin tool window
+## Plugin toolwindow toolbar
 
 The plugin tool window has a toolbar with the following buttons
+
+<video src="../images/plugin-toolwindow-toolbar.webp" preview-src="vale_sync_toolbar_action.webp" />
 
 * Feature request
 * Bug report
 * Vale Project Settings
 * Vale Global Settings
-* Sync Vale Styles action
+* Navigate to Vale Configuration file
+* Sync Vale Styles
 
 The tool window will display any errors with the configuration of the plugin.
 
 ## Results
 
-The Vale CLI alerts are displayed 
+The Vale CLI alerts are displayed
 
 * On the problem view
 * As markers on the editor of a supported file.
@@ -100,7 +103,7 @@ The Vale CLI alerts are displayed
 
 <img src="results_problemview_annotator.png" alt="Results in problem view" border-effect="line" />
 
-The Vale CLI alerts can be visualized on the problem view. 
+The Vale CLI alerts can be visualized on the problem view.
 Clicking on them will navigate to the line where Vale CLI found the problem.  
 Additionally, these alerts are also visible on the editor as markers.
 
@@ -117,3 +120,11 @@ When the Vale CLI suggests a fix,  the plugin will offer a Quick Fix action on t
 From version 0.0.33, when opening vale rules YAML files, the plugin shows documentation about the rules:
 
 <img src="vale_rules_documentation.webp" alt="Vale Rules Documentation" border-effect="line" /> 
+
+## Autocomplete for Vale Configuration File and navigation to rules 
+
+From version 0.0.35 there is autocomplete in `.vale.ini` and navigate to rules, with documentation as well
+
+<img src="vale_ini_documentation.webp" alt="Vale .init Documentation" border-effect="line" /> 
+
+<video src="../images/autocomplete_vale_ini.webp" preview-src="vale_ini_documentation.webp" /> /> 

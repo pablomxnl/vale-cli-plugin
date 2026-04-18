@@ -10,7 +10,7 @@ given it gathers all the versioning information needed for troubleshooting.
 
 ## Feature request and Bug report plugin toolwindow toolbar actions
 
-<img src="toolbar_feedback_actions.png" alt="Toolwindow toolbar actions" />
+<img src="vale_sync_toolbar_action.webp" alt="Toolwindow toolbar actions" />
 
 Since version 0.0.22 the plugin tool window has a toolbar with a bug report and a feature request button.
 
