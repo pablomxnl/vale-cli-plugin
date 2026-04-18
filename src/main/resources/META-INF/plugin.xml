@@ -16,6 +16,7 @@
     <resource-bundle>ValePlugin</resource-bundle>
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.lang</depends>
+    <depends>com.jetbrains.plugins.ini4idea</depends>
     <depends>org.jetbrains.plugins.yaml</depends>
     <extensions defaultExtensionNs="com.intellij">
 
@@ -45,6 +46,12 @@
         <!-- Enables clickable rule links in annotation tooltips for local Vale rules. -->
         <codeInsight.linkHandler prefix="#vale-rule/"
                                  handlerClass="org.ideplugins.vale_cli_plugin.annotator.ValeRuleLinkHandler" />
+        <!-- Ctrl+click navigation from BasedOnStyles values to the style folder. -->
+        <gotoDeclarationHandler
+                implementation="org.ideplugins.vale_cli_plugin.documentation.ValeIniStyleGotoDeclarationHandler"/>
+        <!-- Autocompletion for style names in BasedOnStyles values. -->
+        <completion.contributor language="any"
+                                implementationClass="org.ideplugins.vale_cli_plugin.documentation.ValeIniStyleCompletionContributor"/>
         <!-- Tool window that displays Vale output. -->
         <toolWindow id="Vale CLI"
                     anchor="bottom"

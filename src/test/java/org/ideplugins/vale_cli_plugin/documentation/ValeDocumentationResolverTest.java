@@ -8,16 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ValeDocumentationResolverTest {
 
-    private static final String SAMPLE_INI = """
-            StylesPath = styles
-            MinAlertLevel = suggestion
-            Packages = Google, proselint, write-good
-            [formats]
-            mdx = md
-            [*]
-            BasedOnStyles = Vale, Google, proselint, write-good
-            """;
-
     private static final String EXISTENCE_RULE = """
             extends: existence
             message: Consider removing '%s'
@@ -30,9 +20,8 @@ class ValeDocumentationResolverTest {
     private final ValeDocumentationResolver resolver = new ValeDocumentationResolver();
 
     @Test
-    void shouldResolveIniDocumentation() {
-        int offset = SAMPLE_INI.indexOf("StylesPath") + 2;
-        String doc = resolver.resolveForIniOffset(SAMPLE_INI, offset);
+    void shouldResolveIniKeyDocumentation() {
+        String doc = resolver.resolveForIniKey("StylesPath");
         assertNotNull(doc);
         assertTrue(doc.contains("StylesPath"));
         assertTrue(doc.contains("path_to_directory"));
@@ -69,20 +58,17 @@ class ValeDocumentationResolverTest {
     }
 
     @Test
-    void shouldNotResolveIniDocumentationForValueOrSection() {
-        int valueOffset = SAMPLE_INI.indexOf("suggestion") + 2;
-        String valueDoc = resolver.resolveForIniOffset(SAMPLE_INI, valueOffset);
+    void shouldNotResolveIniDocumentationForUnknownKeyOrWildcardSection() {
+        String valueDoc = resolver.resolveForIniKey("suggestion");
         assertNull(valueDoc);
 
-        int sectionOffset = SAMPLE_INI.indexOf("[*]") + 1;
-        String sectionDoc = resolver.resolveForIniOffset(SAMPLE_INI, sectionOffset);
+        String sectionDoc = resolver.resolveForIniSection("[*]");
         assertNull(sectionDoc);
     }
 
     @Test
     void shouldResolveIniSectionDocumentation() {
-        int sectionOffset = SAMPLE_INI.indexOf("formats") + 1;
-        String sectionDoc = resolver.resolveForIniOffset(SAMPLE_INI, sectionOffset);
+        String sectionDoc = resolver.resolveForIniSection("[formats]");
         assertNotNull(sectionDoc);
         assertTrue(sectionDoc.contains("[formats]"));
     }

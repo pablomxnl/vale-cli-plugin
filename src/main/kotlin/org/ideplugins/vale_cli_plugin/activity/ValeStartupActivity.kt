@@ -13,6 +13,7 @@ import com.intellij.openapi.startup.ProjectActivity
 import org.ideplugins.vale_cli_plugin.Constants
 import org.ideplugins.vale_cli_plugin.service.ValeCliExecutor
 import org.ideplugins.vale_cli_plugin.service.ValeLsConfigService
+import org.ideplugins.vale_cli_plugin.service.ValeStylesCache
 import org.ideplugins.vale_cli_plugin.settings.*
 import org.ideplugins.vale_cli_plugin.utils.NotificationHelper
 
@@ -27,6 +28,7 @@ class ValeStartupActivity : ProjectActivity {
         checkValeConfig(project)
         runSyncIfNeeded(project, notificationHelper)
         checkIfPluginWasUpdated(notificationHelper)
+        ValeStylesCache.getInstance(project).refresh()
     }
 
     private fun checkValeConfig(project: Project) {

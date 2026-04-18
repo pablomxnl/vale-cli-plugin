@@ -10,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -33,6 +34,7 @@ class ValeDocumentationTargetProviderTest {
         int keyOffset = ini.indexOf("StylesPath") + 1;
         List<? extends DocumentationTarget> keyTargets = provider.documentationTargets(file, keyOffset);
         assertFalse(keyTargets.isEmpty());
+        assertEquals("StylesPath", keyTargets.getFirst().computeDocumentationHint());
         assertNotNull(keyTargets.getFirst().computeDocumentation());
 
         int valueOffset = ini.indexOf("suggestion") + 1;
@@ -42,6 +44,7 @@ class ValeDocumentationTargetProviderTest {
         int sectionOffset = ini.indexOf("formats") + 1;
         List<? extends DocumentationTarget> sectionTargets = provider.documentationTargets(file, sectionOffset);
         assertFalse(sectionTargets.isEmpty());
+        assertEquals("[formats]", sectionTargets.getFirst().computeDocumentationHint());
         assertNotNull(sectionTargets.getFirst().computeDocumentation());
     }
 
@@ -57,6 +60,7 @@ class ValeDocumentationTargetProviderTest {
         int keyOffset = yml.indexOf("message") + 1;
         List<? extends DocumentationTarget> keyTargets = provider.documentationTargets(file, keyOffset);
         assertFalse(keyTargets.isEmpty());
+        assertEquals("message", keyTargets.getFirst().computeDocumentationHint());
         assertNotNull(keyTargets.getFirst().computeDocumentation());
 
         int valueOffset = yml.indexOf("warning") + 1;

@@ -1,6 +1,7 @@
 package org.ideplugins.vale_cli_plugin.documentation;
 
 import com.intellij.openapi.util.TextRange;
+import org.ideplugins.vale_cli_plugin.annotator.ValeRuleDescriptionHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -10,18 +11,36 @@ import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ValeDocumentationResolver {
 
+    public static final String VALE_BUILTIN_STYLE = "Vale";
+    public static final Set<String> STYLE_PROPERTIES = Set.of("BasedOnStyles", "Packages");
+
     private static final Pattern YML_KEY_PATTERN = Pattern.compile("^\\s*([A-Za-z][A-Za-z0-9_-]*)\\s*:");
     private static final Pattern EXTENDS_PATTERN = Pattern.compile(
             "(?mi)^\\s*extends\\s*:\\s*['\"]?([A-Za-z0-9_-]+)['\"]?\\s*(?:#.*)?$"
     );
+    private static final String BUILTIN_VALE_STYLE_MARKDOWN = buildBuiltinValeStyleMarkdown();
     private final Map<String, Optional<String>> resourceCache = new ConcurrentHashMap<>();
     private final ClassLoader classLoader = ValeDocumentationResolver.class.getClassLoader();
+
+    private static @NotNull String buildBuiltinValeStyleMarkdown() {
+        String[] rules = {"Vale.Spelling", "Vale.Terms", "Vale.Avoid", "Vale.Repetition"};
+        StringBuilder md = new StringBuilder(
+                "Vale comes with a single built-in style named `Vale` that implements a few rules:\n\n"
+        );
+        for (String rule : rules) {
+            md.append("- **`").append(rule).append("`**  \n  ")
+              .append(ValeRuleDescriptionHelper.buildBuiltInDescription(rule))
+              .append("\n");
+        }
+        return md.toString();
+    }
 
     public static boolean isValeIniFile(@NotNull String fileName) {
         return fileName.toLowerCase(Locale.ENGLISH).endsWith(".ini");
@@ -31,17 +50,26 @@ public class ValeDocumentationResolver {
         return fileName.toLowerCase(Locale.ENGLISH).endsWith(".yml");
     }
 
-    public @Nullable String resolveForIniOffset(@NotNull String fileText, int offset) {
-        ValeIniSyntax.Property property = ValeIniSyntax.findPropertyKeyAtOffset(fileText, offset);
-        if (property != null) {
-            return readResource("doc/ini/" + property.key() + ".md");
-        }
+    public @NotNull String resolveForBuiltinValeStyle() {
+        return BUILTIN_VALE_STYLE_MARKDOWN;
+    }
 
-        ValeIniSyntax.Section section = ValeIniSyntax.findSectionNameAtOffset(fileText, offset);
-        if (section == null) {
+    public @Nullable String resolveForIniKey(@Nullable String rawKey) {
+        if (rawKey == null || rawKey.isBlank()) {
             return null;
         }
-        return resolveIniSectionDocumentation(section.name());
+        return readResource("doc/ini/" + rawKey.trim() + ".md");
+    }
+
+    public @Nullable String resolveForIniSection(@Nullable String rawSectionName) {
+        if (rawSectionName == null) {
+            return null;
+        }
+        String normalizedSectionName = normalizeIniSectionName(rawSectionName);
+        if (normalizedSectionName.isEmpty()) {
+            return null;
+        }
+        return resolveIniSectionDocumentation(normalizedSectionName);
     }
 
     public @Nullable String resolveForRuleKey(@Nullable String rawRuleKey, @NotNull String fileText) {
@@ -64,12 +92,12 @@ public class ValeDocumentationResolver {
         return readResource("doc/yml/" + extendsValue + "/" + token + ".md");
     }
 
-    public @Nullable String resolveForRuleOffset(@NotNull String fileText, int offset) {
+    public @Nullable String findRuleKeyAtOffset(@NotNull String fileText, int offset) {
         LineToken lineToken = extractLineToken(fileText, offset);
         if (lineToken == null || !lineToken.isOffsetInToken()) {
             return null;
         }
-        return resolveForRuleKey(lineToken.token(), fileText);
+        return lineToken.token();
     }
 
     private @Nullable String mergeExtendsWithExample(@Nullable String extendsValue) {
@@ -108,27 +136,41 @@ public class ValeDocumentationResolver {
         return matcher.group(1).toLowerCase(Locale.ENGLISH);
     }
 
-    private @Nullable LineToken extractLineToken(@NotNull String fileText,
-                                                 int offset) {
+    private @Nullable LineToken extractLineToken(@NotNull String fileText, int offset) {
         if (fileText.isEmpty()) {
             return null;
         }
         int safeOffset = Math.max(0, Math.min(offset, fileText.length()));
-        TextRange lineBounds = ValeIniSyntax.lineRangeAtOffset(fileText, safeOffset);
+        TextRange lineBounds = lineRangeAtOffset(fileText, safeOffset);
 
         String line = fileText.substring(lineBounds.getStartOffset(), lineBounds.getEndOffset());
-        Matcher matcher = ValeDocumentationResolver.YML_KEY_PATTERN.matcher(line);
+        Matcher matcher = YML_KEY_PATTERN.matcher(line);
         if (!matcher.find()) {
             return null;
         }
-        String token = matcher.group(1);
+
+        String token = matcher.group(1).toLowerCase(Locale.ENGLISH);
         int tokenStartInLine = matcher.start(1);
         int tokenEndInLineExclusive = matcher.end(1);
         int column = safeOffset - lineBounds.getStartOffset();
         boolean isInToken = column >= tokenStartInLine && column < tokenEndInLineExclusive;
-        String normalizedToken = token.toLowerCase(Locale.ENGLISH);
+        return new LineToken(token, isInToken);
+    }
 
-        return new LineToken(normalizedToken, isInToken);
+    private @NotNull String normalizeIniSectionName(@NotNull String rawSectionName) {
+        String normalized = rawSectionName.trim();
+        if (normalized.length() >= 2 && normalized.startsWith("[") && normalized.endsWith("]")) {
+            normalized = normalized.substring(1, normalized.length() - 1).trim();
+        }
+        return normalized;
+    }
+
+    private static @NotNull TextRange lineRangeAtOffset(@NotNull String text, int offset) {
+        int lineStart = text.lastIndexOf('\n', Math.max(0, offset - 1));
+        lineStart = lineStart < 0 ? 0 : lineStart + 1;
+        int lineEnd = text.indexOf('\n', offset);
+        lineEnd = lineEnd < 0 ? text.length() : lineEnd;
+        return TextRange.create(lineStart, lineEnd);
     }
 
     private @Nullable String readResource(@NotNull String path) {
@@ -146,6 +188,6 @@ public class ValeDocumentationResolver {
         }
     }
 
-    private record LineToken(String token, boolean isOffsetInToken) {
+    private record LineToken(@NotNull String token, boolean isOffsetInToken) {
     }
 }

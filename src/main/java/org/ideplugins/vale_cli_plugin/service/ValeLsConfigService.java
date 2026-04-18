@@ -79,7 +79,9 @@ public final class ValeLsConfigService {
             LsConfigResponse response = mapper.readValue(stdout, LsConfigResponse.class);
             List<String> configFiles = response.configFiles == null ? List.of() : List.copyOf(response.configFiles);
             List<String> paths = response.paths == null ? List.of() : List.copyOf(response.paths);
-            return new ValeConfigurationPaths(response.rootIni, configFiles, paths);
+            ValeConfigurationPaths result = new ValeConfigurationPaths(response.rootIni, configFiles, paths);
+            ValeStylesCache.getInstance(project).update(result);
+            return result;
         } catch (Exception e) {
             LOGGER.warn("Failed to run vale ls-config", e);
             return ValeConfigurationPaths.empty();
