@@ -2,7 +2,6 @@ package org.ideplugins.vale_cli_plugin.documentation;
 
 import com.intellij.markdown.utils.MarkdownToHtmlConverterKt;
 import com.intellij.model.Pointer;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.platform.backend.documentation.DocumentationResult;
 import com.intellij.platform.backend.documentation.DocumentationTarget;
@@ -11,22 +10,13 @@ import com.intellij.platform.backend.presentation.TargetPresentation;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
-import ini4idea.lang.psi.IniProperty;
-import ini4idea.lang.psi.IniSectionName;
-import org.ideplugins.vale_cli_plugin.service.ValeConfigurationPaths;
-import org.ideplugins.vale_cli_plugin.service.ValeStylesCache;
+import com.intellij.ide.plugins.PluginManager;
+import com.intellij.openapi.extensions.PluginId;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.yaml.psi.YAMLKeyValue;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.InvalidPathException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
 
 // TargetPresentation is marked Experimental in 252/253 SDKs and becomes stable in 261.
 @SuppressWarnings({"UnstableApiUsage"})
@@ -65,72 +55,13 @@ public class ValeDocumentationTargetProvider implements DocumentationTargetProvi
     }
 
     private @Nullable DocumentationRequest findIniDocumentationRequestAt(@NotNull PsiFile psiFile, int offset) {
-        PsiElement element = findLeafElement(psiFile, offset);
-        if (element == null) {
+        // Only attempt INI-specific PSI handling if the ini4idea plugin is present.
+        if (!PluginManager.isPluginInstalled(PluginId.getId("com.jetbrains.plugins.ini4idea"))) {
             return null;
         }
-
-        IniProperty property = PsiTreeUtil.getParentOfType(element, IniProperty.class, false);
-        if (property != null && isOffsetInside(property.getNameElement(), offset)) {
-            String propertyName = property.getName();
-            String markdown = resolver.resolveForIniKey(propertyName);
-            if (markdown != null) {
-                return new DocumentationRequest(propertyName, markdown);
-            }
-        }
-
-        IniSectionName sectionName = PsiTreeUtil.getParentOfType(element, IniSectionName.class, false);
-        if (sectionName != null && isOffsetInside(sectionName, offset)) {
-            String markdown = resolver.resolveForIniSection(sectionName.getText());
-            if (markdown != null) {
-                return new DocumentationRequest(sectionName.getText(), markdown);
-            }
-        }
-
-        if (property != null && ValeDocumentationResolver.STYLE_PROPERTIES.contains(property.getName())) {
-            PsiElement nameEl = property.getNameElement();
-            if (nameEl == null || !isOffsetInside(nameEl, offset)) {
-                String styleName = ValeIniStyleGotoDeclarationHandler.extractStyleAtOffset(property, offset);
-                if (styleName != null && !styleName.isBlank()) {
-                    String markdown = resolveStyleDocumentation(styleName, psiFile.getProject());
-                    if (markdown != null) {
-                        return new DocumentationRequest(styleName, markdown);
-                    }
-                }
-            }
-        }
-
-        return null;
-    }
-
-    private @Nullable String resolveStyleDocumentation(@NotNull String styleName, @NotNull Project project) {
-        if (ValeDocumentationResolver.VALE_BUILTIN_STYLE.equals(styleName)) {
-            return resolver.resolveForBuiltinValeStyle();
-        }
-        ValeConfigurationPaths paths = ValeStylesCache.getInstance(project).getCachedPaths();
-        return findStyleReadme(styleName, paths);
-    }
-
-    private @Nullable String findStyleReadme(@NotNull String styleName,
-                                              @NotNull ValeConfigurationPaths paths) {
-        for (String rawPath : paths.paths()) {
-            if (rawPath == null || rawPath.isBlank()) continue;
-            try {
-                Path styleDir = Paths.get(rawPath.trim()).resolve(styleName);
-                if (!Files.isDirectory(styleDir)) continue;
-                try (Stream<Path> entries = Files.list(styleDir)) {
-                    Optional<Path> readme = entries
-                            .filter(p -> p.getFileName().toString().equalsIgnoreCase("readme.md"))
-                            .findFirst();
-                    if (readme.isPresent()) {
-                        return Files.readString(readme.get());
-                    }
-                } catch (IOException ignore) {
-                }
-            } catch (InvalidPathException ignore) {
-            }
-        }
-        return null;
+        IniDocumentationHelper.IniDoc res = IniDocumentationHelper.findIniDocumentationRequestAt(psiFile, offset, resolver);
+        if (res == null) return null;
+        return new DocumentationRequest(res.presentableText(), res.markdown());
     }
 
     private @Nullable DocumentationRequest findYamlDocumentationRequest(@NotNull PsiFile psiFile, int offset) {
@@ -185,14 +116,6 @@ public class ValeDocumentationTargetProvider implements DocumentationTargetProvi
         }
         int safeOffset = clampOffset(offset, psiFile.getTextLength());
         return psiFile.findElementAt(safeOffset);
-    }
-
-    private boolean isOffsetInside(@Nullable PsiElement element, int offset) {
-        if (element == null) {
-            return false;
-        }
-        TextRange range = element.getTextRange();
-        return range != null && range.containsOffset(offset);
     }
 
     private int clampOffset(int offset, int textLength) {

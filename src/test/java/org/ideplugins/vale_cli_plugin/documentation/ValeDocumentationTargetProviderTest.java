@@ -1,10 +1,14 @@
 package org.ideplugins.vale_cli_plugin.documentation;
 
+import com.intellij.openapi.application.Application;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.platform.backend.documentation.DocumentationTarget;
 import com.intellij.psi.PsiFile;
+import com.intellij.testFramework.common.ThreadLeakTracker;
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture;
 import org.ideplugins.vale_cli_plugin.testing.PluginTest;
 import org.ideplugins.vale_cli_plugin.testing.RunInEdtExtension;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -20,6 +24,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ValeDocumentationTargetProviderTest {
 
     private final ValeDocumentationTargetProvider provider = new ValeDocumentationTargetProvider();
+
+    @BeforeEach
+    public void setUp() {
+        Application app = ApplicationManager.getApplication();
+        //noinspection UnstableApiUsage
+        ThreadLeakTracker.longRunningThreadCreated(app, "SystemPropertyWatcher");
+    }
 
     @Test
     void shouldProvideIniDocumentationOnlyOnKey(CodeInsightTestFixture fixture) {
