@@ -39,6 +39,7 @@ public class BaseTest {
     @BeforeEach
     public void setUp() {
         Application app = ApplicationManager.getApplication();
+        //noinspection UnstableApiUsage
         ThreadLeakTracker.longRunningThreadCreated(app, "SystemPropertyWatcher");
         NotificationsConfiguration notificationsConfiguration = NotificationsConfiguration.getNotificationsConfiguration();
         notificationsConfiguration.register(Constants.VALE_NOTIFICATION_GROUP, NotificationDisplayType.BALLOON, false, false);
