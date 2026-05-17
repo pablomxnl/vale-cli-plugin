@@ -70,7 +70,7 @@ public class ValeIniStyleGotoDeclarationHandler implements GotoDeclarationHandle
             return PsiElement.EMPTY_ARRAY;
         }
 
-        VirtualFile vFile = LocalFileSystem.getInstance().refreshAndFindFileByPath(styleFolder.toString());
+        VirtualFile vFile = LocalFileSystem.getInstance().findFileByPath(styleFolder.toString());
         if (vFile == null || !vFile.isDirectory()) {
             notifyStyleNotFound(project, styleName);
             return PsiElement.EMPTY_ARRAY;
