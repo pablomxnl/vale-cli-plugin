@@ -1,12 +1,9 @@
 package org.ideplugins.vale_cli_plugin.settings;
 
-import com.intellij.ide.plugins.IdeaPluginDescriptor;
-import com.intellij.ide.plugins.PluginManagerCore;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
-import com.intellij.openapi.extensions.PluginId;
 import com.intellij.util.xmlb.annotations.MapAnnotation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -23,13 +20,12 @@ public final class ValeCliPluginConfigurationState
 
     private static final String LAST_VERSION = "lastVersion";
     private static final String SENTRY_DSN = "sentryDsn";
+    private static final ResourceBundle BUNDLE = ResourceBundle.getBundle(PLUGIN_BUNDLE);
 
     private PluginSettings settings = createInitialSettings();
 
     private PluginSettings createInitialSettings() {
-        Optional<IdeaPluginDescriptor> optional =
-                Optional.ofNullable(PluginManagerCore.getPlugin(PluginId.getId(PLUGIN_ID)));
-        return PluginSettings.create(optional.isPresent()? optional.get().getVersion() : "");
+        return PluginSettings.create(BUNDLE.getString("vale.cli.plugin.version"));
     }
 
     @Override

@@ -10,7 +10,6 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.ErrorReportSubmitter;
 import com.intellij.openapi.diagnostic.IdeaLoggingEvent;
 import com.intellij.openapi.diagnostic.SubmittedReportInfo;
-import com.intellij.openapi.extensions.PluginDescriptor;
 import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.Task;
@@ -31,15 +30,17 @@ import org.jetbrains.annotations.Nullable;
 import java.awt.Component;
 import java.io.File;
 import java.util.List;
+import java.util.ResourceBundle;
 
-import static com.intellij.ide.plugins.PluginManagerCore.getPlugin;
+import static org.ideplugins.vale_cli_plugin.Constants.PLUGIN_BUNDLE;
 import static org.ideplugins.vale_cli_plugin.Constants.PLUGIN_ID;
 
 public class SentryErrorReporter extends ErrorReportSubmitter {
 
     private static boolean isSentryInit;
+    private static final ResourceBundle BUNDLE = ResourceBundle.getBundle(PLUGIN_BUNDLE);
 
-    static synchronized void initSentry(final PluginDescriptor pluginDescriptor) {
+    static synchronized void initSentry() {
         if (!isSentryInit) {
             ValeCliPluginConfigurationState pluginSettings =
                     ApplicationManager.getApplication().getService(ValeCliPluginConfigurationState.class);
@@ -47,10 +48,10 @@ public class SentryErrorReporter extends ErrorReportSubmitter {
             final String operatingSystem = getOperatingSystem();
             Sentry.init(options -> {
                 options.setDsn(pluginSettings.getSentryDsn());
-                options.setRelease(pluginDescriptor.getVersion());
+                options.setRelease(BUNDLE.getString("vale.cli.plugin.version"));
                 options.setServerName("");
                 options.setSendDefaultPii(false);
-                options.setEnvironment(pluginDescriptor.getPluginId().getIdString());
+                options.setEnvironment(PLUGIN_ID);
                 options.setDiagnosticLevel(SentryLevel.ERROR);
             });
 
@@ -105,16 +106,11 @@ public class SentryErrorReporter extends ErrorReportSubmitter {
         }
     }
 
-    private PluginDescriptor getMyPluginDescriptor() {
-        var pluginId = PluginId.getId(PLUGIN_ID);
-        return getPlugin(pluginId);
-    }
-
-    private void showOutdatedPluginErrorNotification(PluginDescriptor descriptor, NotificationHelper helper) {
+    private void showOutdatedPluginErrorNotification(NotificationHelper helper) {
         ApplicationManager.getApplication().invokeLater(() ->
                   helper.showNotificationWithGoToPluginsAction(
                           "Error won't be submitted because there is a newer version available",
-                          "Update %s Plugin".formatted(descriptor.getName()),
+                          "Update %s Plugin".formatted("Vale CLI Plugin"),
                           NotificationType.ERROR)
         );
     }
@@ -143,11 +139,10 @@ public class SentryErrorReporter extends ErrorReportSubmitter {
                           @NotNull Consumer<? super SubmittedReportInfo> consumer) {
         DataContext context = DataManager.getInstance().getDataContext(parentComponent);
         Project project = CommonDataKeys.PROJECT.getData(context);
-        PluginDescriptor pluginDescriptor = getMyPluginDescriptor();
-        initSentry(pluginDescriptor);
+        initSentry();
         InstalledPluginsState pluginState = InstalledPluginsState.getInstance();
-        if (pluginState.hasNewerVersion(pluginDescriptor.getPluginId())) {
-            showOutdatedPluginErrorNotification(pluginDescriptor, new NotificationHelper(project));
+        if (pluginState.hasNewerVersion(PluginId.getId(PLUGIN_ID))) {
+            showOutdatedPluginErrorNotification(new NotificationHelper(project));
             consumer.consume(new SubmittedReportInfo(SubmittedReportInfo.SubmissionStatus.DUPLICATE));
             return true;
         }
