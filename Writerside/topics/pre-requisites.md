@@ -5,6 +5,7 @@ The plugin requires:
 * Vale CLI tool installed and available in the system path.
 * To support _AsciiDoc_ files, the plugin requires asciidoctor available in the system path. (optional)
 * To support _reStructuredText_ files, the plugin requires docutils available in the system path. (optional)
+* Plugin [`ini4idea`](https://plugins.jetbrains.com/plugin/6981-ini) installed.
 
 > **Make sure these dependencies are available on your system path**
 >

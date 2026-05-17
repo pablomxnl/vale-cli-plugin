@@ -7,8 +7,9 @@ This document provides an overview of the changes by release.
 [[releasenotes]]
 == Release notes
 
-=== 0.0.36 [unreleased]
+=== 0.0.36
 - Fixes https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/65[#65] Do not perform a synchronous refresh under read lock
+- Fixes https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/66[#66] java.lang.ClassNotFoundException: ini4idea.lang.psi.IniProperty
 
 === 0.0.35
 - Implements https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/58[#58] Autocompletion and navigation to rules from .vale.ini files
