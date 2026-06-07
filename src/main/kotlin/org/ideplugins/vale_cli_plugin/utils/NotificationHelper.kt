@@ -1,7 +1,6 @@
 package org.ideplugins.vale_cli_plugin.utils
 
 import com.intellij.ide.BrowserUtil
-import com.intellij.ide.IdeBundle
 import com.intellij.notification.Notification
 import com.intellij.notification.NotificationAction
 import com.intellij.notification.NotificationGroup
@@ -106,7 +105,7 @@ class NotificationHelper(
         addAction(
             NotificationAction.createSimple(text) {
                 ShowSettingsUtil.getInstance()
-                    .showSettingsDialog(project, IdeBundle.message("title.plugins"))
+                    .showSettingsDialog(project, bundle.getString("ide.plugin.settings"))
             }
         )
 
