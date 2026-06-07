@@ -12,7 +12,7 @@ assertj = "3.27.7"
 mockito = "5.11.0"
 
 # plugins
-gradleIntelliJPlugin = "2.15.0"
+gradleIntelliJPlugin = "2.16.0"
 semver = "1.0.4"
 asciidoc = "5.0.0-alpha.1"
 kotlin = "2.2.21"

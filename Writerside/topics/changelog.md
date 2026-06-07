@@ -5,6 +5,9 @@ This document provides an overview of the changes by release.
 
 ## Release notes
 
+### 0.0.37
+* Remove usage of internal classes for 2026.2 EAP compatibility
+
 ### 0.0.36
 * Fixes [#65](https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/65) Do not perform a synchronous refresh under read lock
 * Fixes [#66](https://gitlab.com/pablomxnl/vale-cli-plugin/-/issues/66) java.lang.ClassNotFoundException: ini4idea.lang.psi.IniProperty
