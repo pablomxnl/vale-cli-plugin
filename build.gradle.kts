@@ -36,7 +36,7 @@ asciidoc {
             sourceSet {
                 setSourceDir(project.projectDir.path)
                 sources {
-                    include("CHANGELOG.adoc")
+                    include("changelog.adoc")
                 }
             }
             output("asciidoctorj", "html")
@@ -91,7 +91,7 @@ tasks.register<DefaultTask>("printCoverageForGitlab") {
 
 dependencies {
     intellijPlatform {
-        intellijIdeaCommunity("2025.2")
+        intellijIdea("2025.3.6")
         compatiblePlugin("com.jetbrains.plugins.ini4idea")
         bundledPlugin("org.jetbrains.plugins.yaml")
         testBundledPlugin("org.jetbrains.plugins.yaml")
@@ -186,32 +186,33 @@ tasks {
 
 }
 
-// Task to update CHANGELOG.adoc and Writerside/v.list after version bump
+// Task to update changelog.adoc and Writerside/v.list after version bump
 tasks.register<DefaultTask>("updateVersionInDocs") {
+    description = "update version everywhere"
     doLast {
         val ver = project.version.toString()
 
-        // --- CHANGELOG.adoc update ---
-        val changelog = file("CHANGELOG.adoc")
+        // --- changelog.adoc update ---
+        val changelog = file("changelog.adoc")
         if (!changelog.exists()) {
-            throw GradleException("CHANGELOG.adoc not found at: ${changelog.path}")
+            throw GradleException("changelog.adoc not found at: ${changelog.path}")
         }
 
         val lines = changelog.readLines().toMutableList()
         val releaseHeaderIndex = lines.indexOfFirst { it.trim() == "== Release notes" }
         if (releaseHeaderIndex == -1) {
-            throw GradleException("No '== Release notes' header found in CHANGELOG.adoc. Please add it before running incrementPatch.")
+            throw GradleException("No '== Release notes' header found in changelog.adoc. Please add it before running incrementPatch.")
         }
 
         // Idempotency: skip if a section for this version already exists
         val sectionExists = lines.any { it.trim().startsWith("=== $ver") }
         if (sectionExists) {
-            logger.lifecycle("CHANGELOG.adoc already contains a section for version $ver; skipping changelog update.")
+            logger.lifecycle("changelog.adoc already contains a section for version $ver; skipping changelog update.")
         } else {
             // Backup
             val changelogBak = file("${changelog.path}.bak")
             changelog.copyTo(changelogBak, overwrite = true)
-            logger.lifecycle("Backed up CHANGELOG.adoc to ${changelogBak.path}")
+            logger.lifecycle("Backed up changelog.adoc to ${changelogBak.path}")
 
             // Prepare insertion block. Keep blank lines around sections and preserve list indentation.
             val insertBlock = listOf(
@@ -227,7 +228,7 @@ tasks.register<DefaultTask>("updateVersionInDocs") {
 
             // Write back
             changelog.writeText(lines.joinToString("\n"))
-            logger.lifecycle("Inserted unreleased section for version $ver into CHANGELOG.adoc")
+            logger.lifecycle("Inserted unreleased section for version $ver into changelog.adoc")
         }
 
         // --- Writerside/v.list update ---
@@ -257,6 +258,45 @@ tasks.register<DefaultTask>("updateVersionInDocs") {
             vlist.writeText(newVText)
             logger.lifecycle("Updated plugin_version in Writerside/v.list to $ver")
         }
+
+        // --- Update plugin properties file ---
+        val propFile = file("src/main/resources/ValePlugin.properties")
+        if (!propFile.exists()) {
+            throw GradleException("Plugin properties file not found at: ${propFile.path}")
+        }
+
+        val propKey = "vale.cli.plugin.version"
+        val propsText = propFile.readText()
+        val keyRegex = Regex("^${Regex.escape(propKey)}\\s*=.*$", RegexOption.MULTILINE)
+
+        val newPropsText = if (keyRegex.containsMatchIn(propsText)) {
+            propsText.replace(keyRegex, "$propKey=$ver")
+        } else {
+            // Append property if missing
+            propsText.trimEnd() + "\n$propKey=$ver\n"
+        }
+
+        if (newPropsText == propsText) {
+            logger.lifecycle("${propFile.path} already up-to-date with $propKey=$ver; skipping.")
+        } else {
+            val propBak = file("${propFile.path}.bak")
+            propFile.copyTo(propBak, overwrite = true)
+            logger.lifecycle("Backed up ${propFile.path} to ${propBak.path}")
+
+            propFile.writeText(newPropsText)
+            logger.lifecycle("Updated $propKey in ${propFile.path} to $ver")
+        }
+        // --- Regenerate Writerside changelog.md from changelog.adoc ---
+        val downdoc = providers.exec {
+            commandLine("downdoc", "changelog.adoc", "-o", "Writerside/topics/changelog.md")
+            workingDir = projectDir
+        }
+        downdoc.result.get().assertNormalExitValue()
+        val downdocOutput = downdoc.standardOutput.asText.get()
+        if (downdocOutput.isNotBlank()) {
+            logger.lifecycle(downdocOutput)
+        }
+        logger.lifecycle("Regenerated Writerside/topics/changelog.md from changelog.adoc")
     }
 }
 

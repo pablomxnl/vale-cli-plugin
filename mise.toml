@@ -1,5 +1,5 @@
 [tools]
-gradle = "9.1.0"
+gradle = "9.6.1"
 java = "temurin-21"
 node = "24.13.0"
 "github:errata-ai/vale" = "3.13.0"

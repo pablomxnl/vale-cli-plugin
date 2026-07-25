@@ -1,7 +1,7 @@
 FROM debian:12-slim
 RUN apt-get update  \
     && apt-get -y --no-install-recommends install \
-        # install any other dependencies you might need
+        # install any other dependencies you might need \
         sudo curl ca-certificates fontconfig \
     && rm -rf /var/lib/apt/lists/*
 RUN groupadd -g 1000 gradle \
@@ -20,7 +20,7 @@ RUN curl https://mise.run | MISE_DATA_DIR="/opt/mise/data" MISE_CONFIG_DIR="/opt
 RUN echo 'eval "$(/usr/local/bin/mise activate bash)"' >> /root/.bashrc
 RUN mise install
 RUN mkdir -p "/home/gradle/project" && cd /home/gradle/project && touch mise.toml && mise trust --ignore mise.toml
-RUN chown -R gradle:gradle /home/gradle
+RUN chown -R gradle:gradle /home/gradle /opt/mise/state
 USER gradle
 WORKDIR /home/gradle
 COPY --chown=gradle .vale.ini ./
