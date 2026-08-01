@@ -51,7 +51,7 @@ tasks.named("asciidoctorHtml"){
 }
 
 @Suppress("unused")
-val runIdeForManualTests by intellijPlatformTesting.runIde.registering {
+val runIdeForManualTests = intellijPlatformTesting.runIde.register("runIdeForManualTests") {
     prepareSandboxTask {
         sandboxDirectory = project.layout.buildDirectory.dir("custom-sandbox")
         sandboxSuffix = ""
@@ -73,7 +73,7 @@ val runIdeForManualTests by intellijPlatformTesting.runIde.registering {
 }
 
 @Suppress("unused")
-val runIdeEAP by intellijPlatformTesting.runIde.registering {
+val runIdeEAP = intellijPlatformTesting.runIde.register("runIdeEAP") {
     type = IntelliJPlatformType.IntellijIdea
     version = "253-EAP-SNAPSHOT"
     useInstaller = false

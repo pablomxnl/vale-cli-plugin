@@ -6,7 +6,7 @@ RUN apt-get update  \
     && rm -rf /var/lib/apt/lists/*
 RUN groupadd -g 1000 gradle \
  && useradd -u 1000 -g 1000 -m -d /home/gradle gradle
-COPY mise-ci.toml /opt/mise/config/mise.toml
+COPY mise.toml /opt/mise/config/mise.toml
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 ENV MISE_DATA_DIR="/opt/mise/data"
 ENV MISE_CONFIG_DIR="/opt/mise/config"

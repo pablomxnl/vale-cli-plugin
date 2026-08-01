@@ -1,4 +1,5 @@
 stages:
+  - dockerbuild
   - build
   - deploy
   - release
@@ -10,17 +11,10 @@ variables:
   ARTIFACT: webHelpPD2-all.zip
   WRS_VERSION: "2025.03.8312"
 
-image: registry.gitlab.com/pablomxnl/vale-cli-plugin/builder:0.0.37
+image: registry.gitlab.com/pablomxnl/vale-cli-plugin/builder:latest
 default:
   tags:
     - saas-linux-medium-amd64
-
-cache:
-  key: "$CI_JOB_NAME"
-  paths:
-    - .gradle/caches/modules-2
-    - .gradle/caches/build-cache-1
-    - .intellijPlatform
 
 .build_release:
   stage: build
@@ -114,7 +108,13 @@ build-documentation:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_SOURCE_PROJECT_ID != $CI_PROJECT_ID'
       when: never
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - Writerside/
+        - changelog.adoc
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        - Writerside/
+        - changelog.adoc
   script:
     - set -e
     - export DISPLAY=:99
@@ -128,11 +128,12 @@ build-documentation:
 
 pages:
   stage: deploy
-  image: alpine:latest
+  image: registry.gitlab.com/pablomxnl/vale-cli-plugin/releaser:latest
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-  before_script:
-    - apk add zip
+      changes:
+        - Writerside/
+        - changelog.adoc
   script:
     - cp -R build/reports/jacoco/test public/
     - mv public/test public/coverage
@@ -151,26 +152,29 @@ publish_docs_staging_marketplace:
     - pages
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        - Writerside/
+        - changelog.adoc
   variables:
     TEAMCITY_BUILD_CONFIG_ID: $TEAMCITY_STAGING_BUILD_CONFIG_ID
 
 prepare_release_notes:
   stage: build
-  image: docker.io/library/node:lts-alpine
+  image: registry.gitlab.com/pablomxnl/vale-cli-plugin/releaser:latest
   rules:
     - if: '$CI_COMMIT_TAG =~ /^\d+\.\d+\.\d+$/'
   script:
-    - npm i -g downdoc
     - downdoc changelog.adoc
     - awk '/^### /{if(x)exit;x=1}x' changelog.md > release_notes.md
   artifacts:
     paths:
       - release_notes.md
 
-
 release_job:
   stage: release
-  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  image: registry.gitlab.com/pablomxnl/vale-cli-plugin/releaser:latest
+  variables:
+    GLAB_ENABLE_CI_AUTOLOGIN: 'true'
   needs:
     - job: prepare_release_notes
       artifacts: true
@@ -179,16 +183,12 @@ release_job:
   rules:
     - if: '$CI_COMMIT_TAG =~ /^\d+\.\d+\.\d+$/'
   script:
-    - echo "Creating release"
-  release:
-    name: 'Release $CI_COMMIT_TAG'
-    description: release_notes.md
-    tag_name: '$CI_COMMIT_TAG'
-    ref: '$CI_COMMIT_SHA'
-    assets:
-      links:
-        - name: "Vale CLI Plugin v$CI_COMMIT_TAG for Jetbrain's IDEs"
-          url: "$CI_SERVER_URL/$CI_PROJECT_PATH/-/jobs/$CI_JOB_ID/artifacts/file/build/distributions/vale-cli-plugin-$CI_COMMIT_TAG.zip"
+    - |
+      glab release create "$CI_COMMIT_TAG" \
+        --name "Release $CI_COMMIT_TAG" \
+        --ref "$CI_COMMIT_SHA" \
+        --notes-file release_notes.md \
+        --assets-links="[{\"name\": \"Vale CLI Plugin v$CI_COMMIT_TAG for Jetbrain's IDEs\", \"url\": \"$CI_SERVER_URL/$CI_PROJECT_PATH/-/jobs/$CI_JOB_ID/artifacts/file/build/distributions/vale-cli-plugin-$CI_COMMIT_TAG.zip\", \"link_type\": \"other\"}]"
   artifacts:
     when: always
     paths:
@@ -219,3 +219,65 @@ publish_docs_marketplace:
       when: manual
   variables:
     TEAMCITY_BUILD_CONFIG_ID: $TEAMCITY_PRODUCTION_BUILD_CONFIG_ID
+
+.build_docker_image:
+  stage: dockerbuild
+  image:
+    name: moby/buildkit:rootless
+    entrypoint: [""]
+  variables:
+    BUILDKITD_FLAGS: --oci-worker-no-process-sandbox
+  before_script:
+    - mkdir -p ~/.docker
+    - |
+      echo "{\"auths\":{\"$CI_REGISTRY\":{\"auth\":\"$(echo -n "$CI_REGISTRY_USER:$CI_REGISTRY_PASSWORD" | base64 | tr -d '\n')\"}}}" > ~/.docker/config.json
+  script:
+    - buildctl-daemonless.sh build
+      --frontend dockerfile.v0
+      --local context="$CI_PROJECT_DIR"
+      --local dockerfile="$DOCKERFILE_DIR"
+      --output type=image,\"name=$CI_REGISTRY_IMAGE/$IMAGE_NAME:$IMAGE_VERSION,$CI_REGISTRY_IMAGE/$IMAGE_NAME:latest\",push=true
+
+get_project_version:
+  stage: dockerbuild
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        - docker/builder/Dockerfile
+        - docker/releaser/Dockerfile
+        - mise.toml
+  script:
+    - echo "BUILDER_VERSION=$(gradle properties | grep '^version:' | awk '{printf $2}')" >> build.env
+  artifacts:
+    reports:
+      dotenv: build.env
+
+build_builder_image:
+  extends: .build_docker_image
+  needs:
+    - job: get_project_version
+      artifacts: true
+  variables:
+    DOCKERFILE_DIR: "$CI_PROJECT_DIR/docker/builder"
+    IMAGE_NAME: builder
+    IMAGE_VERSION: $BUILDER_VERSION
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        - docker/builder/Dockerfile
+        - mise.toml
+
+build_release_builder_image:
+  extends: .build_docker_image
+  needs:
+    - job: get_project_version
+      artifacts: true
+  variables:
+    DOCKERFILE_DIR: "$CI_PROJECT_DIR/docker/releaser"
+    IMAGE_NAME: releaser
+    IMAGE_VERSION: $BUILDER_VERSION
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        - docker/releaser/Dockerfile
+        - mise.toml
