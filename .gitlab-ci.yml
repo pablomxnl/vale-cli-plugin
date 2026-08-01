@@ -240,6 +240,7 @@ publish_docs_marketplace:
 
 get_project_version:
   stage: dockerbuild
+  image: alpine:3.20
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       changes:
@@ -247,7 +248,7 @@ get_project_version:
         - docker/releaser/Dockerfile
         - mise.toml
   script:
-    - echo "BUILDER_VERSION=$(gradle properties | grep '^version:' | awk '{printf $2}')" >> build.env
+    - echo "BUILDER_VERSION=$(grep '^version.semver=' version.properties | cut -d= -f2-)" >> build.env
   artifacts:
     reports:
       dotenv: build.env
